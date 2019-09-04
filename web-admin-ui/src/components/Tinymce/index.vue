@@ -8,7 +8,6 @@
 </template>
 
 <script>
-// import editorImage from './components/editorImage'
 import plugins from './plugins'
 import toolbar from './toolbar'
 import materialLibrary from '@/components/materialLibrary'

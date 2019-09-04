@@ -19,7 +19,7 @@
             <i :class="child.meta.icon"></i>
             <span slot="title">{{child.meta.name}}</span>
           </el-menu-item>
-          <sidebar-item v-else :menu="[child]" :key="cindex" :isCollapse="isCollapse"></sidebar-item>
+          <sidebar-item v-else :menu="[child]" :key="cindex"></sidebar-item>
         </template>
       </el-submenu>
     </template>
