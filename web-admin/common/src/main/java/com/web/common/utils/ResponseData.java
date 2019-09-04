@@ -5,11 +5,11 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * controller返回值
+ * controller层返回值
  * @param <T>
  */
 @Data
-public class ResData<T> implements Serializable {
+public class ResponseData<T> implements Serializable {
     private Integer code;
     private String message;
     private Long timestamp;
@@ -21,26 +21,26 @@ public class ResData<T> implements Serializable {
     private static Integer FAIL_CODE = 500;
     private static String FAIL_MESSAGE = "失败";
 
-    public ResData(Integer code, String message, T data) {
+    public ResponseData(Integer code, String message, T data) {
         this.code = code;
         this.message = message;
         this.data = data;
         this.timestamp = System.currentTimeMillis();
     }
 
-    public static <T> ResData success(T data) {
-        return new ResData<>(SUCCESS_CODE, SUCCESS_MESSAGE, data);
+    public static <T> ResponseData success(T data) {
+        return new ResponseData<>(SUCCESS_CODE, SUCCESS_MESSAGE, data);
     }
 
-    public static <T> ResData fail() {
+    public static ResponseData fail() {
         return fail(FAIL_CODE, FAIL_MESSAGE);
     }
 
-    public static <T> ResData fail(String message) {
+    public static ResponseData fail(String message) {
         return fail(FAIL_CODE, message);
     }
 
-    public static <T> ResData fail(Integer code, String message) {
-        return new ResData<>(code, message, null);
+    public static ResponseData fail(Integer code, String message) {
+        return new ResponseData<>(code, message, null);
     }
 }

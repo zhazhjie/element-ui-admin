@@ -110,9 +110,9 @@ public class CodeGenerator {
         strategy.setSuperEntityClass("com.web.model.BaseModel");
         strategy.setEntityLombokModel(true);
         strategy.setRestControllerStyle(true);
-//        strategy.setSuperControllerClass("com.baomidou.ant.common.BaseController");
+//        strategy.setSuperControllerClass("com.web.admin.BaseController");
         strategy.setInclude(scanner("表名"));
-        strategy.setSuperEntityColumns("id");
+        strategy.setSuperEntityColumns("id","create_time","update_time");
         strategy.setControllerMappingHyphenStyle(true);
         strategy.setTablePrefix(pc.getModuleName() + "_");
         mpg.setStrategy(strategy);

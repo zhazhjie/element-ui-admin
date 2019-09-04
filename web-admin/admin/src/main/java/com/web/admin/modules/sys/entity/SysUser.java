@@ -1,7 +1,6 @@
 package com.web.admin.modules.sys.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import com.web.model.BaseModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,13 +12,13 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author zzj
- * @since 2019-09-03
+ * @since 2019-09-04
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("sys_user")
-public class User extends BaseModel {
+public class SysUser extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
@@ -72,16 +71,6 @@ public class User extends BaseModel {
      * 更新人
      */
     private Long updateBy;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
 
 
 }

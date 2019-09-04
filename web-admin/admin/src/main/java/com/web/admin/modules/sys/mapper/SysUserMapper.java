@@ -1,6 +1,6 @@
 package com.web.admin.modules.sys.mapper;
 
-import com.web.admin.modules.sys.entity.User;
+import com.web.admin.modules.sys.entity.SysUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author zzj
- * @since 2019-09-03
+ * @since 2019-09-04
  */
-public interface UserMapper extends BaseMapper<User> {
+public interface SysUserMapper extends BaseMapper<SysUser> {
 
 }

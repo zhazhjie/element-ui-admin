@@ -26,6 +26,7 @@
 		<mybatisplus.spring.boot.version>3.0.5</mybatisplus.spring.boot.version>
 		<mysql.version>5.1.44</mysql.version>
 		<shiro.version>1.4.0</shiro.version>
+		<commons-lang.version>2.6</commons-lang.version>
 	</properties>
 
 	<dependencies>
@@ -33,6 +34,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>${commons-lang.version}</version>
 		</dependency>
 	</dependencies>
 
