@@ -65,7 +65,22 @@ export default new Router({
             },
           ]
         },
-
+        {
+          path: 'sys',
+          meta:{
+            name:'说明'
+          },
+          component: (resolve)=>require(['@/views/routerView'],resolve),
+          children:[
+            {
+              path: 'user',
+              meta:{
+                name:'说明'
+              },
+              component: (resolve)=>require(['@/views/sys/user'],resolve),
+            },
+          ]
+        },
 
       ],
     },

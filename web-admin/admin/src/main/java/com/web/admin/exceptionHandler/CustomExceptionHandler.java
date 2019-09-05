@@ -33,7 +33,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(WebException.class)
     public ResponseData handleWebException(WebException e) {
         log.error("业务异常", e);
-        return ResponseData.fail(e.getCode(), e.getMsg());
+        return ResponseData.fail(e.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

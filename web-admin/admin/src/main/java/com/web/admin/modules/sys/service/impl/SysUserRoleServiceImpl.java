@@ -26,7 +26,7 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
             SysUserRole sysUserRole = new SysUserRole();
             sysUserRole.setRoleId(roleId);
             sysUserRole.setUserId(userId);
-            this.baseMapper.insert(sysUserRole);
+            baseMapper.insert(sysUserRole);
         });
     }
 }

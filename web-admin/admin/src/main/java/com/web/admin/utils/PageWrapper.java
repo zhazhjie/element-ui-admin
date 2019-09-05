@@ -27,11 +27,11 @@ public class PageWrapper<T> implements Serializable {
     }
 
     public PageWrapper(Map<String, Object> params) {
-        if (params.get("curPage") != null) {
-            current = Integer.parseInt((String) params.get("curPage"));
+        if (params.get("current") != null) {
+            current = Integer.parseInt((String) params.get("current"));
         }
-        if (params.get("pageSize") != null) {
-            size = Integer.parseInt((String) params.get("pageSize"));
+        if (params.get("size") != null) {
+            size = Integer.parseInt((String) params.get("size"));
         }
         this.page=new Page<T>(current,size);
     }

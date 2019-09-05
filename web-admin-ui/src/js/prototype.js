@@ -44,12 +44,7 @@ Vue.prototype.routeBack = function(){
     ? this.$router.go(-1)
     : this.$router.replace('/')
 };
-// Vue.prototype.throttle = function(callback) {
-//   clearTimeout(callback.id);
-//   callback.id = setTimeout(() => {
-//     callback()
-//   }, 20)
-// };
+
 Vue.prototype.formatAmount=formatAmount;
 Vue.filter('formatAmount',formatAmount);
 

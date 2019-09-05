@@ -56,7 +56,7 @@ public class SysUserDTO extends BaseModel {
     private String avatar;
 
     /**
-     * 状态  0：正常   1：禁用
+     * 状态  1：正常   0：禁用
      */
     private Integer state;
 
@@ -75,5 +75,5 @@ public class SysUserDTO extends BaseModel {
      */
     private Long updateBy;
 
-    private List<Long> roleIds;
+    private List<Long> roleIdList;
 }

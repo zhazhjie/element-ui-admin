@@ -1,6 +1,8 @@
 package com.web.admin.config;
 
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.alibaba.fastjson.serializer.ValueFilter;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
@@ -8,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -35,9 +38,14 @@ public class FastJsonConfiguration {
                 //格式化Date对象，默认为yyyy-MM-dd hh:mm:ss。
                 SerializerFeature.WriteDateUseDateFormat
         );
-        ValueFilter valueFilter = (Object var1, String var2, Object var3) -> var3 == null ? "" : var3 instanceof Long ? var3.toString() : var3;
+        ValueFilter valueFilter = (Object var1, String var2, Object var3) -> var3 == null ? "" : var3;
+        SerializeConfig serializeConfig = SerializeConfig.globalInstance;
+        serializeConfig.put(BigInteger.class, ToStringSerializer.instance);
+        serializeConfig.put(Long.class, ToStringSerializer.instance);
+        serializeConfig.put(Long.TYPE, ToStringSerializer.instance);
         fastJsonConfig.setCharset(Charset.forName("utf-8"));
         fastJsonConfig.setSerializeFilters(valueFilter);
+        fastJsonConfig.setSerializeConfig(serializeConfig);
         converter.setFastJsonConfig(fastJsonConfig);
         ArrayList<MediaType> mediaTypes = new ArrayList<>();
         mediaTypes.add(MediaType.APPLICATION_JSON_UTF8);

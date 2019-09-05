@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 /**
  * controller层返回值
+ *
  * @param <T>
  */
 @Data
@@ -30,6 +31,10 @@ public class ResponseData<T> implements Serializable {
 
     public static <T> ResponseData success(T data) {
         return new ResponseData<>(SUCCESS_CODE, SUCCESS_MESSAGE, data);
+    }
+
+    public static ResponseData success() {
+        return success(null);
     }
 
     public static ResponseData fail() {

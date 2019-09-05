@@ -2,7 +2,7 @@ import request from '@/js/request'
 
 export function fetchList(query) {
   return request({
-    url: '/sys/user/list',
+    url: '/sys/user/listPage',
     method: 'get',
     params: query
   })
@@ -11,7 +11,7 @@ export function fetchList(query) {
 export function addObj(obj) {
   return request({
     url: '/sys/user/add',
-    method: 'post',
+    method: 'put',
     data: obj
   })
 }
@@ -26,7 +26,7 @@ export function getObj(id) {
 export function delObj(id) {
   return request({
     url: '/sys/user/delete',
-    method: 'post',
+    method: 'delete',
     data: id
   })
 }
@@ -41,7 +41,7 @@ export function updObj(obj) {
 
 export function resetPwd(id) {
   return request({
-    url: '/sys/user/resetPwd',
+    url: '/sys/user/resetPassword/'+id,
     method: 'post',
     params: {id: id}
   })

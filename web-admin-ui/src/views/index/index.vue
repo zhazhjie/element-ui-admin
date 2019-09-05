@@ -12,9 +12,7 @@
       <el-container class='right-container'>
         <headbar />
         <el-main class='el-main'>
-          <transition name='fade-right' mode='out-in'>
-            <router-view class='router-view child-router' />
-          </transition>
+          <el-router-view/>
         </el-main>
       </el-container>
     </el-container>
@@ -25,6 +23,7 @@
 <script>
 import headbar from './headbar'
 import sidebar from './sidebar'
+import elRouterView from '../routerView'
 export default {
   data() {
     return {
@@ -34,6 +33,7 @@ export default {
   components: {
     headbar,
     sidebar,
+    elRouterView
   },
   methods: {
 

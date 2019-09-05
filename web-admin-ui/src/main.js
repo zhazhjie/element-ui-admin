@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import commonEl from './js/commonEl'
 // import './permission'
 import {getStore,setStore} from '@/js/util'
 import './js/prototype'
@@ -11,7 +12,7 @@ import imgPreview from '@/js/img-preview'
 Vue.use(ElementUI,{size:getStore('size')||'mini'});
 Vue.config.productionTip = false;
 Vue.use(imgPreview);
-
+Vue.use(commonEl);
 new Vue({
   el: '#app',
   router,

@@ -17,5 +17,16 @@
         <result column="hidden" property="hidden" />
         <result column="create_time" property="createTime" />
     </resultMap>
-
+    <select id="listMenu" resultMap="BaseResultMap">
+        select DISTINCT a.* from sys_permission a
+        left join sys_role_permission b on a.id=b.permission_id
+        left join sys_user_role c on b.role_id=c.role_id
+        where a.type=1
+        <if test="params.keyword!=null and params.keyword!=''">
+            and a.name like concat('%',#{params.keyword},'%')
+        </if>
+        <if test="params.userId!=null">
+            and c.user_id = #{params.userId}
+        </if>
+    </select>
 </mapper>

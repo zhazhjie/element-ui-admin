@@ -6,6 +6,8 @@ import com.web.admin.modules.sys.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 角色 服务实现类
@@ -16,5 +18,9 @@ import org.springframework.stereotype.Service;
  */
 @Service("SysRoleService")
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
-
+    @Override
+    public List<SysRole> list(Long userId) {
+        List<SysRole> sysRoles = baseMapper.selectList(null);
+        return sysRoles;
+    }
 }

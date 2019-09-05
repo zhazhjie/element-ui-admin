@@ -6,6 +6,9 @@ import com.web.admin.modules.sys.service.SysPermissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * <p>
  *  权限管理 服务实现类
@@ -16,5 +19,8 @@ import org.springframework.stereotype.Service;
  */
 @Service("SysPermissionService")
 public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, SysPermission> implements SysPermissionService {
-
+    @Override
+    public List<SysPermission> listMenu(Map<String, Object> params) {
+        return null;
+    }
 }

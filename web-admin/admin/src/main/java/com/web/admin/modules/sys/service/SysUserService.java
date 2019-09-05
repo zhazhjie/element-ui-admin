@@ -26,4 +26,6 @@ public interface SysUserService extends IService<SysUser> {
     void delete(List<Long> ids);
 
     SysUser getUserByUsername(String username);
+
+    void resetPassword(Long userId);
 }

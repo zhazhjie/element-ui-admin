@@ -57,6 +57,12 @@
           field: 'date',
           props:{
             width: 150,
+            align:'left'
+          },
+          form:{
+            placeholder:"123",
+            labelWidth: 100,
+            component:"checkbox"
           },
           render:(a)=>{
             console.log(a)

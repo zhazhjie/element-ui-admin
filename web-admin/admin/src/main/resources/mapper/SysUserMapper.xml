@@ -18,5 +18,28 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
-
+    <resultMap id="ListMap" type="com.web.admin.modules.sys.dto.SysUserDTO">
+        <result column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="avatar" property="avatar" />
+        <result column="state" property="state" />
+        <result column="create_time" property="createTime" />
+        <collection property="roleIdList" ofType="java.lang.Long">
+            <result column="role_id" property="roleId" />
+        </collection>
+    </resultMap>
+    <select id="listPage" resultMap="ListMap">
+        select 
+        a.*,
+        b.role_id
+        from sys_user a
+        left join sys_user_role b on a.id=b.user_id
+        where a.del_flag=0
+        <if test="params.keyword!=null and params.keyword!=''">
+            and a.username like concat('%',#{params.keyword},'%')
+        </if>
+        order by a.id desc
+    </select>
 </mapper>
