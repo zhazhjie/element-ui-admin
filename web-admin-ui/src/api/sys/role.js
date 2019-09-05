@@ -2,16 +2,8 @@ import request from '@/js/request'
 
 export function roleList() {
   return request({
-    url: '/sys/role/select',
-    method: 'get'
-  })
-}
-
-export function fetchList(query) {
-  return request({
     url: '/sys/role/list',
-    method: 'get',
-    params: query
+    method: 'get'
   })
 }
 
