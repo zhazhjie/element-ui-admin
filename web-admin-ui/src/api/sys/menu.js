@@ -7,9 +7,9 @@
 
 import request from '@/js/request'
 
-export function findMenuTree(data) {
+export function listMenu(data) {
   return request({
-    url: '/sys/menu/list',
+    url: '/sys/permission/listMenu',
     method: 'get',
     params: data
   })

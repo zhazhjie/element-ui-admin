@@ -126,7 +126,7 @@
 </template>
 
 <script>
-  import {findMenuTree, getObj, udpObj, addObj, delObj, selectMenu} from '@/api/sys/menu'
+  import {listMenu, getObj, udpObj, addObj, delObj, selectMenu} from '@/api/sys/menu'
 
   export default {
     data() {
@@ -174,9 +174,9 @@
     },
     components: {},
     methods: {
-      findMenuTree() {
+      listMenu() {
         this.tableLoading = true;
-        findMenuTree(this.params).then((res) => {
+        listMenu(this.params).then((res) => {
           this.tableLoading = false;
           this.menuList = res.data;
         })
@@ -212,7 +212,7 @@
               message: '删除成功!'
             });
 
-            this.findMenuTree();
+            this.listMenu();
             this.selectMenu();
           });
         }).catch(() => {
@@ -221,7 +221,7 @@
       },
       handleSearch(curPage) {
         this.params.curPage = curPage;
-        this.findMenuTree();
+        this.listMenu();
       },
       handleSubmit(formName) {
         this.$refs[formName].validate((valid) => {
@@ -244,7 +244,7 @@
             type: 'success',
             message: '新增成功!'
           });
-          this.findMenuTree();
+          this.listMenu();
           this.selectMenu();
           this.dialogVisible = false;
           this.handleLoading = false;
@@ -260,7 +260,7 @@
             type: 'success',
             message: '更新成功!'
           });
-          this.findMenuTree();
+          this.listMenu();
           this.selectMenu();
           this.dialogVisible = false;
           this.handleLoading = false;
@@ -311,8 +311,8 @@
     computed: {},
     mounted() {
       //this.fetchList();
-      this.findMenuTree();
-      this.selectMenu();
+      this.listMenu();
+      // this.selectMenu();
     }
   }
 </script>

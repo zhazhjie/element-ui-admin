@@ -21,6 +21,6 @@ import java.util.Map;
 public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, SysPermission> implements SysPermissionService {
     @Override
     public List<SysPermission> listMenu(Map<String, Object> params) {
-        return null;
+        return baseMapper.listMenu(params);
     }
 }

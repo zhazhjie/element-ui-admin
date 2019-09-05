@@ -79,6 +79,13 @@ export default new Router({
               },
               component: (resolve)=>require(['@/views/sys/user'],resolve),
             },
+            {
+              path: 'menu',
+              meta:{
+                name:'说明'
+              },
+              component: (resolve)=>require(['@/views/sys/menu'],resolve),
+            },
           ]
         },
 
