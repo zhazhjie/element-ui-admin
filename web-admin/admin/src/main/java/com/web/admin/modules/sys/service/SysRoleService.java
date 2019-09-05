@@ -1,7 +1,7 @@
 package com.web.admin.modules.sys.service;
 
-import com.web.admin.modules.sys.entity.SysRole;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.web.admin.modules.sys.entity.SysRole;
 
 import java.util.List;
 
@@ -15,4 +15,10 @@ import java.util.List;
  */
 public interface SysRoleService extends IService<SysRole> {
     List<SysRole> list(Long userId);
+
+    void add(SysRole sysRole);
+
+    void update(SysRole sysRole);
+
+    void delete(List<Long> ids);
 }

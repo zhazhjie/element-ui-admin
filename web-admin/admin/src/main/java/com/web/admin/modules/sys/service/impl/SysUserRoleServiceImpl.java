@@ -1,5 +1,6 @@
 package com.web.admin.modules.sys.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.web.admin.modules.sys.entity.SysUserRole;
 import com.web.admin.modules.sys.mapper.SysUserRoleMapper;
@@ -21,12 +22,17 @@ import java.util.List;
 public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUserRole> implements SysUserRoleService {
     @Override
     public void saveUserRole(Long userId,List<Long> roleIds) {
-        baseMapper.delete(new QueryWrapper<SysUserRole>().eq("user_id",userId));
+        baseMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId,userId));
         roleIds.forEach(roleId->{
             SysUserRole sysUserRole = new SysUserRole();
             sysUserRole.setRoleId(roleId);
             sysUserRole.setUserId(userId);
             baseMapper.insert(sysUserRole);
         });
+    }
+
+    @Override
+    public List<SysUserRole> getByRoleId(Long roleId) {
+        return baseMapper.selectList(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getRoleId,roleId));
     }
 }

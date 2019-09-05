@@ -1,5 +1,6 @@
 package com.web.admin.modules.sys.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 import com.web.model.BaseModel;
@@ -27,6 +28,9 @@ public class SysPermission extends BaseModel {
      * 父菜单ID，一级菜单为0 (类型为菜单时必填)
      */
     private Long parentId;
+
+    @TableField(exist = false)
+    private String parentName;
 
     /**
      * 权限名称

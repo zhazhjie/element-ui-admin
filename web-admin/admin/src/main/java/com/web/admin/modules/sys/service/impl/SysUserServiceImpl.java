@@ -1,5 +1,6 @@
 package com.web.admin.modules.sys.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.web.admin.modules.sys.dto.SysUserDTO;
@@ -92,6 +93,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     public SysUser getUserByUsername(String username){
-        return baseMapper.selectOne(new QueryWrapper<SysUser>().eq("username",username));
+        return baseMapper.selectOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername,username));
     }
 }

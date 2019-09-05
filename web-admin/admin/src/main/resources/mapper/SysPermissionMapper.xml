@@ -4,24 +4,26 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.web.admin.modules.sys.entity.SysPermission">
-        <id column="id" property="id" />
-    <result column="update_time" property="updateTime" />
-        <result column="parent_id" property="parentId" />
-        <result column="name" property="name" />
-        <result column="url" property="url" />
-        <result column="permission_flag" property="permissionFlag" />
-        <result column="type" property="type" />
-        <result column="icon" property="icon" />
-        <result column="state" property="state" />
-        <result column="sort" property="sort" />
-        <result column="hidden" property="hidden" />
-        <result column="create_time" property="createTime" />
+        <id column="id" property="id"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="parent_name" property="parentName"/>
+        <result column="name" property="name"/>
+        <result column="url" property="url"/>
+        <result column="permission_flag" property="permissionFlag"/>
+        <result column="type" property="type"/>
+        <result column="icon" property="icon"/>
+        <result column="state" property="state"/>
+        <result column="sort" property="sort"/>
+        <result column="hidden" property="hidden"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
     <select id="listMenu" resultMap="BaseResultMap">
-        select DISTINCT a.* from sys_permission a
+        select DISTINCT a.*,d.name as parent_name from sys_permission a
         left join sys_role_permission b on a.id=b.permission_id
         left join sys_user_role c on b.role_id=c.role_id
-        where a.type=1
+        left join sys_permission d on a.parent_id=d.id
+        where 1=1
         <if test="params.keyword!=null and params.keyword!=''">
             and a.name like concat('%',#{params.keyword},'%')
         </if>

@@ -57,9 +57,10 @@ export default {
     formProps: {
       type: Object
     },
-    handleSelectionChange:{
-      type:Function,
-      default:()=>{}
+    handleSelectionChange: {
+      type: Function,
+      default: () => {
+      }
     }
   },
   data() {
@@ -90,7 +91,7 @@ export default {
     handleSubmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.dialogVisible = false;
+          // this.dialogVisible = false;
           console.log(this.curRow);
           this.$emit("submit", this.curRow);
         } else {
@@ -212,14 +213,19 @@ export default {
                   return null;
                 } else {
                   return (
-                    <el-form-item label={column.label} prop={column.field}>
+                    <el-form-item
+                      {...{props: column.formItem ? column.formItem.props : null}}
+                      label={column.label}
+                      prop={column.field}>
                       {
                         column.formItem && column.formItem.render
                           ?
                           column.formItem.render(this.curRow)
                           :
-                          <el-input placeholder={"请输入" + column.label} value={this.curRow[column.field]}
-                                    on-input={e => this.curRow[column.field] = e}/>
+                          <el-input
+                            placeholder={"请输入" + column.label}
+                            value={this.curRow[column.field]}
+                            on-input={e => this.curRow[column.field] = e}/>
                       }
                       {/*{this.formComponents(column)}*/}
                     </el-form-item>
@@ -230,8 +236,7 @@ export default {
           </el-form>
           <div slot="footer">
             <el-button on-click={this.handleClose.bind(this)}>取 消</el-button>
-            <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
-            </el-button>
+            <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定</el-button>
           </div>
         </el-dialog>}
       </div>

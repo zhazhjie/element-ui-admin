@@ -22,7 +22,6 @@
       ref="table"
       @submit="handleSubmit"
       :dialogProps="{width:'500px'}"
-      :handleProps="{width:'250px'}"
       :rules="rules"
       :loading='tableLoading'
       :tableData='userList'
@@ -200,7 +199,6 @@
       handleAdd() {
         let table = this.$refs.table;
         table.curRow = this.curUser;
-        this.columns[2].hiddenInDialog=true;
         table.showDialog();
       },
       handleResetPwd(row) {
@@ -230,7 +228,7 @@
       },
       handleSubmit(row) {
         let table = this.$refs.table;
-        if (table.handleType === 1) {
+        if (table.handleType) {
           this.submitUpdate(row);
         } else {
           this.submitAdd(row);

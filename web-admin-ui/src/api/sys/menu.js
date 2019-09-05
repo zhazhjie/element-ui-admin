@@ -9,27 +9,27 @@ import request from '@/js/request'
 
 export function listMenu(data) {
   return request({
-    url: '/sys/permission/listMenu',
+    url: '/sys/permission/list',
     method: 'get',
     params: data
   })
 }
 export function selectMenu() {
   return request({
-    url: '/sys/menu/select',
+    url: '/sys/permission/select',
     method: 'get'
   })
 }
 export function findNavTree(query) {
   return request({
-    url: '/sys/menu/nav',
+    url: '/sys/permission/nav',
     method: 'get',
     params: query
   })
 }
 export function getSimpleTree(query) {
   return request({
-    url: '/sys/menu/tree',
+    url: '/sys/permission/tree',
     method: 'get',
     params: query
   })
@@ -37,29 +37,29 @@ export function getSimpleTree(query) {
 
 export function addObj(obj) {
   return request({
-    url: '/sys/menu/add',
-    method: 'post',
+    url: '/sys/permission/add',
+    method: 'put',
     data: obj
   })
 }
 
 export function getObj(id) {
   return request({
-    url: '/sys/menu/info/' + id,
+    url: '/sys/permission/info/' + id,
     method: 'get'
   })
 }
 
 export function delObj(id) {
   return request({
-    url: '/sys/menu/delete/' + id,
-    method: 'post'
+    url: '/sys/permission/delete/' + id,
+    method: 'delete'
   })
 }
 
 export function udpObj(obj) {
   return request({
-    url: '/sys/menu/update',
+    url: '/sys/permission/update',
     method: 'post',
     data: obj
   })

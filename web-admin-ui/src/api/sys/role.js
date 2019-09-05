@@ -1,5 +1,11 @@
 import request from '@/js/request'
 
+export function fetchList() {
+  return request({
+    url: '/sys/role/list',
+    method: 'get'
+  })
+}
 export function roleList() {
   return request({
     url: '/sys/role/list',
