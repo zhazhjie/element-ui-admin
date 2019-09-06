@@ -3,6 +3,7 @@ package com.web.admin.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.web.admin.modules.sys.dto.SysUserDTO;
 import com.web.admin.modules.sys.entity.SysUser;
 import com.web.admin.modules.sys.entity.SysUserRole;
@@ -37,8 +38,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public IPage listPage(Map<String, Object> params) {
-        IPage<SysUser> sysUserIPage = baseMapper.listPage(new PageWrapper<SysUser>(params).getPage(),params);
-        return sysUserIPage;
+        PageWrapper<SysUser> pageWrapper = new PageWrapper<>(params);
+        params.put("curPage", (pageWrapper.getCurrent() - 1) * pageWrapper.getSize());
+        params.put("limit",pageWrapper.getSize());
+        List<SysUser> sysUsers = baseMapper.listUser(params);
+        Integer total = baseMapper.countUser(params);
+        Page<SysUser> page = pageWrapper.getPage();
+        page.setTotal(total);
+        page.setRecords(sysUsers);
+        return page;
     }
 
     @Override
@@ -66,6 +74,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         sysUser.setEmail(sysUserDTO.getEmail());
         sysUser.setState(sysUserDTO.getState());
         baseMapper.updateById(sysUser);
+        sysUserRoleService.deleteByUserId(sysUserDTO.getId());
         sysUserRoleService.saveUserRole(sysUser.getId(),sysUserDTO.getRoleIdList());
     }
 

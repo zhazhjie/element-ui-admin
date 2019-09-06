@@ -1,10 +1,13 @@
 package com.web.admin.modules.sys.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.web.model.BaseModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 /**
  * <p>
@@ -37,5 +40,7 @@ public class SysRole extends BaseModel {
      */
     private Long createBy;
 
+    @TableField(exist = false)
+    private List<Long> permissionIdList;
 
 }

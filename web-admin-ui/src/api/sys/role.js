@@ -1,9 +1,10 @@
 import request from '@/js/request'
 
-export function fetchList() {
+export function listPage(params) {
   return request({
-    url: '/sys/role/list',
-    method: 'get'
+    url: '/sys/role/listPage',
+    method: 'get',
+    params
   })
 }
 export function roleList() {
@@ -30,7 +31,7 @@ export function getObj(id) {
 export function addObj(obj) {
   return request({
     url: '/sys/role/add',
-    method: 'post',
+    method: 'put',
     data: obj
   })
 }

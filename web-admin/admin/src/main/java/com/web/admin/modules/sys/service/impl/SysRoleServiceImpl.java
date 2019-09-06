@@ -1,16 +1,22 @@
 package com.web.admin.modules.sys.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.web.admin.modules.sys.entity.SysRole;
+import com.web.admin.modules.sys.entity.SysRolePermission;
 import com.web.admin.modules.sys.entity.SysUserRole;
 import com.web.admin.modules.sys.mapper.SysRoleMapper;
+import com.web.admin.modules.sys.service.SysRolePermissionService;
 import com.web.admin.modules.sys.service.SysRoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.web.admin.modules.sys.service.SysUserRoleService;
+import com.web.admin.utils.PageWrapper;
 import com.web.common.utils.AssertUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -24,6 +30,8 @@ import java.util.List;
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
     @Autowired
     SysUserRoleService sysUserRoleService;
+    @Autowired
+    SysRolePermissionService sysRolePermissionService;
 
     @Override
     public List<SysRole> list(Long userId) {
@@ -32,21 +40,38 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     @Override
+    public IPage<SysRole> listPage(Map<String, Object> params) {
+        PageWrapper<SysRole> pageWrapper = new PageWrapper<>(params);
+        params.put("curPage", (pageWrapper.getCurrent() - 1) * pageWrapper.getSize());
+        params.put("limit",pageWrapper.getSize());
+        List<SysRole> sysRoles = baseMapper.listRole(params);
+        Integer total = baseMapper.countRole(params);
+        Page<SysRole> page = pageWrapper.getPage();
+        page.setTotal(total);
+        page.setRecords(sysRoles);
+        return page;
+    }
+
+    @Override
     public void add(SysRole sysRole) {
         baseMapper.insert(sysRole);
+        sysRolePermissionService.saveRolePermission(sysRole.getId(),sysRole.getPermissionIdList());
     }
 
     @Override
     public void update(SysRole sysRole) {
         baseMapper.updateById(sysRole);
+        sysRolePermissionService.deleteByRoleId(sysRole.getId());
+        sysRolePermissionService.saveRolePermission(sysRole.getId(),sysRole.getPermissionIdList());
     }
 
     @Override
     public void delete(List<Long> ids) {
-        ids.forEach(id->{
+        ids.forEach(id -> {
             List<SysUserRole> byRoleId = sysUserRoleService.getByRoleId(id);
-            AssertUtil.isFalse(byRoleId.size()>0,"该角色已被使用，不能删除");
+            AssertUtil.isFalse(byRoleId.size() > 0, "该角色已被使用，不能删除");
             baseMapper.deleteById(id);
+            sysRolePermissionService.deleteByRoleId(id);
         });
     }
 }

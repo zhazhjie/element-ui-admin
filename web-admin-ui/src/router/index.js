@@ -86,6 +86,13 @@ export default new Router({
               },
               component: (resolve)=>require(['@/views/sys/menu'],resolve),
             },
+            {
+              path: 'role',
+              meta:{
+                name:'说明'
+              },
+              component: (resolve)=>require(['@/views/sys/role'],resolve),
+            },
           ]
         },
 

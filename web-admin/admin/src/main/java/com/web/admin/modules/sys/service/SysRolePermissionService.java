@@ -3,6 +3,8 @@ package com.web.admin.modules.sys.service;
 import com.web.admin.modules.sys.entity.SysRolePermission;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * 角色权限关系表 服务类
@@ -13,5 +15,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface SysRolePermissionService extends IService<SysRolePermission> {
     void deleteByPermissionId(Long permissionId);
+
     void deleteByRoleId(Long roleId);
+
+    void saveRolePermission(Long roleId, List<Long> permissionIds);
 }

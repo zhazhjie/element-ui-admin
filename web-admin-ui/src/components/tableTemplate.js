@@ -76,8 +76,8 @@ export default {
     },
     vModel(column) {
       return {
-        value: this.curRow[column.field],
-        onInput: e => this.curRow[column.field] = e
+        props: {value: this.curRow[column.field]},
+        on: {input: e => this.curRow[column.field] = e}
       }
     },
     handleSizeChange(pageSize) {
@@ -115,6 +115,7 @@ export default {
       this.curRow = this.copy(row);
       this.handleType = 1;
       this.dialogVisible = true;
+      this.$emit("showDialog",row);
     },
     formComponents(column = {}) {
       let {formItem = {}} = column;
@@ -164,11 +165,12 @@ export default {
             })
           }
           {
-            <el-table-column
+            this.handleList.length && <el-table-column
               label="操作"
               fixed="right"
               header-align="center"
               {...{props: this.handleProps}}
+              width="145"
               scopedSlots={{
                 default: scope => {
                   return this.handleList.map(el => {
@@ -236,7 +238,8 @@ export default {
           </el-form>
           <div slot="footer">
             <el-button on-click={this.handleClose.bind(this)}>取 消</el-button>
-            <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定</el-button>
+            <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
+            </el-button>
           </div>
         </el-dialog>}
       </div>

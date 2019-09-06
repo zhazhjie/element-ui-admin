@@ -2,6 +2,9 @@ package com.web.admin.modules.sys.mapper;
 
 import com.web.admin.modules.sys.entity.SysRolePermission;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2019-09-04
  */
 public interface SysRolePermissionMapper extends BaseMapper<SysRolePermission> {
-
+    void saveRolePermission(@Param("SysRolePermissionList") List<SysRolePermission> SysRolePermissionList);
 }

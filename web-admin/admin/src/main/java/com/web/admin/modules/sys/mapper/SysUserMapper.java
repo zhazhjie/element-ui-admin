@@ -6,6 +6,7 @@ import com.web.admin.modules.sys.entity.SysUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,5 +18,7 @@ import java.util.Map;
  * @since 2019-09-04
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
-    IPage<SysUser> listPage(IPage page, @Param("params") Map<String, Object> params);
+    List<SysUser> listUser(@Param("params") Map<String, Object> params);
+
+    Integer countUser(@Param("params") Map<String, Object> params);
 }

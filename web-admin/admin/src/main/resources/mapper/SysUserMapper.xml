@@ -30,16 +30,24 @@
             <result column="role_id" property="roleId" />
         </collection>
     </resultMap>
-    <select id="listPage" resultMap="ListMap">
+    <select id="listUser" resultMap="ListMap">
         select 
         a.*,
         b.role_id
-        from sys_user a
+        from ( select a.* from sys_user a limit #{params.curPage}, #{params.limit}) a
         left join sys_user_role b on a.id=b.user_id
         where a.del_flag=0
         <if test="params.keyword!=null and params.keyword!=''">
             and a.username like concat('%',#{params.keyword},'%')
         </if>
         order by a.id desc
+    </select>
+
+    <select id="countUser" resultType="java.lang.Integer">
+        select count(1) from sys_user a
+        where a.del_flag=0
+        <if test="params.keyword!=null and params.keyword!=''">
+            and a.username like concat('%',#{params.keyword},'%')
+        </if>
     </select>
 </mapper>

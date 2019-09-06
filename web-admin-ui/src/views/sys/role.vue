@@ -9,7 +9,7 @@
   <section>
     <el-form :inline="true">
       <el-form-item>
-        <el-input placeholder="名称" v-model='params.roleName' :clearable="true"></el-input>
+        <el-input placeholder="角色名称" v-model='params.keyword' :clearable="true"></el-input>
       </el-form-item>
       <el-form-item>
         <permission-btn type='primary' plain @click='handleSearch'>查询</permission-btn>
@@ -19,59 +19,53 @@
       <permission-btn type='primary' @click='handleAdd'>新增</permission-btn>
     </div>
     <table-template
-      border
+      ref="table"
+      :dialogProps="{width:'500px'}"
       :loading='tableLoading'
-      :data='roleList'
+      :tableData='roleList'
       :columns='columns'
       :handleList='handleList'
-      @handleChange='handleChange'
-      @handleDelete='handleDelete'
-      handlePageFunction='getRoleList'
-      :page='params'>
-      <!-- <el-table-column label='操作' >
-        <template slot-scope="scope">
-          <permission-btn>编辑</permission-btn>
-        </template>
-      </el-table-column> -->
-    </table-template>
-    <el-dialog
-      :title="handleType?'编辑':'新增'"
-      :visible.sync="dialogVisible"
-      :before-close="handleClose"
-      :close-on-click-modal="false"
-      width="500px">
-      <el-form :model="curRole" label-width="80px" :rules="rules" ref="ruleForm">
-        <el-form-item label='名称' prop="roleName">
-          <el-input v-model='curRole.roleName' placeholder='请输入角色名称'></el-input>
-        </el-form-item>
-        <el-form-item label='备注' prop="remark">
-          <el-input type="textarea" v-model='curRole.remark' placeholder='请输入备注'></el-input>
-        </el-form-item>
-        <el-form-item size="mini" label="授权">
-          <el-tree
-            :data="menuList"
-            :props="defaultProps"
-            node-key="id"
-            ref="menuTree"
-            :default-expand-all="false"
-            :check-on-click-node="true"
-            show-checkbox>
-          </el-tree>
-        </el-form-item>
-      </el-form>
-      <span slot="footer">
-          <el-button @click="handleClose('')">取 消</el-button>
-          <el-button type="primary" @click="handleSubmit('ruleForm')" :loading='handleLoading'>确 定</el-button>
-        </span>
-    </el-dialog>
+      :handlePageChange='getRoleList'
+      @submit="handleSubmit"
+      :page='params'/>
+    <!--<el-dialog-->
+      <!--:title="handleType?'编辑':'新增'"-->
+      <!--:visible.sync="dialogVisible"-->
+      <!--:before-close="handleClose"-->
+      <!--:close-on-click-modal="false"-->
+      <!--width="500px">-->
+      <!--<el-form :model="curRole" label-width="80px" :rules="rules" ref="ruleForm">-->
+        <!--<el-form-item label='名称' prop="roleName">-->
+          <!--<el-input v-model='curRole.roleName' placeholder='请输入角色名称'></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label='备注' prop="remark">-->
+          <!--<el-input type="textarea" v-model='curRole.remark' placeholder='请输入备注'></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item size="mini" label="授权">-->
+          <!--<el-tree-->
+            <!--:data="permissionList"-->
+            <!--:props="defaultProps"-->
+            <!--node-key="id"-->
+            <!--ref="permissionTree"-->
+            <!--:default-expand-all="false"-->
+            <!--:check-on-click-node="true"-->
+            <!--show-checkbox>-->
+          <!--</el-tree>-->
+        <!--</el-form-item>-->
+      <!--</el-form>-->
+      <!--<span slot="footer">-->
+          <!--<el-button @click="handleClose('')">取 消</el-button>-->
+          <!--<el-button type="primary" @click="handleSubmit('ruleForm')" :loading='handleLoading'>确 定</el-button>-->
+        <!--</span>-->
+    <!--</el-dialog>-->
   </section>
 </template>
 
 <script>
-  import {fetchList, getObj, updObj, delObj, addObj} from '@/api/sys/role'
-  import {getSimpleTree} from '@/api/sys/menu'
-  import {formatTreeData, treeDataTranslate} from '@/js/util'
+  import {listPage, getObj, updObj, delObj, addObj} from '../../api/sys/role'
+  import {formatTreeData, treeDataTranslate} from '../../js/util'
   import {mapState} from 'vuex'
+  import {listMenu} from "../../api/sys/menu";
 
   export default {
     data() {
@@ -79,6 +73,7 @@
         dialogVisible: false,
         tableLoading: false,
         handleLoading: false,
+        permsVisible: false,
         handleType: 0,
         defaultProps: {
           children: 'children',
@@ -88,36 +83,67 @@
         curRole: {
           roleName: '',
           remark: '',
-          menuIdList: []
+          permissionIdList: []
         },
-        menuList: [],
-        columns: [{
-            name: 'ID',
+        permissionList: [],
+        columns: [
+          {
+            label: 'ID',
             field: 'id',
-            width: 160
+            hiddenInDialog: true
           },
           {
-            name: '角色名',
+            label: '角色名',
             field: 'roleName',
           },
           {
-            name: '备注',
+            label: '备注',
             field: 'remark',
           },
           {
-            name: '创建时间',
+            label: '创建时间',
             field: 'createTime',
+            hiddenInDialog: true
           },
+          {
+            label: '选择权限',
+            field: 'permissionIdList',
+            hiddenInTable: true,
+            formItem: {
+              render: row => {
+                return (
+                  <el-cascader
+                    ref="perms"
+                    style="width:100%"
+                    placeholder="请选择权限"
+                    value={row.permissionIdList}
+                    on-input={e=>this.handleInput(e,row)}
+                    // on-change={this.handleSelectNode.bind(this,row)}
+                    props={{
+                      label: "name",
+                      value: "id",
+                      multiple: true,
+                      expandTrigger: "hover"
+                    }}
+                    options={this.permissionList}
+                    collapse-tags/>
+                )
+              }
+            }
+          }
         ],
         handleList: [
           {
-            name: '编辑',
-            type: '',
-            handleName: 'handleChange'
-          }, {
-            name: '删除',
-            type: 'danger',
-            handleName: 'handleDelete'
+            label: '编辑'
+          },
+          {
+            label: '删除',
+            props: {
+              type: 'danger'
+            },
+            click: row => {
+              this.handleDelete(row);
+            }
           }
         ],
         rules: {
@@ -126,22 +152,33 @@
           ]
         },
         params: {
-          roleName: '',
-          curPage: 1,
-          pageSize: 10,
-          totalCount: 0
+          keyword: '',
+          current: 1,
+          size: 10,
+          total: 10
         },
         refTree: null
       }
     },
     components: {},
     methods: {
+      handleInput(e,row){
+        console.log(e)
+        row.permissionIdList=e;
+      },
+      listPermission () {
+        this.tableLoading = true;
+        listMenu(this.params).then((res) => {
+          this.tableLoading = false;
+          this.permissionList = treeDataTranslate(res.data);
+        })
+      },
       getRoleList() {
         this.tableLoading = true;
-        fetchList(this.params).then(res => {
+        listPage(this.params).then(res => {
           this.tableLoading = false;
-          this.roleList = res.data.list;
-          this.params.totalCount = res.data.totalCount;
+          this.roleList = res.data.records;
+          this.params.total = res.data.total;
         })
       },
       handleAdd() {
@@ -149,20 +186,8 @@
         this.dialogVisible = true;
         this.getSimpleTree();
       },
-      handleChange(row, index) {
-        this.handleType = 1;
-        this.dialogVisible = true;
-        getObj(this.roleList[index].id).then(res => {
-          this.curRole = res.data;
-          this.getSimpleTree();
-        });
-      },
       handleDelete(row, index) {
-        this.$confirm('确定要删除[' + row.roleName + ']吗?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
+        this.confirm('确定要删除[' + row.roleName + ']吗?').then(() => {
           delObj([row.id]).then(() => {
             this.$message({
               type: 'success',
@@ -170,127 +195,61 @@
             });
             this.getRoleList();
           });
-        }).catch(() => {
-
         });
       },
-      handleSearch(curPage) {
-        this.params.curPage = curPage;
+      handleSearch() {
+        this.params.current = 1;
         this.getRoleList();
       },
-      handleSubmit(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            this.handleLoading = true;
-            if (this.handleType) {
-              this.submitUpdate();
+      handleSubmit(row) {
+        let table=this.$refs.table;
+            if (table.handleType) {
+              this.submitUpdate(row);
             } else {
-              this.submitAdd();
+              this.submitAdd(row);
             }
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
       },
-      submitAdd() {
-        if(this.$refs.menuTree){
-          let menuList = this.$refs.menuTree.getCheckedNodes().concat(this.$refs.menuTree.getHalfCheckedNodes());
-          this.curRole.menuIdList = menuList.map(el => el.id);
-        }
-        addObj(this.curRole).then(() => {
+      submitAdd(row) {
+        addObj(row).then(() => {
           this.$message({
             type: 'success',
             message: '新增成功!'
           });
           this.getRoleList();
-          this.dialogVisible = false;
+          this.$refs.table.handleClose();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;
         });
       },
-      submitUpdate() {
-        if(this.$refs.menuTree){
-          let menuList = this.$refs.menuTree.getCheckedNodes().concat(this.$refs.menuTree.getHalfCheckedNodes());
-          this.curRole.menuIdList = menuList.map(el => el.id);
-        }
-        updObj(this.curRole).then(() => {
+      submitUpdate(row) {
+        updObj(row).then(() => {
           this.$message({
             type: 'success',
             message: '更新成功!'
           });
           this.getRoleList();
-          this.dialogVisible = false;
+          this.$refs.table.handleClose();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;
         });
       },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
+      handleSelectNode(row){
+        let permissionList=this.$refs.perms.getCheckedNodes(false);
+        row.permissionIdList=permissionList.map(v=>v.value);
       },
-      getSimpleTree() {
-        getSimpleTree().then((res) => {
-          this.menuList = res.data;
-          if(this.handleType == 1){
-            let _this = this;
-            this.$nextTick(() => {
-              for(let i = 0;i < _this.curRole.menuIdList.length;i++){
-                let key = _this.curRole.menuIdList[i];
-                let node = _this.$refs.menuTree.getNode(key);
-                if(node.childNodes.length > 0){
-                  continue;
-                }
-                _this.$refs.menuTree.setChecked(key, true, false);
-              }
-            })
-          }
-        })
-      },
-      handleClose(done) {
-        this.dialogVisible = false;
-        this.$nextTick(() => {
-          this.resetForm('ruleForm');
-          this.$refs.menuTree.setCheckedKeys([]);
-        })
-        if (done) {
-          done();
-        }
-      }
     },
     computed: {
       ...mapState(['userInfo']),
     },
     mounted() {
+      this.listPermission();
       this.getRoleList();
     }
   }
 </script>
 
 <style scoped>
-  .custom-tree-node {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
-  }
 
-  .permissions {
-    display: inline-block;
-    border-radius: 4px;
-    border: 1px solid #dcdfe6;
-    padding: 4px;
-  }
-
-  .permissions .el-tag {
-    margin: 4px;
-  }
-  .clear-value{
-    position: absolute;
-    right: 5px;
-    top: 7px;
-    cursor: pointer;
-  }
 </style>

@@ -28,9 +28,15 @@ public class SysRoleController {
     SysRoleService sysRoleService;
 
     @GetMapping("/list")
-    public ResponseData listPage() {
+    public ResponseData list() {
         List<SysRole> list = sysRoleService.list(1L);
         return ResponseData.success(list);
+    }
+
+    @GetMapping("/listPage")
+    public ResponseData listPage(@RequestParam Map<String,Object> params) {
+        IPage<SysRole> sysRoleIPage = sysRoleService.listPage(params);
+        return ResponseData.success(sysRoleIPage);
     }
 
     @PostMapping("/update")
