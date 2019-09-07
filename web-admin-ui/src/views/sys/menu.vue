@@ -224,6 +224,7 @@
         this.listMenu();
       },
       handleSubmit(row) {
+        row.parentId=this.selectedPerms[this.selectedPerms.length-1];
         if (this.$refs.table.handleType) {
           this.submitUpdate(row);
         } else {
@@ -260,10 +261,10 @@
         let result=[];
         let parent=this.permissionMap[row.parentId];
         while (parent){
-          result.push(parent.id);
+          result.unshift(parent.id);
           parent=this.permissionMap[parent.parentId];
         }
-        this.selectedPerms=result.reverse();
+        this.selectedPerms=result;
       },
     },
     computed: {},

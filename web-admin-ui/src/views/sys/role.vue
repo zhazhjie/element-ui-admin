@@ -50,6 +50,7 @@
           permissionIdList: []
         },
         permissionTree: [],
+        selectedPerms:[],
         columns: [
           {
             label: 'ID',
@@ -160,6 +161,12 @@
         this.getRoleList();
       },
       handleSubmit(row) {
+        let permissionIdList=[];
+        this.selectedPerms.forEach(item=>{
+          permissionIdList.push(...item);
+        });
+        console.log(permissionIdList)
+        row.permissionIdList=[...new Set(permissionIdList)];
         let table = this.$refs.table;
         if (table.handleType) {
           this.submitUpdate(row);
@@ -197,20 +204,20 @@
         let result=[];
         let index=0;
         let permissionIdList=row.permissionIdList||[];
-        // permissionIdList.forEach((permissionId,i)=>{
-        //   if(!result[index]){
-        //     result[index]=[];
-        //   }
-        //   let permission=this.permissionMap[permissionId];
-        //   result[index].push(permission.id);
-        //   let parent=this.permissionMap[permission.parentId];
-        //   while (parent){
-        //     result[index].push(parent.id);
-        //     parent=this.permissionMap[parent.parentId];
-        //   }
-        //   index++;
-        // });
-        this.selectedPerms=[["1153189990263828481", "1154599246522019842"],["1154389609496887298", "1154389755186036737"]];
+        permissionIdList.forEach((permissionId,i)=>{
+          if(!result[index]){
+            result[index]=[];
+          }
+          let permission=this.permissionMap[permissionId];
+          result[index].push(permission.id);
+          let parent=this.permissionMap[permission.parentId];
+          while (parent){
+            result[index].unshift(parent.id);
+            parent=this.permissionMap[parent.parentId];
+          }
+          index++;
+        });
+        this.selectedPerms=result;
       },
     },
     computed: {
