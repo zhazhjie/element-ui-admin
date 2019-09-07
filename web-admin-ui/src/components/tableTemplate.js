@@ -1,23 +1,13 @@
 export default {
   name: "table-template",
   props: {
-    withoutDialog: {
-      type: Boolean,
-      default: false
-    },
-    tableLoading: {
-      type: Boolean,
-      default: false
-    },
-    handleLoading: {
-      type: Boolean,
-      default: false
-    },
     columns: {
-      type: Array
+      type: Array,
+      required: true
     },
     tableData: {
-      type: Array
+      type: Array,
+      required: true
     },
     handleList: {
       type: Array
@@ -37,6 +27,18 @@ export default {
     needPage: {
       type: Boolean,
       default: true
+    },
+    withoutDialog: {
+      type: Boolean,
+      default: false
+    },
+    tableLoading: {
+      type: Boolean,
+      default: false
+    },
+    handleLoading: {
+      type: Boolean,
+      default: false
     },
     selectable: {
       type: Boolean,
@@ -100,11 +102,11 @@ export default {
         }
       });
     },
-    handleClose() {
+    handleCloseDialog() {
       this.dialogVisible = false;
       this.resetForm();
     },
-    showDialog() {
+    handleShowDialog() {
       this.handleType = 0;
       this.dialogVisible = true;
     },
@@ -115,16 +117,18 @@ export default {
       this.curRow = this.copy(row);
       this.handleType = 1;
       this.dialogVisible = true;
-      this.$emit("showDialog",row);
+      this.$emit("showDialog", row);
     },
-    formComponents(column = {}) {
+    buildFormEl(column = {}) {
       let {formItem = {}} = column;
-      let {name} = formItem;
+      let {name} = formEl;
       switch (name) {
         case "checkbox":
           return <el-checkbox {...this.vModel(column)}/>;
         case "radio":
           return <el-radio {...this.vModel(column)}/>;
+        case "select":
+          return <el-select {...this.vModel(column)}/>;
         default:
           return <el-input {...this.vModel(column)}/>
       }
@@ -204,7 +208,7 @@ export default {
         {!this.withoutDialog && <el-dialog
           title={this.handleType ? '编辑' : '新增'}
           visible={this.dialogVisible}
-          before-close={this.handleClose.bind(this)}
+          before-close={this.handleCloseDialog.bind(this)}
           close-on-click-modal={false}
           {...{props: this.dialogProps}}
           width="800px">
@@ -216,20 +220,21 @@ export default {
                 } else {
                   return (
                     <el-form-item
-                      {...{props: column.formItem ? column.formItem.props : null}}
                       label={column.label}
+                      {...{props: column.formItem ? column.formItem.props : null}}
                       prop={column.field}>
                       {
-                        column.formItem && column.formItem.render
+                        column.formEl && column.formEl.render
                           ?
-                          column.formItem.render(this.curRow)
+                          column.formEl.render(this.curRow)
                           :
                           <el-input
                             placeholder={"请输入" + column.label}
+                            {...{props: column.formEl ? column.formEl.props : null}}
                             value={this.curRow[column.field]}
                             on-input={e => this.curRow[column.field] = e}/>
                       }
-                      {/*{this.formComponents(column)}*/}
+                      {/*{this.buildFormEl(column)}*/}
                     </el-form-item>
                   )
                 }
@@ -237,7 +242,7 @@ export default {
             }
           </el-form>
           <div slot="footer">
-            <el-button on-click={this.handleClose.bind(this)}>取 消</el-button>
+            <el-button on-click={this.handleCloseDialog.bind(this)}>取 消</el-button>
             <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
             </el-button>
           </div>

@@ -20,6 +20,7 @@
     </div>
     <table-template
       ref="table"
+      @showDialog="findParentId"
       :dialogProps="{width:'500px'}"
       :loading='tableLoading'
       :tableData='roleList'
@@ -28,64 +29,27 @@
       :handlePageChange='getRoleList'
       @submit="handleSubmit"
       :page='params'/>
-    <!--<el-dialog-->
-      <!--:title="handleType?'编辑':'新增'"-->
-      <!--:visible.sync="dialogVisible"-->
-      <!--:before-close="handleClose"-->
-      <!--:close-on-click-modal="false"-->
-      <!--width="500px">-->
-      <!--<el-form :model="curRole" label-width="80px" :rules="rules" ref="ruleForm">-->
-        <!--<el-form-item label='名称' prop="roleName">-->
-          <!--<el-input v-model='curRole.roleName' placeholder='请输入角色名称'></el-input>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label='备注' prop="remark">-->
-          <!--<el-input type="textarea" v-model='curRole.remark' placeholder='请输入备注'></el-input>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item size="mini" label="授权">-->
-          <!--<el-tree-->
-            <!--:data="permissionList"-->
-            <!--:props="defaultProps"-->
-            <!--node-key="id"-->
-            <!--ref="permissionTree"-->
-            <!--:default-expand-all="false"-->
-            <!--:check-on-click-node="true"-->
-            <!--show-checkbox>-->
-          <!--</el-tree>-->
-        <!--</el-form-item>-->
-      <!--</el-form>-->
-      <!--<span slot="footer">-->
-          <!--<el-button @click="handleClose('')">取 消</el-button>-->
-          <!--<el-button type="primary" @click="handleSubmit('ruleForm')" :loading='handleLoading'>确 定</el-button>-->
-        <!--</span>-->
-    <!--</el-dialog>-->
   </section>
 </template>
 
 <script>
   import {listPage, getObj, updObj, delObj, addObj} from '../../api/sys/role'
-  import {formatTreeData, treeDataTranslate} from '../../js/util'
+  import {formatTreeData, listToMap, treeDataTranslate} from '../../js/util'
   import {mapState} from 'vuex'
   import {listMenu} from "../../api/sys/menu";
 
   export default {
     data() {
       return {
-        dialogVisible: false,
         tableLoading: false,
         handleLoading: false,
-        permsVisible: false,
-        handleType: 0,
-        defaultProps: {
-          children: 'children',
-          label: 'name'
-        },
         roleList: [],
         curRole: {
           roleName: '',
           remark: '',
           permissionIdList: []
         },
-        permissionList: [],
+        permissionTree: [],
         columns: [
           {
             label: 'ID',
@@ -109,23 +73,22 @@
             label: '选择权限',
             field: 'permissionIdList',
             hiddenInTable: true,
-            formItem: {
+            formEl: {
               render: row => {
                 return (
                   <el-cascader
                     ref="perms"
                     style="width:100%"
                     placeholder="请选择权限"
-                    value={row.permissionIdList}
-                    on-input={e=>this.handleInput(e,row)}
-                    // on-change={this.handleSelectNode.bind(this,row)}
+                    value={this.selectedPerms}
+                    on-input={e =>{console.log(e);this.selectedPerms=e}}
                     props={{
                       label: "name",
                       value: "id",
                       multiple: true,
                       expandTrigger: "hover"
                     }}
-                    options={this.permissionList}
+                    options={this.permissionTree}
                     collapse-tags/>
                 )
               }
@@ -157,20 +120,16 @@
           size: 10,
           total: 10
         },
-        refTree: null
       }
     },
     components: {},
     methods: {
-      handleInput(e,row){
-        console.log(e)
-        row.permissionIdList=e;
-      },
-      listPermission () {
+      listPermission() {
         this.tableLoading = true;
         listMenu(this.params).then((res) => {
           this.tableLoading = false;
-          this.permissionList = treeDataTranslate(res.data);
+          this.permissionTree = treeDataTranslate(res.data);
+          this.permissionMap = listToMap(res.data);
         })
       },
       getRoleList() {
@@ -184,7 +143,6 @@
       handleAdd() {
         this.handleType = 0;
         this.dialogVisible = true;
-        this.getSimpleTree();
       },
       handleDelete(row, index) {
         this.confirm('确定要删除[' + row.roleName + ']吗?').then(() => {
@@ -202,12 +160,12 @@
         this.getRoleList();
       },
       handleSubmit(row) {
-        let table=this.$refs.table;
-            if (table.handleType) {
-              this.submitUpdate(row);
-            } else {
-              this.submitAdd(row);
-            }
+        let table = this.$refs.table;
+        if (table.handleType) {
+          this.submitUpdate(row);
+        } else {
+          this.submitAdd(row);
+        }
       },
       submitAdd(row) {
         addObj(row).then(() => {
@@ -216,7 +174,7 @@
             message: '新增成功!'
           });
           this.getRoleList();
-          this.$refs.table.handleClose();
+          this.$refs.table.handleCloseDialog();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;
@@ -229,15 +187,30 @@
             message: '更新成功!'
           });
           this.getRoleList();
-          this.$refs.table.handleClose();
+          this.$refs.table.handleCloseDialog();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;
         });
       },
-      handleSelectNode(row){
-        let permissionList=this.$refs.perms.getCheckedNodes(false);
-        row.permissionIdList=permissionList.map(v=>v.value);
+      findParentId(row){
+        let result=[];
+        let index=0;
+        let permissionIdList=row.permissionIdList||[];
+        // permissionIdList.forEach((permissionId,i)=>{
+        //   if(!result[index]){
+        //     result[index]=[];
+        //   }
+        //   let permission=this.permissionMap[permissionId];
+        //   result[index].push(permission.id);
+        //   let parent=this.permissionMap[permission.parentId];
+        //   while (parent){
+        //     result[index].push(parent.id);
+        //     parent=this.permissionMap[parent.parentId];
+        //   }
+        //   index++;
+        // });
+        this.selectedPerms=[["1153189990263828481", "1154599246522019842"],["1154389609496887298", "1154389755186036737"]];
       },
     },
     computed: {

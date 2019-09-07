@@ -65,7 +65,6 @@
             component:"checkbox"
           },
           render:(a)=>{
-            console.log(a)
             return <el-button on-click={this.cons.bind(this,a)}>666</el-button>
           }
         },

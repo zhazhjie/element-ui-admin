@@ -5,52 +5,54 @@
  * @version: 1.0
  */
 export function setMenu(menu) {
-	return menu.map(el => {
-		const {
-			id,
-			url,
-			name,
-			icon,
-			children,
-			parentId,
-			hidden
-		} = el;
-		return {
-			path: url || '/' + id,
-			component: (resolve) => {
-				if (!url) {
-					if (parentId == 0) {
-						require(['@/views/index'], resolve)
-					} else {
-						require(['@/views/routerView'], resolve)
-					}
-				} else {
-					require([`@/views${url}`], resolve)
-				}
-			},
-			//name:name,
-			meta: {
-				name: name,
-				icon: icon,
-				hidden: hidden
-			},
-			children: (children && children.length) ? setMenu(children) : []
-		}
-	})
+  return menu.map(el => {
+    const {
+      id,
+      url,
+      name,
+      icon,
+      children,
+      parentId,
+      hidden
+    } = el;
+    return {
+      path: url || '/' + id,
+      component: (resolve) => {
+        if (!url) {
+          if (parentId == 0) {
+            require(['@/views/index'], resolve)
+          } else {
+            require(['@/views/routerView'], resolve)
+          }
+        } else {
+          require([`@/views${url}`], resolve)
+        }
+      },
+      //name:name,
+      meta: {
+        name: name,
+        icon: icon,
+        hidden: hidden
+      },
+      children: (children && children.length) ? setMenu(children) : []
+    }
+  })
 }
+
 export function setStore(name, data, type) {
-	if (type) {
-		localStorage.setItem(name, JSON.stringify(data))
-	} else {
-		sessionStorage.setItem(name, JSON.stringify(data))
-	}
+  if (type) {
+    localStorage.setItem(name, JSON.stringify(data))
+  } else {
+    sessionStorage.setItem(name, JSON.stringify(data))
+  }
 }
+
 export function getStore(name, type) {
-	if (type) {
-		return JSON.parse(localStorage.getItem(name) || 'null')
-	} else {
-		return JSON.parse(sessionStorage.getItem(name) || 'null')
-	}
+  if (type) {
+    return JSON.parse(localStorage.getItem(name) || 'null')
+  } else {
+    return JSON.parse(sessionStorage.getItem(name) || 'null')
+  }
 }
 
 export function toTreeData(list, parentId = 0, idKey = "id", parentIdKey = "parentId") {
@@ -76,6 +78,7 @@ function findChildren(parent, list, idKey, parentIdKey, level) {
   });
   return parent;
 }
+
 /**
  * 树形数据转换
  * @param {*} data
@@ -83,44 +86,58 @@ function findChildren(parent, list, idKey, parentIdKey, level) {
  * @param {*} pid
  */
 export function treeDataTranslate(data, id = 'id', pid = 'parentId') {
-	let res = []
-	let temp = {}
-	for (let i = 0; i < data.length; i++) {
-		temp[data[i][id]] = data[i]
-	}
-	for (let k = 0; k < data.length; k++) {
-		if (temp[data[k][pid]] && data[k][id] !== data[k][pid]) {
-			if (!temp[data[k][pid]]['children']) {
-				temp[data[k][pid]]['children'] = []
-			}
-			if (!temp[data[k][pid]]['_level']) {
-				temp[data[k][pid]]['_level'] = 1
-			}
-			data[k]['_level'] = temp[data[k][pid]]._level + 1
-			temp[data[k][pid]]['children'].push(data[k])
-		} else {
-			res.push(data[k])
-		}
-	}
-	return res
+  let res = []
+  let temp = {}
+  for (let i = 0; i < data.length; i++) {
+    temp[data[i][id]] = data[i]
+  }
+  for (let k = 0; k < data.length; k++) {
+    if (temp[data[k][pid]] && data[k][id] !== data[k][pid]) {
+      if (!temp[data[k][pid]]['children']) {
+        temp[data[k][pid]]['children'] = []
+      }
+      if (!temp[data[k][pid]]['_level']) {
+        temp[data[k][pid]]['_level'] = 1
+      }
+      data[k]['_level'] = temp[data[k][pid]]._level + 1
+      temp[data[k][pid]]['children'].push(data[k])
+    } else {
+      res.push(data[k])
+    }
+  }
+  return res
 }
 
-Date.prototype.Format = function(fmt) { //author: meizz
-	let o = {
-		"M+": this.getMonth() + 1, //月份
-		"d+": this.getDate(), //日
-		"h+": this.getHours(), //小时
-		"m+": this.getMinutes(), //分
-		"s+": this.getSeconds(), //秒
-		"q+": Math.floor((this.getMonth() + 3) / 3), //季度
-		"S": this.getMilliseconds() //毫秒
-	};
-	if (/(y+)/.test(fmt))
-		fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-	for (let k in o)
-		if (new RegExp("(" + k + ")").test(fmt))
-			fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-	return fmt;
+/**
+ * list转map
+ * @param list
+ * @param key
+ * @returns {*}
+ */
+export function listToMap(list, key = "id") {
+  let map = {};
+  list.forEach(item => {
+    map[item[key]] = item;
+  })
+  return map;
+}
+
+Date.prototype.Format = function (fmt) { //author: meizz
+  let o = {
+    "M+": this.getMonth() + 1, //月份
+    "d+": this.getDate(), //日
+    "h+": this.getHours(), //小时
+    "m+": this.getMinutes(), //分
+    "s+": this.getSeconds(), //秒
+    "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+    "S": this.getMilliseconds() //毫秒
+  };
+  if (/(y+)/.test(fmt))
+    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  for (let k in o)
+    if (new RegExp("(" + k + ")").test(fmt))
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+  return fmt;
 }
 
 /**

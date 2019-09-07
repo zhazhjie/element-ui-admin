@@ -28,7 +28,7 @@
       :handleProps="{width:'150px'}"
       :rules="rules"
       :loading='tableLoading'
-      :tableData='menuList'
+      :tableData='permissionTree'
       :columns='columns'
       :handleList='handleList'
       :handlePageChange='listMenu'
@@ -38,20 +38,13 @@
 
 <script>
   import {listMenu, udpObj, addObj, delObj, selectMenu} from '@/api/sys/menu'
-  import {treeDataTranslate} from "../../js/util";
+  import {listToMap, treeDataTranslate} from "../../js/util";
 
   export default {
     data() {
       return {
-        dialogVisible: false,
-        deptVisible: false,
         tableLoading: false,
         handleLoading: false,
-        handleType: 0,
-        defaultProps: {
-          children: 'children',
-          label: 'name'
-        },
         curMenu: {
           id: '',
           name: '',
@@ -64,8 +57,7 @@
           parentId: '',
           parentName: ''
         },
-        menuList: [],
-        selectMenuList: [],
+        permissionTree: [],
         selectedPerms:[],
         columns: [
           {
@@ -84,23 +76,22 @@
           {
             label: '上级菜单',
             field: 'parentName',
-            formItem: {
+            formEl: {
               render: row => {
                 return (
                   <el-cascader
                     ref="perms"
                     style="width:100%"
-                    placeholder="请选择权限"
+                    placeholder="请选择父节点"
                     value={this.selectedPerms}
-                    // on-input={e=>row.parentId=e}
-                    // on-change={this.handleSelectNode.bind(this,row)}
+                    on-input={e=>this.handleSelectNode(e,row)}
                     props={{
                       label: "name",
                       value: "id",
                       checkStrictly: true,
                       expandTrigger: "hover"
                     }}
-                    options={this.menuList}
+                    options={this.permissionTree}
                     collapse-tags/>
                 )
               }
@@ -123,7 +114,7 @@
                 return <el-tag size="small" type="info">接口</el-tag>
               }
             },
-            formItem: {
+            formEl: {
               render: row => {
                 return (
                   <div>
@@ -170,7 +161,7 @@
         ],
         rules: {
           name: [
-            {required: true, message: '请输入菜单名称', trigger: 'blur'},
+            {required: true, message: '请输入权限名称', trigger: 'blur'},
           ],
           parentName: [
             {message: '请选择上级目录', trigger: 'change'},
@@ -181,7 +172,8 @@
         params: {
           keyword: '',
           current: 1,
-          size: 10
+          size: 10,
+          total:10
         }
       }
     },
@@ -197,14 +189,24 @@
         this.tableLoading = true;
         listMenu(this.params).then((res) => {
           this.tableLoading = false;
-          this.originalMenuList=res.data;
-          this.menuList = treeDataTranslate(res.data);
+         this.permissionTree = treeDataTranslate(res.data);
+          this.permissionMap=listToMap(res.data);
         })
+      },
+      handleSelectNode(e,row){
+        for(let i=0;i<e.length;i++){
+          let perms=this.permissionMap[e[i]];
+          if(perms&&(perms.id===row.id)){
+            this.selectedPerms=[];
+            return this.$message.warning("不能选自己及子节点作为父节点");
+          }
+        }
+        this.selectedPerms=e;
       },
       handleAdd() {
         let table = this.$refs.table;
         table.curRow = this.curMenu;
-        table.showDialog();
+        table.handlesShowDialog();
       },
       handleDelete(id, name) {
         this.confirm('确定要删除[' + name + ']吗?', '提示').then(() => {
@@ -214,7 +216,6 @@
               message: '删除成功!'
             });
             this.listMenu();
-            this.selectMenu();
           });
         });
       },
@@ -237,7 +238,7 @@
           });
           this.listMenu();
           this.handleLoading = false;
-          this.$refs.table.handleClose();
+          this.$refs.table.handleCloseDialog();
         }).catch(() => {
           this.handleLoading = false;
         });
@@ -250,59 +251,23 @@
           });
           this.listMenu();
           this.handleLoading = false;
-          this.$refs.table.handleClose();
+          this.$refs.table.handleCloseDialog();
         }).catch(() => {
           this.handleLoading = false;
         });
       },
-      handleNodeClick(row, data) {
-        this.deptVisible = false;
-        row.parentId = data.id;
-        row.parentName = data.name;
-      },
-      selectMenu() {
-        selectMenu().then(res => {
-          this.selectMenuList = [];
-          this.selectMenuList.push(res.data);
-        });
-      },
       findParentId(row){
         let result=[];
-        result.push(row.id);
-        this.findNext(result,row.parentId);
-        this.selectedPerms=[result.reverse()];
-        console.log(row,this.selectedPerms)
-      },
-      findNext(result,parentId){
-        let len=this.originalMenuList.length;
-        for(let i =0;i<len;i++){
-          let item=this.originalMenuList[i];
-          if(item.id===parentId){
-            result.push(item.id);
-            if(item.parentId!=0) this.findNext(result,item.parentId);
-            break;
-          }
+        let parent=this.permissionMap[row.parentId];
+        while (parent){
+          result.push(parent.id);
+          parent=this.permissionMap[parent.parentId];
         }
+        this.selectedPerms=result.reverse();
       },
-      handleMenuTypeChange() {
-        this.rules.url = [];
-        this.rules.perms = [];
-        if (this.curMenu.type == 0) {
-          this.curMenu.url = "";
-          this.curMenu.perms = "";
-        } else if (this.curMenu.type == 1) {
-          this.curMenu.perms = "";
-          this.rules.url.push({required: true, message: '请输入菜单路由', trigger: 'blur'});
-        } else if (this.curMenu.type == 2) {
-          this.curMenu.url = "";
-          this.curMenu.icon = "";
-          this.rules.perms.push({required: true, message: '请输入授权标识', trigger: 'blur'});
-        }
-      }
     },
     computed: {},
     mounted() {
-      //this.fetchList();
       this.listMenu();
     }
   }

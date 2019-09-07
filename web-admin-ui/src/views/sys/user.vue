@@ -97,7 +97,7 @@
             label: '角色',
             field: 'roleIdList',
             hiddenInTable: true,
-            formItem: {
+            formEl: {
               render: (row) => {
                 return (<el-select
                   value={row.roleIdList}
@@ -125,7 +125,7 @@
             render: (row) => {
               return row.state ? <el-tag type="success">正常</el-tag> : <el-tag type="danger">禁用</el-tag>
             },
-            formItem: {
+            formEl: {
               render: (row) => {
                 return (<div>
                   <el-radio label={1} value={row.state} on-input={e => row.state = e}>正常</el-radio>
@@ -177,7 +177,8 @@
         params: {
           keyword: '',
           current: 1,
-          size: 10
+          size: 10,
+          total:10
         }
       }
     },

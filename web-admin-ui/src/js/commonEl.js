@@ -6,13 +6,11 @@
 */	
 import permissionBtn from '../components/permissionBtn';
 import tableTemplate from '../components/tableTemplate';
-import tableTreeColumn from '../components/tableTreeColumn';
 
 const commonEl=Object.create(null);
 commonEl.install = function (Vue) {
   Vue.component(permissionBtn.name, permissionBtn);
   Vue.component(tableTemplate.name, tableTemplate);
-  Vue.component(tableTreeColumn.name, tableTreeColumn);
 };
 
 export default commonEl;
