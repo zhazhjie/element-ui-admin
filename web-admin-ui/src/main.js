@@ -4,8 +4,8 @@ import router from './router'
 import store from './store'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-import commonEl from './js/commonEl'
-// import './permission'
+import commonEl from './components/index'
+import './permission'
 import {getStore,setStore} from '@/js/util'
 import './js/prototype'
 import imgPreview from '@/js/imgPreview'

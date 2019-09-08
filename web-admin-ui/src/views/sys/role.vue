@@ -165,7 +165,6 @@
         this.selectedPerms.forEach(item=>{
           permissionIdList.push(...item);
         });
-        console.log(permissionIdList)
         row.permissionIdList=[...new Set(permissionIdList)];
         let table = this.$refs.table;
         if (table.handleType) {
