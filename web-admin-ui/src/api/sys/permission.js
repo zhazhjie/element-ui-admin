@@ -7,16 +7,16 @@
 
 import request from '@/js/request'
 
-export function listMenu(data) {
+export function listPermission(data) {
   return request({
     url: '/sys/permission/list',
     method: 'get',
     params: data
   })
 }
-export function selectMenu() {
+export function listUserPermission() {
   return request({
-    url: '/sys/permission/select',
+    url: '/sys/permission/listUserPermission',
     method: 'get'
   })
 }

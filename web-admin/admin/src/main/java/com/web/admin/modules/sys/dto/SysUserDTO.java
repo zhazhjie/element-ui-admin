@@ -32,7 +32,7 @@ public class SysUserDTO extends BaseModel {
     /**
      * 密码
      */
-    @NotBlank(message = "密码不能为空")
+//    @NotBlank(message = "密码不能为空")
     private String password;
 
     /**

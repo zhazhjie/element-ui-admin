@@ -33,10 +33,10 @@
 </template>
 
 <script>
-  import {listPage, getObj, updObj, delObj, addObj} from '../../api/sys/role'
+  import {listPage, updObj, delObj, addObj} from '../../api/sys/role'
   import {formatTreeData, listToMap, treeDataTranslate} from '../../js/util'
   import {mapState} from 'vuex'
-  import {listMenu} from "../../api/sys/menu";
+  import {listPermission} from "../../api/sys/permission";
 
   export default {
     data() {
@@ -127,7 +127,7 @@
     methods: {
       listPermission() {
         this.tableLoading = true;
-        listMenu(this.params).then((res) => {
+        listPermission(this.params).then((res) => {
           this.tableLoading = false;
           this.permissionTree = treeDataTranslate(res.data);
           this.permissionMap = listToMap(res.data);

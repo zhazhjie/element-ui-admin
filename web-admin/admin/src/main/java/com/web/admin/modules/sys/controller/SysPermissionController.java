@@ -2,16 +2,20 @@ package com.web.admin.modules.sys.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.web.admin.modules.BaseController;
 import com.web.admin.modules.sys.dto.SysUserDTO;
 import com.web.admin.modules.sys.entity.SysPermission;
 import com.web.admin.modules.sys.service.SysPermissionService;
+import com.web.common.utils.Constant;
 import com.web.common.utils.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -23,14 +27,25 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/sys/permission")
-public class SysPermissionController {
+public class SysPermissionController extends BaseController {
     @Autowired
     SysPermissionService sysPermissionService;
 
     @GetMapping("/list")
-    public ResponseData listMenu(@RequestParam Map<String, Object> params) {
-        List<SysPermission> sysPermissions = sysPermissionService.listMenu(params);
+    public ResponseData listPermission(@RequestParam Map<String, Object> params) {
+        List<SysPermission> sysPermissions = sysPermissionService.listPermission(params);
         return ResponseData.success(sysPermissions);
+    }
+
+    @GetMapping("/listUserPermission")
+    public ResponseData listUserMenu(@RequestParam Map<String, Object> params) {
+        List<SysPermission> userMenuList = sysPermissionService.listUserPermission(getUser().getId(), Constant.SysPermissionType.MENU.getValue());
+        List<SysPermission> userPermissions = sysPermissionService.listUserPermission(getUser().getId(),Constant.SysPermissionType.INTERFACE.getValue());
+        List<String> userPermissionList = userPermissions.stream().map(item -> item.getPermissionFlag()).collect(Collectors.toList());
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("menuList",userMenuList);
+        result.put("permissions",userPermissionList);
+        return ResponseData.success(result);
     }
 
     @PostMapping("/update")

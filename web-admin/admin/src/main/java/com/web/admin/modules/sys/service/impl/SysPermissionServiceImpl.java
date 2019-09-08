@@ -25,8 +25,13 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
     SysRolePermissionService sysRolePermissionService;
 
     @Override
-    public List<SysPermission> listMenu(Map<String, Object> params) {
-        return baseMapper.listMenu(params);
+    public List<SysPermission> listPermission(Map<String, Object> params) {
+        return baseMapper.listPermission(params);
+    }
+
+    @Override
+    public List<SysPermission> listUserPermission(Long userId,Integer type) {
+        return baseMapper.listUserPermission(userId, type);
     }
 
     @Override

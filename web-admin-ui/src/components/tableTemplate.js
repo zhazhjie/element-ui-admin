@@ -229,7 +229,7 @@ export default {
                           column.formEl.render(this.curRow)
                           :
                           <el-input
-                            placeholder={"请输入" + column.label}
+                            placeholder={column.formEl&&column.formEl.placeholder?column.formEl.placeholder:"请输入" + column.label}
                             {...{props: column.formEl ? column.formEl.props : null}}
                             value={this.curRow[column.field]}
                             on-input={e => this.curRow[column.field] = e}/>

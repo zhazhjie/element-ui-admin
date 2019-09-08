@@ -8,7 +8,7 @@ import commonEl from './js/commonEl'
 // import './permission'
 import {getStore,setStore} from '@/js/util'
 import './js/prototype'
-import imgPreview from '@/js/img-preview'
+import imgPreview from '@/js/imgPreview'
 Vue.use(ElementUI,{size:getStore('size')||'mini'});
 Vue.config.productionTip = false;
 Vue.use(imgPreview);

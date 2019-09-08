@@ -10,28 +10,17 @@
       :default-active="$route.path"
       class="el-menu-vertical"
       :collapse="isCollapse"
-      text-color="rgb(191, 203, 217)"
-      background-color="#304156">
+      background-color="#545c64"
+      text-color="#fff">
       <div class="logo">
         <!-- <img src="@/img/google.svg"> -->
-        <span class="tit">{{userInfo.orgTypeName}}运营平台</span>
+        <span class="tit">{{userInfo.orgTypeName}}spring-admin</span>
       </div>
       <el-menu-item index='/homePage' @click='routeTo("/homePage")'>
         <i class="icon-home"></i>
         <span slot="title">首页</span>
       </el-menu-item>
       <sidebar-item :menu="menuList" :isCollapse="isCollapse"></sidebar-item>
-      <!--<el-submenu index="/help">-->
-        <!--<template slot="title">-->
-          <!--<i class="icon-question-circle"></i>-->
-          <!--<span slot="title">帮助</span>-->
-        <!--</template>-->
-        <!--<el-menu-item index="/help/other" @click='routeTo("/help/other")'>说明</el-menu-item>-->
-        <!--<el-menu-item index="/help/table" @click='routeTo("/help/table")'>表格</el-menu-item>-->
-        <!--<el-menu-item index="/help/iconfont" @click='routeTo("/help/iconfont")'>图标</el-menu-item>-->
-        <!--<el-menu-item index="/help/richText" @click='routeTo("/help/richText")'>富本文</el-menu-item>-->
-
-      <!--</el-submenu>-->
     </el-menu>
 </template>
 
@@ -54,9 +43,7 @@ export default {
     ...mapState(["menuList","userInfo","isCollapse"]),
   },
   mounted(){
-    // this.$store.dispatch('getMenu').then(res=>{
-    //   this.routeTo('/',1)
-    // })
+
   }
 }
 </script>
@@ -68,7 +55,7 @@ export default {
   height: 50px;
   line-height: 50px;
   font-size: 20px;
-  border-bottom: 1px solid #263445;
+  border-bottom: 1px solid #ccc;
   color: var(--blue);
   font-weight: bold;
 }
@@ -91,7 +78,7 @@ export default {
   min-width: 180px;
 }
 .el-menu{
-  border-right: 0;
+  /*border-right: 0;*/
 }
 .el-menu--collapse {
   width: 36px;

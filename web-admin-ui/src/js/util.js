@@ -19,7 +19,7 @@ export function setMenu(menu) {
       path: url || '/' + id,
       component: (resolve) => {
         if (!url) {
-          if (parentId == 0) {
+          if (parentId === "0") {
             require(['@/views/index'], resolve)
           } else {
             require(['@/views/routerView'], resolve)

@@ -22,6 +22,7 @@
       ref="table"
       @submit="handleSubmit"
       :dialogProps="{width:'500px'}"
+      :handleProps="{width:'235px'}"
       :rules="rules"
       :loading='tableLoading'
       :tableData='userList'
@@ -200,14 +201,14 @@
       handleAdd() {
         let table = this.$refs.table;
         table.curRow = this.curUser;
-        table.showDialog();
+        table.handleShowDialog();
       },
       handleResetPwd(row) {
         this.confirm('确定要重置[' + row.username + ']的密码吗?').then(() => {
-          resetPwd(row.id).then(() => {
+          resetPwd(row.id).then((res) => {
             this.$message({
               type: 'success',
-              message: '密码重置成功!'
+              message: `重置成功，默认密码：${res.data}!`
             });
           });
         });
@@ -236,13 +237,13 @@
         }
       },
       submitAdd(row) {
-        addObj(row).then(() => {
+        addObj(row).then((res) => {
           this.$message({
             type: 'success',
-            message: '新增成功!'
+            message: `新增成功，默认密码：${res.data}!'`
           });
           this.fetchList();
-          this.$refs.table.handleClose();
+          this.$refs.table.handleCloseDialog();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;
@@ -256,7 +257,7 @@
             message: '更新成功!'
           });
           this.fetchList();
-          this.$refs.table.handleClose();
+          this.$refs.table.handleCloseDialog();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;

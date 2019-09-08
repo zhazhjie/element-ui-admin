@@ -84,7 +84,7 @@ export default new Router({
               meta:{
                 name:'说明'
               },
-              component: (resolve)=>require(['@/views/sys/menu'],resolve),
+              component: (resolve)=>require(['@/views/sys/permission'],resolve),
             },
             {
               path: 'role',

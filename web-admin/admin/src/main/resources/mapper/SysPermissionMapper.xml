@@ -18,17 +18,28 @@
         <result column="hidden" property="hidden"/>
         <result column="create_time" property="createTime"/>
     </resultMap>
-    <select id="listMenu" resultMap="BaseResultMap">
+    <select id="listPermission" resultMap="BaseResultMap">
         select DISTINCT a.*,d.name as parent_name from sys_permission a
-        left join sys_role_permission b on a.id=b.permission_id
-        left join sys_user_role c on b.role_id=c.role_id
         left join sys_permission d on a.parent_id=d.id
         where 1=1
         <if test="params.keyword!=null and params.keyword!=''">
             and a.name like concat('%',#{params.keyword},'%')
         </if>
-        <if test="params.userId!=null">
-            and c.user_id = #{params.userId}
+        order by a.sort
+    </select>
+
+
+    <select id="listUserPermission" resultMap="BaseResultMap">
+        select DISTINCT a.* from sys_permission a
+        left join sys_role_permission b on a.id=b.permission_id
+        left join sys_user_role c on b.role_id=c.role_id
+        where 1=1
+        <if test="userId!=null">
+            and c.user_id = #{userId}
         </if>
+        <if test="type!=null">
+            and a.type = #{type}
+        </if>
+        order by a.sort
     </select>
 </mapper>

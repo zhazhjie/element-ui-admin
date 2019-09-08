@@ -15,7 +15,9 @@ import java.util.Map;
  * @since 2019-09-04
  */
 public interface SysPermissionService extends IService<SysPermission> {
-    List<SysPermission> listMenu(Map<String, Object> params);
+    List<SysPermission> listPermission(Map<String, Object> params);
+
+    List<SysPermission> listUserPermission(Long userId,Integer type);
 
     void add(SysPermission sysPermission);
 

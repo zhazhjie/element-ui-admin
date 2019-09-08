@@ -8,9 +8,9 @@
 <template>
   <section id="index">
     <el-container class='container'>
-      <sidebar/>
+      <nav-bar/>
       <el-container class='right-container'>
-        <headbar />
+        <head-bar />
         <el-main class='el-main'>
           <el-router-view/>
         </el-main>
@@ -21,8 +21,8 @@
 
 
 <script>
-import headbar from './headbar'
-import sidebar from './sidebar'
+import headBar from './headBar'
+import navBar from './navBar'
 import elRouterView from '../routerView'
 export default {
   data() {
@@ -31,8 +31,8 @@ export default {
     }
   },
   components: {
-    headbar,
-    sidebar,
+    headBar,
+    navBar,
     elRouterView
   },
   methods: {

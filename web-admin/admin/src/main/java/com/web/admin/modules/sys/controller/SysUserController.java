@@ -2,14 +2,18 @@ package com.web.admin.modules.sys.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.web.admin.modules.BaseController;
 import com.web.admin.modules.sys.dto.SysUserDTO;
 import com.web.admin.modules.sys.dto.UserLoginDTO;
+import com.web.admin.modules.sys.entity.SysUser;
 import com.web.admin.modules.sys.service.SysUserService;
+import com.web.common.utils.Constant;
 import com.web.common.utils.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +27,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/sys/user")
-public class SysUserController {
+public class SysUserController extends BaseController {
     @Autowired
     SysUserService sysUserService;
 
@@ -31,6 +35,12 @@ public class SysUserController {
     public ResponseData listPage(@RequestParam Map<String, Object> params) {
         IPage iPage = sysUserService.listPage(params);
         return ResponseData.success(iPage);
+    }
+
+    @GetMapping("/info")
+    public ResponseData info() {
+        SysUser user = sysUserService.getUserById(getUser().getId());
+        return ResponseData.success(user);
     }
 
     @PostMapping("/update")
@@ -42,7 +52,7 @@ public class SysUserController {
     @PutMapping("/add")
     public ResponseData add(@RequestBody @Valid SysUserDTO sysUserDTO) {
         sysUserService.add(sysUserDTO);
-        return ResponseData.success();
+        return ResponseData.success(Constant.INITIAL_PASSWORD);
     }
 
     @DeleteMapping("/delete")
@@ -54,11 +64,7 @@ public class SysUserController {
     @PostMapping("/resetPassword/{userId}")
     public ResponseData resetPassword(@PathVariable Long userId) {
         sysUserService.resetPassword(userId);
-        return ResponseData.success();
+        return ResponseData.success(Constant.INITIAL_PASSWORD);
     }
 
-    @PostMapping("/login")
-    public ResponseData login(@RequestBody @Valid UserLoginDTO userLoginDTO) {
-        return ResponseData.success();
-    }
 }

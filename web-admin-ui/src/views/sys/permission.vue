@@ -31,13 +31,13 @@
       :tableData='permissionTree'
       :columns='columns'
       :handleList='handleList'
-      :handlePageChange='listMenu'
+      :handlePageChange='listPermission'
       :page='params'/>
   </section>
 </template>
 
 <script>
-  import {listMenu, udpObj, addObj, delObj, selectMenu} from '@/api/sys/menu'
+  import {listPermission, udpObj, addObj, delObj} from '../../api/sys/permission'
   import {listToMap, treeDataTranslate} from "../../js/util";
 
   export default {
@@ -74,7 +74,7 @@
             field: 'name',
           },
           {
-            label: '上级菜单',
+            label: '父节点',
             field: 'parentName',
             formEl: {
               render: row => {
@@ -100,7 +100,8 @@
           {
             label: '图标',
             field: 'icon',
-            render: row => <i class={row.icon}></i>
+            render: row => <i class={row.icon}></i>,
+            hiddenInDialog: false,
           },
           {
             label: '类型',
@@ -108,8 +109,6 @@
             render: row => {
               if (row.type === 0) {
                 return <el-tag size="small">菜单</el-tag>
-              } else if (row.type === 1) {
-                return <el-tag size="small" type="success">按钮</el-tag>
               } else {
                 return <el-tag size="small" type="info">接口</el-tag>
               }
@@ -118,9 +117,8 @@
               render: row => {
                 return (
                   <div>
-                    <el-radio label={0} {...this.vModel(row)}>菜单</el-radio>
-                    <el-radio label={1} {...this.vModel(row)}>按钮</el-radio>
-                    <el-radio label={2} {...this.vModel(row)}>接口</el-radio>
+                    <el-radio label={0} {...this.vModel(row,'type')} on-change={this.handleChangeType.bind(this,row)}>菜单</el-radio>
+                    <el-radio label={1} {...this.vModel(row,'type')} on-change={this.handleChangeType.bind(this,row)}>接口</el-radio>
                   </div>
                 )
               }
@@ -142,7 +140,26 @@
             field: 'permissionFlag',
             props: {
               showOverflowTooltip: true
+            },
+            formEl:{
+              placeholder:'授权标识（如：sys:user:add）',
             }
+          },
+          {
+            label: '导航隐藏',
+            field: 'hidden',
+            hiddenInTable:true,
+            formEl: {
+              render: row => {
+                return (
+                  <div>
+                    <el-radio label={1} {...this.vModel(row,'hidden')}>是</el-radio>
+                    <el-radio label={0} {...this.vModel(row,'hidden')}>否</el-radio>
+                  </div>
+                )
+              }
+            },
+            hiddenInDialog: false,
           },
         ],
         handleList: [
@@ -179,15 +196,15 @@
     },
     components: {},
     methods: {
-      vModel(row) {
+      vModel(row,key) {
         return {
-          props: {value: row.type},
-          on: {input: e => row.type = e}
+          props: {value: row[key]},
+          on: {input: e => row[key] = e}
         }
       },
-      listMenu: function () {
+      listPermission: function () {
         this.tableLoading = true;
-        listMenu(this.params).then((res) => {
+        listPermission(this.params).then((res) => {
           this.tableLoading = false;
          this.permissionTree = treeDataTranslate(res.data);
           this.permissionMap=listToMap(res.data);
@@ -206,7 +223,7 @@
       handleAdd() {
         let table = this.$refs.table;
         table.curRow = this.curMenu;
-        table.handlesShowDialog();
+        table.handleShowDialog();
       },
       handleDelete(id, name) {
         this.confirm('确定要删除[' + name + ']吗?', '提示').then(() => {
@@ -215,13 +232,13 @@
               type: 'success',
               message: '删除成功!'
             });
-            this.listMenu();
+            this.listPermission();
           });
         });
       },
       handleSearch() {
         this.params.current = 1;
-        this.listMenu();
+        this.listPermission();
       },
       handleSubmit(row) {
         row.parentId=this.selectedPerms[this.selectedPerms.length-1];
@@ -237,7 +254,7 @@
             type: 'success',
             message: '新增成功!'
           });
-          this.listMenu();
+          this.listPermission();
           this.handleLoading = false;
           this.$refs.table.handleCloseDialog();
         }).catch(() => {
@@ -250,7 +267,7 @@
             type: 'success',
             message: '更新成功!'
           });
-          this.listMenu();
+          this.listPermission();
           this.handleLoading = false;
           this.$refs.table.handleCloseDialog();
         }).catch(() => {
@@ -266,10 +283,18 @@
         }
         this.selectedPerms=result;
       },
+      handleChangeType(row){
+        console.log(row)
+        if(row.type===0){
+
+        }else{
+
+        }
+      }
     },
     computed: {},
     mounted() {
-      this.listMenu();
+      this.listPermission();
     }
   }
 </script>

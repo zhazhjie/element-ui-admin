@@ -16,5 +16,6 @@ import java.util.Map;
  * @since 2019-09-04
  */
 public interface SysPermissionMapper extends BaseMapper<SysPermission> {
-    List<SysPermission> listMenu(@Param("params") Map<String, Object> params);
+    List<SysPermission> listPermission(@Param("params") Map<String, Object> params);
+    List<SysPermission> listUserPermission(@Param("userId") Long id,@Param("type") Integer type);
 }
