@@ -1,8 +1,8 @@
 package com.web.admin.modules.sys.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.web.admin.modules.sys.dto.SysUserDTO;
-import com.web.admin.modules.sys.entity.SysUser;
+import com.web.admin.modules.sys.entity.dto.SysUserDTO;
+import com.web.admin.modules.sys.entity.po.SysUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;

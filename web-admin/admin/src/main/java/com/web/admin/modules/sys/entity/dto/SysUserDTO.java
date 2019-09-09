@@ -1,12 +1,8 @@
-package com.web.admin.modules.sys.dto;
+package com.web.admin.modules.sys.entity.dto;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.web.model.BaseModel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 

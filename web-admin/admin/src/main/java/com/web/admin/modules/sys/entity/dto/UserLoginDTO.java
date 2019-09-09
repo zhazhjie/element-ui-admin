@@ -1,4 +1,4 @@
-package com.web.admin.modules.sys.dto;
+package com.web.admin.modules.sys.entity.dto;
 
 import lombok.Data;
 

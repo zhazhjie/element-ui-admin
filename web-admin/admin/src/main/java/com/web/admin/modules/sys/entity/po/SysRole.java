@@ -1,11 +1,9 @@
-package com.web.admin.modules.sys.entity;
+package com.web.admin.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.web.model.BaseModel;
+import com.web.common.utils.BaseModel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -18,8 +16,6 @@ import java.util.List;
  * @since 2019-09-04
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("sys_role")
 public class SysRole extends BaseModel {
 

@@ -2,7 +2,7 @@ package com.web.admin.modules.sys.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.web.admin.modules.sys.entity.SysRole;
+import com.web.admin.modules.sys.entity.po.SysRole;
 
 import java.util.List;
 import java.util.Map;

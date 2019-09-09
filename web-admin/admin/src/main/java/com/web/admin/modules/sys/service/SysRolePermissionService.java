@@ -1,6 +1,6 @@
 package com.web.admin.modules.sys.service;
 
-import com.web.admin.modules.sys.entity.SysRolePermission;
+import com.web.admin.modules.sys.entity.po.SysRolePermission;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;

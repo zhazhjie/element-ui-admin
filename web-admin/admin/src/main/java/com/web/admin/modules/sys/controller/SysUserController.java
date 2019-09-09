@@ -2,10 +2,8 @@ package com.web.admin.modules.sys.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.web.admin.modules.BaseController;
-import com.web.admin.modules.sys.dto.SysUserDTO;
-import com.web.admin.modules.sys.dto.UserLoginDTO;
-import com.web.admin.modules.sys.entity.SysUser;
+import com.web.admin.modules.sys.entity.dto.SysUserDTO;
+import com.web.admin.modules.sys.entity.po.SysUser;
 import com.web.admin.modules.sys.service.SysUserService;
 import com.web.common.utils.Constant;
 import com.web.common.utils.ResponseData;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 

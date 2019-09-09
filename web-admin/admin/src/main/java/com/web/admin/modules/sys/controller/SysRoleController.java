@@ -2,8 +2,7 @@ package com.web.admin.modules.sys.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.web.admin.modules.sys.dto.SysUserDTO;
-import com.web.admin.modules.sys.entity.SysRole;
+import com.web.admin.modules.sys.entity.po.SysRole;
 import com.web.admin.modules.sys.service.SysRoleService;
 import com.web.common.utils.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;

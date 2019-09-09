@@ -1,9 +1,8 @@
 package com.web.admin.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.web.admin.modules.sys.entity.SysRolePermission;
+import com.web.admin.modules.sys.entity.po.SysRolePermission;
 import com.web.admin.modules.sys.mapper.SysRolePermissionMapper;
 import com.web.admin.modules.sys.service.SysRolePermissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

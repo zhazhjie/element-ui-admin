@@ -3,7 +3,7 @@
 <mapper namespace="com.web.admin.modules.sys.mapper.SysUserMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.web.admin.modules.sys.entity.SysUser">
+    <resultMap id="BaseResultMap" type="com.web.admin.modules.sys.entity.po.SysUser">
     <result column="id" property="id" />
         <result column="username" property="username" />
         <result column="password" property="password" />
@@ -18,7 +18,7 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
-    <resultMap id="ListMap" type="com.web.admin.modules.sys.dto.SysUserDTO">
+    <resultMap id="ListMap" type="com.web.admin.modules.sys.entity.dto.SysUserDTO">
         <result column="id" property="id" />
         <result column="username" property="username" />
         <result column="email" property="email" />

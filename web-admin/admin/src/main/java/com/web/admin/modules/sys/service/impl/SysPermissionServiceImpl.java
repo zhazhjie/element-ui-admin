@@ -1,12 +1,13 @@
 package com.web.admin.modules.sys.service.impl;
 
-import com.web.admin.modules.sys.entity.SysPermission;
+import com.web.admin.modules.sys.entity.po.SysPermission;
 import com.web.admin.modules.sys.mapper.SysPermissionMapper;
 import com.web.admin.modules.sys.service.SysPermissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.web.admin.modules.sys.service.SysRolePermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         baseMapper.deleteById(id);
         sysRolePermissionService.deleteByPermissionId(id);

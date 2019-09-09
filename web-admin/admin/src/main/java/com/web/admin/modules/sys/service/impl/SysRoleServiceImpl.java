@@ -2,9 +2,8 @@ package com.web.admin.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.web.admin.modules.sys.entity.SysRole;
-import com.web.admin.modules.sys.entity.SysRolePermission;
-import com.web.admin.modules.sys.entity.SysUserRole;
+import com.web.admin.modules.sys.entity.po.SysRole;
+import com.web.admin.modules.sys.entity.po.SysUserRole;
 import com.web.admin.modules.sys.mapper.SysRoleMapper;
 import com.web.admin.modules.sys.service.SysRolePermissionService;
 import com.web.admin.modules.sys.service.SysRoleService;
@@ -14,6 +13,7 @@ import com.web.admin.utils.PageWrapper;
 import com.web.common.utils.AssertUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -53,12 +53,14 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void add(SysRole sysRole) {
         baseMapper.insert(sysRole);
         sysRolePermissionService.saveRolePermission(sysRole.getId(),sysRole.getPermissionIdList());
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void update(SysRole sysRole) {
         baseMapper.updateById(sysRole);
         sysRolePermissionService.deleteByRoleId(sysRole.getId());
@@ -66,6 +68,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delete(List<Long> ids) {
         ids.forEach(id -> {
             List<SysUserRole> byRoleId = sysUserRoleService.getByRoleId(id);

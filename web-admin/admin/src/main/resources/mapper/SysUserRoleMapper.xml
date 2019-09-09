@@ -3,7 +3,7 @@
 <mapper namespace="com.web.admin.modules.sys.mapper.SysUserRoleMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.web.admin.modules.sys.entity.SysUserRole">
+    <resultMap id="BaseResultMap" type="com.web.admin.modules.sys.entity.po.SysUserRole">
     <result column="id" property="id" />
     <result column="create_time" property="createTime" />
     <result column="update_time" property="updateTime" />

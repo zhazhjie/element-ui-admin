@@ -1,10 +1,7 @@
 package com.web.admin.modules.sys.controller;
 
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.web.admin.modules.BaseController;
-import com.web.admin.modules.sys.dto.SysUserDTO;
-import com.web.admin.modules.sys.entity.SysPermission;
+import com.web.admin.modules.sys.entity.po.SysPermission;
 import com.web.admin.modules.sys.service.SysPermissionService;
 import com.web.common.utils.Constant;
 import com.web.common.utils.ResponseData;

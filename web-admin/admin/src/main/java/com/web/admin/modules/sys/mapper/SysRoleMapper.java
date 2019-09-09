@@ -1,8 +1,6 @@
 package com.web.admin.modules.sys.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.web.admin.modules.sys.entity.SysRole;
+import com.web.admin.modules.sys.entity.po.SysRole;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 

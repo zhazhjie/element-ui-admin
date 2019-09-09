@@ -1,12 +1,9 @@
-package com.web.admin.modules.sys.entity;
+package com.web.admin.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
-import com.web.model.BaseModel;
+import com.web.common.utils.BaseModel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
  * <p>
@@ -17,8 +14,6 @@ import lombok.experimental.Accessors;
  * @since 2019-09-04
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @TableName("sys_permission")
 public class SysPermission extends BaseModel {
 

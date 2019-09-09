@@ -1,12 +1,10 @@
 package com.web.admin.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.web.admin.modules.sys.dto.SysUserDTO;
-import com.web.admin.modules.sys.entity.SysUser;
-import com.web.admin.modules.sys.entity.SysUserRole;
+import com.web.admin.modules.sys.entity.dto.SysUserDTO;
+import com.web.admin.modules.sys.entity.po.SysUser;
 import com.web.admin.modules.sys.mapper.SysUserMapper;
 import com.web.admin.modules.sys.service.SysUserRoleService;
 import com.web.admin.modules.sys.service.SysUserService;

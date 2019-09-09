@@ -3,7 +3,7 @@
 <mapper namespace="com.web.admin.modules.sys.mapper.SysPermissionMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.web.admin.modules.sys.entity.SysPermission">
+    <resultMap id="BaseResultMap" type="com.web.admin.modules.sys.entity.po.SysPermission">
         <id column="id" property="id"/>
         <result column="update_time" property="updateTime"/>
         <result column="parent_id" property="parentId"/>

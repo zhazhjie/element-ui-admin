@@ -1,7 +1,7 @@
 package com.web.admin.modules.sys.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.web.admin.modules.sys.entity.SysPermission;
+import com.web.admin.modules.sys.entity.po.SysPermission;
 
 import java.util.List;
 import java.util.Map;
