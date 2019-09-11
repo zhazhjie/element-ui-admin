@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.web.admin.modules.sys.entity.dto.SysUserDTO;
 import com.web.admin.modules.sys.entity.po.SysUser;
 import com.web.admin.modules.sys.service.SysUserService;
-import com.web.common.utils.Constant;
+import com.web.common.utils.SysConstant;
 import com.web.common.utils.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +36,7 @@ public class SysUserController extends BaseController {
 
     @GetMapping("/info")
     public ResponseData info() {
-        SysUser user = sysUserService.getUserById(getUser().getId());
-        return ResponseData.success(user);
+        return ResponseData.success(getUser());
     }
 
     @PostMapping("/update")
@@ -49,7 +48,7 @@ public class SysUserController extends BaseController {
     @PutMapping("/add")
     public ResponseData add(@RequestBody @Valid SysUserDTO sysUserDTO) {
         sysUserService.add(sysUserDTO);
-        return ResponseData.success(Constant.INITIAL_PASSWORD);
+        return ResponseData.success(SysConstant.INITIAL_PASSWORD);
     }
 
     @DeleteMapping("/delete")
@@ -61,7 +60,7 @@ public class SysUserController extends BaseController {
     @PostMapping("/resetPassword/{userId}")
     public ResponseData resetPassword(@PathVariable Long userId) {
         sysUserService.resetPassword(userId);
-        return ResponseData.success(Constant.INITIAL_PASSWORD);
+        return ResponseData.success(SysConstant.INITIAL_PASSWORD);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.web.admin.modules.sys.entity.dto;
 
-import com.web.model.BaseModel;
+import com.web.admin.modules.sys.entity.BaseModel;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;

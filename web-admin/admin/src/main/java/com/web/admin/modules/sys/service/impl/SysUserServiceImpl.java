@@ -9,9 +9,10 @@ import com.web.admin.modules.sys.mapper.SysUserMapper;
 import com.web.admin.modules.sys.service.SysUserRoleService;
 import com.web.admin.modules.sys.service.SysUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.web.admin.modules.sys.service.SysUserTokenService;
 import com.web.admin.utils.PageWrapper;
 import com.web.common.utils.AssertUtil;
-import com.web.common.utils.Constant;
+import com.web.common.utils.SysConstant;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +35,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Autowired
     SysUserRoleService sysUserRoleService;
 
+    @Autowired
+    SysUserTokenService sysUserTokenService;
+
     @Override
     public IPage listPage(Map<String, Object> params) {
         PageWrapper<SysUser> pageWrapper = new PageWrapper<>(params);
@@ -54,7 +58,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         SysUser sysUser = new SysUser();
         BeanUtils.copyProperties(sysUserDTO,sysUser);
         String salt = RandomStringUtils.randomAlphanumeric(20);
-        sysUser.setPassword(new Sha256Hash(Constant.INITIAL_PASSWORD, salt).toHex());
+        sysUser.setPassword(new Sha256Hash(SysConstant.INITIAL_PASSWORD, salt).toHex());
         sysUser.setSalt(salt);
         sysUser.setCreateBy(1L);
         baseMapper.insert(sysUser);
@@ -89,7 +93,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public void resetPassword(Long userId){
         SysUser sysUser = new SysUser();
         String salt = RandomStringUtils.randomAlphanumeric(20);
-        sysUser.setPassword(new Sha256Hash(Constant.INITIAL_PASSWORD, salt).toHex());
+        sysUser.setPassword(new Sha256Hash(SysConstant.INITIAL_PASSWORD, salt).toHex());
         sysUser.setSalt(salt);
         sysUser.setId(userId);
         baseMapper.updateById(sysUser);
@@ -101,5 +105,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     public SysUser getUserByUsername(String username){
         return baseMapper.selectOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername,username));
+    }
+
+    @Override
+    public String login(Long userId) {
+        return sysUserTokenService.buildLoginToken(userId);
     }
 }

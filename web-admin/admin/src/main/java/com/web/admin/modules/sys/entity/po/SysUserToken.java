@@ -4,29 +4,34 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.web.admin.modules.sys.entity.BaseModel;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 /**
  * <p>
- * 角色权限关系表
+ * 系统用户Token
  * </p>
  *
  * @author zzj
- * @since 2019-09-04
+ * @since 2019-09-11
  */
 @Data
-@TableName("sys_role_permission")
-public class SysRolePermission extends BaseModel {
+@TableName("sys_user_token")
+public class SysUserToken extends BaseModel {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 角色ID
-     */
-    private Long roleId;
+    private Long userId;
 
     /**
-     * 权限ID
+     * token
      */
-    private Long permissionId;
+    private String token;
+
+    /**
+     * 过期时间
+     */
+    private Date expireTime;
 
 
 }

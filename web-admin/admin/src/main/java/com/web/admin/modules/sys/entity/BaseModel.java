@@ -1,4 +1,4 @@
-package com.web.common.utils;
+package com.web.admin.modules.sys.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;

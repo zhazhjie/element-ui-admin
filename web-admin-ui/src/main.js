@@ -5,10 +5,10 @@ import store from './store'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import commonEl from './components/index'
-import './permission'
-import {getStore,setStore} from '@/js/util'
+import './interceptor'
+import {getStore} from './js/util'
 import './js/prototype'
-import imgPreview from '@/js/imgPreview'
+import imgPreview from './js/imgPreview'
 Vue.use(ElementUI,{size:getStore('size')||'mini'});
 Vue.config.productionTip = false;
 Vue.use(imgPreview);

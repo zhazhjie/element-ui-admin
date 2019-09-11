@@ -41,9 +41,30 @@ export function updObj(obj) {
 
 export function resetPwd(id) {
   return request({
-    url: '/sys/user/resetPassword/'+id,
+    url: '/sys/user/resetPassword/' + id,
     method: 'post',
     params: {id: id}
   })
 }
 
+export function login(data) {
+  return request({
+    url: '/sys/user/login',
+    method: 'post',
+    data: data
+  })
+}
+
+export function getUserInfo() {
+  return request({
+    url: '/sys/user/info',
+    method: 'get'
+  })
+}
+
+export function logout() {
+  return request({
+    url: '/sys/user/logout',
+    method: 'post',
+  })
+}

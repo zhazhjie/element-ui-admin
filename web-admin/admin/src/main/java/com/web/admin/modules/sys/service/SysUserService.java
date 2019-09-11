@@ -30,4 +30,6 @@ public interface SysUserService extends IService<SysUser> {
     SysUser getUserById(Long id);
 
     void resetPassword(Long userId);
+
+    String login(Long userId);
 }

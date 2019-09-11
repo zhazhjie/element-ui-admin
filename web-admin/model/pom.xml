@@ -14,11 +14,7 @@
 	<name>model</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.baomidou</groupId>
-			<artifactId>mybatis-plus-boot-starter</artifactId>
-			<version>${mybatisplus.spring.boot.version}</version>
-		</dependency>
+
 	</dependencies>
 
 	<build>

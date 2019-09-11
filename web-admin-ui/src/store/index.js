@@ -1,9 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {getUserInfo} from '@/api/login'
+import {getUserInfo} from '@/api/sys/user'
 import {listUserPermission} from '@/api/sys/permission'
 import {setMenu,getStore,setStore} from '@/js/util'
-import router from '@/router'
 import {listToMap, toTreeData, treeDataTranslate} from "../js/util";
 Vue.use(Vuex)
 export default new Vuex.Store({

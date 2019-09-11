@@ -14,7 +14,7 @@
       text-color="#fff">
       <div class="logo">
         <!-- <img src="@/img/google.svg"> -->
-        <span class="tit">{{userInfo.orgTypeName}}spring-admin</span>
+        <span class="tit">spring-admin</span>
       </div>
       <el-menu-item index='/homePage' @click='routeTo("/homePage")'>
         <i class="icon-home"></i>
@@ -55,8 +55,7 @@ export default {
   height: 50px;
   line-height: 50px;
   font-size: 20px;
-  border-bottom: 1px solid #ccc;
-  color: var(--blue);
+  color: #fff;
   font-weight: bold;
 }
 .logo img{

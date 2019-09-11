@@ -2,7 +2,7 @@ package com.web.admin.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.web.common.utils.BaseModel;
+import com.web.admin.modules.sys.entity.BaseModel;
 import lombok.Data;
 
 import java.util.List;

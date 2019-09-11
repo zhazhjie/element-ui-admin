@@ -6,25 +6,22 @@
 */
 import router from './router'
 import store from './store'
-import { Message } from 'element-ui'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import {getStore,setStore} from '@/js/util'
+import {getStore,setStore} from './js/util'
 
-NProgress.configure({ showSpinner: false })
+NProgress.configure({ showSpinner: false });
 
-const whiteList = ['/login', '/404']// no redirect whitelist
+const whiteList = ['/login', '/404'];
 
 router.beforeEach((to, from, next) => {
-  NProgress.start() // start progress bar
+  NProgress.start();
   if(whiteList.indexOf(to.path)>-1){
     next();
   }else if(getStore('token','local')){
   	if(!store.state.menuInitialized){
-      Promise.all([
-        store.dispatch('getUserInfo'), store.dispatch('listUserPermission')
-      ]).then(()=>{
-        console.log(store.state.menuList)
+      store.dispatch('getUserInfo');
+      store.dispatch('listUserPermission').then(()=>{
         router.addRoutes(store.state.menuList);
         next({ ...to, replace: true })
       })
@@ -38,4 +35,4 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach(() => {
   NProgress.done() // finish progress bar
-})
+});
