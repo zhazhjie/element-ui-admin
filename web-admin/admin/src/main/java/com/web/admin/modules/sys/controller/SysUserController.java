@@ -43,24 +43,28 @@ public class SysUserController extends BaseController {
     }
 
     @PostMapping("/update")
+    @RequiresPermissions("sys:user:update")
     public ResponseData update(@RequestBody @Valid SysUserDTO sysUserDTO) {
         sysUserService.update(sysUserDTO);
         return ResponseData.success();
     }
 
     @PutMapping("/add")
+    @RequiresPermissions("sys:user:add")
     public ResponseData add(@RequestBody @Valid SysUserDTO sysUserDTO) {
         sysUserService.add(sysUserDTO);
         return ResponseData.success(SysConstant.INITIAL_PASSWORD);
     }
 
     @DeleteMapping("/delete")
+    @RequiresPermissions("sys:user:delete")
     public ResponseData delete(@RequestBody List<Long> ids) {
         sysUserService.delete(ids);
         return ResponseData.success();
     }
 
     @PostMapping("/resetPassword/{userId}")
+    @RequiresPermissions("sys:user:resetPassword")
     public ResponseData resetPassword(@PathVariable Long userId) {
         sysUserService.resetPassword(userId);
         return ResponseData.success(SysConstant.INITIAL_PASSWORD);

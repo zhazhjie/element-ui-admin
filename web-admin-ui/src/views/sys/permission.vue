@@ -43,6 +43,7 @@
   export default {
     data() {
       return {
+        iconList:[],
         tableLoading: false,
         handleLoading: false,
         curMenu: {
@@ -74,6 +75,7 @@
             field: 'name',
           },
           {
+            hiddenInTable:true,
             label: '父节点',
             field: 'parentName',
             formEl: {
@@ -102,6 +104,28 @@
             field: 'icon',
             render: row => <i class={row.icon}></i>,
             hiddenInDialog: false,
+            formEl: {
+              render: (row) => {
+                return (<el-select
+                  value={row.icon}
+                  on-input={e=>row.icon=e}
+                  filterable
+                  placeholder="请选择图标"
+                  style='width:100%'>
+                  {this.iconList.map(icon => {
+                    return (
+                      <el-option
+                        key={icon}
+                        label={icon}
+                        value={icon}>
+                        <i class={icon}></i>
+                        <span>{icon}</span>
+                      </el-option>
+                    )
+                  })}
+                </el-select>)
+              }
+            },
           },
           {
             label: '类型',
@@ -283,8 +307,18 @@
         }
         this.selectedPerms=result;
       },
+      getIconString() {
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            let iconString = xhr.responseText.replace(/@font-face {[^}]+}/, '');
+            this.iconList=iconString.match(/icon-[^:]+/ig);
+          }
+        };
+        xhr.open('GET', '//at.alicdn.com/t/font_904872_39lanr15pjp.css');
+        xhr.send();
+      },
       handleChangeType(row){
-        console.log(row)
         if(row.type===0){
 
         }else{
@@ -295,6 +329,7 @@
     computed: {},
     mounted() {
       this.listPermission();
+      this.getIconString();
     }
   }
 </script>

@@ -7,7 +7,6 @@
         <id column="id" property="id"/>
         <result column="update_time" property="updateTime"/>
         <result column="parent_id" property="parentId"/>
-        <result column="parent_name" property="parentName"/>
         <result column="name" property="name"/>
         <result column="url" property="url"/>
         <result column="permission_flag" property="permissionFlag"/>
@@ -19,13 +18,12 @@
         <result column="create_time" property="createTime"/>
     </resultMap>
     <select id="listPermission" resultMap="BaseResultMap">
-        select DISTINCT a.*,d.name as parent_name from sys_permission a
-        left join sys_permission d on a.parent_id=d.id
+        select DISTINCT * from sys_permission
         where 1=1
         <if test="params.keyword!=null and params.keyword!=''">
-            and a.name like concat('%',#{params.keyword},'%')
+            and name like concat('%',#{params.keyword},'%')
         </if>
-        order by a.sort
+        order by sort
     </select>
 
 

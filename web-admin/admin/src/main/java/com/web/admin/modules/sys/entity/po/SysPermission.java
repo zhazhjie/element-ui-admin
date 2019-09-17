@@ -20,12 +20,9 @@ public class SysPermission extends BaseModel {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 父菜单ID，一级菜单为0 (类型为菜单时必填)
+     * 父节点ID，顶级为0
      */
     private Long parentId;
-
-    @TableField(exist = false)
-    private String parentName;
 
     /**
      * 权限名称
@@ -33,7 +30,7 @@ public class SysPermission extends BaseModel {
     private String name;
 
     /**
-     * 菜单路由 (类型为菜单时选填)
+     * 菜单对应组件的路径或接口URL
      */
     private String url;
 
@@ -43,7 +40,7 @@ public class SysPermission extends BaseModel {
     private String permissionFlag;
 
     /**
-     * 类型 0：菜单，1：按钮，2：接口
+     * 类型 0：菜单，1：接口
      */
     private Integer type;
 
@@ -63,7 +60,7 @@ public class SysPermission extends BaseModel {
     private Integer sort;
 
     /**
-     * 是否隐藏 1 隐藏，0 显示 (类型为菜单时选填)
+     * 在导航菜单中隐藏 1 隐藏，0 显示 (类型为菜单时选填)
      */
     private Integer hidden;
 

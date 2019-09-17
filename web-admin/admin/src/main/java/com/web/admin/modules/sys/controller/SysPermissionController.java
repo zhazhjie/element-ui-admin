@@ -37,6 +37,7 @@ public class SysPermissionController extends BaseController {
     }
 
     @GetMapping("/listUserPermission")
+    @RequiresPermissions("sys:permission:list")
     public ResponseData listUserMenu(@RequestParam Map<String, Object> params) {
         Long userId=getUser().getId();
         List<SysPermission> userMenuList = sysPermissionService.listUserPermission(userId, SysConstant.SysPermissionType.MENU.getValue());
@@ -49,18 +50,21 @@ public class SysPermissionController extends BaseController {
     }
 
     @PostMapping("/update")
+    @RequiresPermissions("sys:permission:update")
     public ResponseData update(@RequestBody @Valid SysPermission sysPermission) {
         sysPermissionService.update(sysPermission);
         return ResponseData.success();
     }
 
     @PutMapping("/add")
+    @RequiresPermissions("sys:permission:add")
     public ResponseData add(@RequestBody @Valid SysPermission sysPermission) {
         sysPermissionService.add(sysPermission);
         return ResponseData.success();
     }
 
     @DeleteMapping("/delete/{id}")
+    @RequiresPermissions("sys:permission:delete")
     public ResponseData delete(@PathVariable Long id) {
         sysPermissionService.delete(id);
         return ResponseData.success();
