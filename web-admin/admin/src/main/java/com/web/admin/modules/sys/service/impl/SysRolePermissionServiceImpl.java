@@ -24,19 +24,19 @@ import java.util.List;
 public class SysRolePermissionServiceImpl extends ServiceImpl<SysRolePermissionMapper, SysRolePermission> implements SysRolePermissionService {
     @Override
     public void deleteByPermissionId(Long permissionId) {
-        baseMapper.delete(new LambdaQueryWrapper<SysRolePermission>().eq(SysRolePermission::getPermissionId,permissionId));
+        baseMapper.delete(new LambdaQueryWrapper<SysRolePermission>().eq(SysRolePermission::getPermissionId, permissionId));
     }
 
     @Override
     public void deleteByRoleId(Long roleId) {
-        baseMapper.delete(new LambdaQueryWrapper<SysRolePermission>().eq(SysRolePermission::getRoleId,roleId));
+        baseMapper.delete(new LambdaQueryWrapper<SysRolePermission>().eq(SysRolePermission::getRoleId, roleId));
     }
 
     @Override
     public void saveRolePermission(Long roleId, List<Long> permissionIds) {
-        if(permissionIds.size()==0) return;
+        if (permissionIds == null) return;
         ArrayList<SysRolePermission> sysRolePermissionList = new ArrayList<>();
-        permissionIds.forEach(permissionId->{
+        permissionIds.forEach(permissionId -> {
             SysRolePermission sysRolePermission = new SysRolePermission();
             sysRolePermission.setId(IdWorker.getId());
             sysRolePermission.setRoleId(roleId);

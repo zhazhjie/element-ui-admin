@@ -157,8 +157,9 @@
     height: 0.6rem;
     line-height: 0.6rem;
     text-indent: 0.2rem;
-    background: rgba(24, 121, 202, 0.5);
-    color: #fff;
+    /*color: #fff;*/
+    border-bottom: 1px solid #ddd;
+    background: #fff;
   }
 
   .login-info {

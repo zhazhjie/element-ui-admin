@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface SysUserTokenService extends IService<SysUserToken> {
     String buildLoginToken(Long userId);
+    SysUserToken getUserToken(String token);
+    void deleteUserToken(Long userId);
 }

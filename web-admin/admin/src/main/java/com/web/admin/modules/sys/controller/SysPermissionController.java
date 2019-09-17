@@ -5,6 +5,7 @@ import com.web.admin.modules.sys.entity.po.SysPermission;
 import com.web.admin.modules.sys.service.SysPermissionService;
 import com.web.common.utils.SysConstant;
 import com.web.common.utils.ResponseData;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ public class SysPermissionController extends BaseController {
     SysPermissionService sysPermissionService;
 
     @GetMapping("/list")
+    @RequiresPermissions("sys:permission:list")
     public ResponseData listPermission(@RequestParam Map<String, Object> params) {
         List<SysPermission> sysPermissions = sysPermissionService.listPermission(params);
         return ResponseData.success(sysPermissions);
@@ -36,8 +38,9 @@ public class SysPermissionController extends BaseController {
 
     @GetMapping("/listUserPermission")
     public ResponseData listUserMenu(@RequestParam Map<String, Object> params) {
-        List<SysPermission> userMenuList = sysPermissionService.listUserPermission(getUser().getId(), SysConstant.SysPermissionType.MENU.getValue());
-        List<SysPermission> userPermissions = sysPermissionService.listUserPermission(getUser().getId(), SysConstant.SysPermissionType.INTERFACE.getValue());
+        Long userId=getUser().getId();
+        List<SysPermission> userMenuList = sysPermissionService.listUserPermission(userId, SysConstant.SysPermissionType.MENU.getValue());
+        List<SysPermission> userPermissions = sysPermissionService.listUserPermission(userId, SysConstant.SysPermissionType.INTERFACE.getValue());
         List<String> userPermissionList = userPermissions.stream().map(item -> item.getPermissionFlag()).collect(Collectors.toList());
         HashMap<String, Object> result = new HashMap<>();
         result.put("menuList",userMenuList);

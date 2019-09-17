@@ -20,8 +20,9 @@ import java.util.List;
 @Service("SysUserRoleService")
 public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUserRole> implements SysUserRoleService {
     @Override
-    public void saveUserRole(Long userId,List<Long> roleIds) {
-        roleIds.forEach(roleId->{
+    public void saveUserRole(Long userId, List<Long> roleIds) {
+        if (roleIds == null) return;
+        roleIds.forEach(roleId -> {
             SysUserRole sysUserRole = new SysUserRole();
             sysUserRole.setRoleId(roleId);
             sysUserRole.setUserId(userId);
@@ -31,11 +32,11 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
 
     @Override
     public void deleteByUserId(Long userId) {
-        baseMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId,userId));
+        baseMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
     }
 
     @Override
     public List<SysUserRole> getByRoleId(Long roleId) {
-        return baseMapper.selectList(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getRoleId,roleId));
+        return baseMapper.selectList(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getRoleId, roleId));
     }
 }

@@ -27,6 +27,10 @@
 		<mysql.version>5.1.44</mysql.version>
 		<shiro.version>1.4.0</shiro.version>
 		<commons-lang.version>2.6</commons-lang.version>
+		<redis.version>2.0.8.RELEASE</redis.version>
+		<jedis.version>2.9.0</jedis.version>
+		<freemarker.version>2.3.23</freemarker.version>
+		<fastjson.version>1.2.46</fastjson.version>
 	</properties>
 
 	<dependencies>

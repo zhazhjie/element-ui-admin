@@ -1,10 +1,12 @@
 package com.web.admin.modules.sys.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.web.admin.modules.sys.entity.po.SysPermission;
 import com.web.admin.modules.sys.mapper.SysPermissionMapper;
 import com.web.admin.modules.sys.service.SysPermissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.web.admin.modules.sys.service.SysRolePermissionService;
+import com.web.common.utils.SysConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,9 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 
     @Override
     public List<SysPermission> listUserPermission(Long userId,Integer type) {
+        if(userId.equals(SysConstant.SUPER_ADMIN_ID)){
+            return baseMapper.selectList(new LambdaQueryWrapper<SysPermission>().eq(SysPermission::getType,type));
+        }
         return baseMapper.listUserPermission(userId, type);
     }
 

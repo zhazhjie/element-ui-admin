@@ -11,7 +11,7 @@
 
       }
     },
-    components: {temp},
+    components: {},
     methods: {
 
     },

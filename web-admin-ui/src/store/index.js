@@ -55,7 +55,6 @@ export default new Vuex.Store({
       state.isCollapse=!state.isCollapse;
     },
     logout({commit,state,dispatch}){
-      return new Promise((resolve, reject) => {
         // setStore('menuList',null);
         // setStore('permissions',null);
         // setStore('userInfo',null);
@@ -65,10 +64,6 @@ export default new Vuex.Store({
         state.userInfo={};
         resolve();
         location.reload();
-      })
-        .catch(error => {
-          reject(error)
-        })
     }
   }
 })

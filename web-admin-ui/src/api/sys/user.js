@@ -47,14 +47,6 @@ export function resetPwd(id) {
   })
 }
 
-export function login(data) {
-  return request({
-    url: '/sys/user/login',
-    method: 'post',
-    data: data
-  })
-}
-
 export function getUserInfo() {
   return request({
     url: '/sys/user/info',
@@ -62,9 +54,17 @@ export function getUserInfo() {
   })
 }
 
+export function login(data) {
+  return request({
+    url: '/sys/login',
+    method: 'post',
+    data: data
+  })
+}
+
 export function logout() {
   return request({
-    url: '/sys/user/logout',
+    url: '/sys/logout',
     method: 'post',
   })
 }

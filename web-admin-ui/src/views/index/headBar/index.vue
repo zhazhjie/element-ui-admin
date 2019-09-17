@@ -63,10 +63,7 @@ export default {
       this.$store.commit('setCollapse')
     },
     logout() {
-      this.$store.dispatch('logout').then(() => {
-        this.routeTo('/login')
-        location.reload()// In order to re-instantiate the vue-router object to avoid bugs
-      })
+      this.$store.commit('logout');
     },
     getBreadcrumb(){
       this.breadcrumb=this.$route.matched;

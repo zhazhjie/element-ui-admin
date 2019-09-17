@@ -2,11 +2,13 @@ package com.web.admin.modules.sys.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.web.admin.config.ShiroCacheManager;
 import com.web.admin.modules.sys.entity.dto.SysUserDTO;
 import com.web.admin.modules.sys.entity.po.SysUser;
 import com.web.admin.modules.sys.service.SysUserService;
 import com.web.common.utils.SysConstant;
 import com.web.common.utils.ResponseData;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,7 @@ public class SysUserController extends BaseController {
     SysUserService sysUserService;
 
     @GetMapping("/listPage")
+    @RequiresPermissions("sys:user:list")
     public ResponseData listPage(@RequestParam Map<String, Object> params) {
         IPage iPage = sysUserService.listPage(params);
         return ResponseData.success(iPage);

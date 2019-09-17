@@ -1,8 +1,10 @@
 package com.web.admin.modules.sys.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.web.admin.config.ShiroCacheManager;
 import com.web.admin.modules.sys.entity.dto.SysUserDTO;
 import com.web.admin.modules.sys.entity.po.SysUser;
 import com.web.admin.modules.sys.mapper.SysUserMapper;
@@ -37,6 +39,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Autowired
     SysUserTokenService sysUserTokenService;
+
+    @Autowired
+    ShiroCacheManager shiroCacheManager;
 
     @Override
     public IPage listPage(Map<String, Object> params) {
@@ -78,6 +83,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         baseMapper.updateById(sysUser);
         sysUserRoleService.deleteByUserId(sysUserDTO.getId());
         sysUserRoleService.saveUserRole(sysUser.getId(),sysUserDTO.getRoleIdList());
+        shiroCacheManager.remove(existUser.toString());
     }
 
     @Override
