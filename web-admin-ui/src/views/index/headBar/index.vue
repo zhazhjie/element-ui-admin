@@ -33,7 +33,7 @@
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item @click.native='routeTo("/homePage")'>首页</el-dropdown-item>
-          <el-dropdown-item @click.native='routeTo("/password")'>修改密码</el-dropdown-item>
+          <el-dropdown-item @click.native='routeTo("/resetPassword")'>修改密码</el-dropdown-item>
           <el-dropdown-item @click.native="logout" divided>退出系统</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>

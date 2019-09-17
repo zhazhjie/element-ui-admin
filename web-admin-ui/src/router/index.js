@@ -22,54 +22,16 @@ export default new Router({
           component: (resolve)=>require(['@/views/homePage'],resolve),
         },
         {
-          path: 'password',
+          path: '/resetPassword',
           meta:{
             name:'修改密码'
           },
           component: (resolve)=>require(['@/views/sys/info'],resolve),
         },
-        {
-          path: 'help',
-          meta:{
-            name:'帮助'
-          },
-          component: (resolve)=>require(['@/views/routerView'],resolve),
-          children:[
-            {
-              path: 'iconfont',
-              meta:{
-                name:'图标'
-              },
-              component: (resolve)=>require(['@/views/help/iconfont'],resolve),
-            },
-            {
-              path: 'table',
-              meta:{
-                name:'表格'
-              },
-              component: (resolve)=>require(['@/views/help/table'],resolve),
-            },
-            {
-              path: 'richText',
-              meta:{
-                name:'富文本'
-              },
-              component: (resolve)=>require(['@/views/help/richText'],resolve),
-            },
-            {
-              path: 'other',
-              meta:{
-                name:'说明'
-              },
-              component: (resolve)=>require(['@/views/help/index'],resolve),
-            },
-          ]
-        },
       ],
     },
     {
       path: '/login',
-      name: 'login',
       meta:{
         name:'登录'
       },
