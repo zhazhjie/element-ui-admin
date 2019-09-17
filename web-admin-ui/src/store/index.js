@@ -54,7 +54,7 @@ export default new Vuex.Store({
     setCollapse(state,isCollapse){
       state.isCollapse=!state.isCollapse;
     },
-    logout({commit,state,dispatch}){
+    logout(state){
         // setStore('menuList',null);
         // setStore('permissions',null);
         // setStore('userInfo',null);
@@ -62,7 +62,6 @@ export default new Vuex.Store({
         state.menuList=[];
         state.permissions=[];
         state.userInfo={};
-        resolve();
         location.reload();
     }
   }

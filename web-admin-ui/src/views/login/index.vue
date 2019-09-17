@@ -7,8 +7,6 @@
 
 <template>
   <section id="login">
-    <header class="header">
-    </header>
     <div class="main">
       <!--<vue-particles color="#fdf6ec" class='vue-particles'></vue-particles>-->
       <transition name='fade-left'>
@@ -28,8 +26,6 @@
         </div>
       </transition>
     </div>
-    <footer class="footer">
-    </footer>
   </section>
 </template>
 
@@ -118,22 +114,8 @@
     width: 100vw;
     min-width: 12rem;
     height: 100vh;
-    background: #fff;
-  }
-
-  .header {
-    width: 12rem;
-    height: 1rem;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 0.2rem;
-  }
-
-  .logo {
-    cursor: pointer;
-    width: 1.5rem;
+    background-color: #fff;
+    padding-top: 1rem;
   }
 
   .main {
