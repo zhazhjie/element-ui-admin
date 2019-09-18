@@ -9,9 +9,7 @@
   <div class="main markdown">
     <p>使用步骤如下：</p>
     <h3>挑选相应图标并获取类名，应用于页面：</h3>
-    <pre><code class="lang-css hljs">&lt;<span class="hljs-selector-tag">i</span> <span
-      class="hljs-selector-tag">class</span>="<span class="hljs-selector-tag"></span><span class="hljs-selector-tag">icon-xxx</span>"&gt;&lt;/<span
-      class="hljs-selector-tag">i</span>&gt;</code></pre>
+    <code>{{example}}</code>
     <ul class="icon_lists clear">
       <li v-for="item in iconList">
         <i class="icon" :class="item"></i>
@@ -22,29 +20,27 @@
 </template>
 
 <script>
+  import {getIconList} from "../../js/util";
+
   export default {
     data() {
       return {
+        example:`<i class="icon-xxx"></i>`,
         iconList: []
       }
     },
     components: {},
     methods: {
-      getIconString() {
-        const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            let iconString = xhr.responseText.replace(/@font-face {[^}]+}/, '');
-            this.iconList = iconString.match(/icon-[^:]+/ig);
-          }
-        };
-        xhr.open('GET', '//at.alicdn.com/t/font_904872_39lanr15pjp.css');
-        xhr.send();
+      getIconList() {
+        getIconList().then(data=>{
+          this.iconList=data;
+        })
+          .catch(err=>err)
       },
     },
     computed: {},
     mounted() {
-      this.getIconString();
+      this.getIconList();
     }
   }
 </script>
@@ -80,9 +76,5 @@
     color: #666;
     font-size: 14px;
     line-height: 1.8;
-  }
-
-  .highlight {
-    line-height: 1.5;
   }
 </style>

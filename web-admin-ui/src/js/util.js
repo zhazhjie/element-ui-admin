@@ -364,3 +364,22 @@ export function copyText(text) {
   document.body.removeChild(el);
   return result;
 }
+
+/**
+ * 获取小图标列表
+ */
+export function getIconList() {
+  return new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        let iconString = xhr.responseText.replace(/@font-face {[^}]+}/, '');
+        let iconList = iconString.match(/icon-[^:]+/ig);
+        resolve(iconList);
+      }
+    };
+    xhr.open('GET', '//at.alicdn.com/t/font_904872_39lanr15pjp.css');
+    xhr.send();
+  });
+
+}

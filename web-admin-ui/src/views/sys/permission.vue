@@ -38,7 +38,7 @@
 
 <script>
   import {listPermission, udpObj, addObj, delObj} from '../../api/sys/permission'
-  import {listToMap, treeDataTranslate} from "../../js/util";
+  import {getIconList, listToMap, treeDataTranslate} from "../../js/util";
 
   export default {
     data() {
@@ -307,16 +307,11 @@
         }
         this.selectedPerms=result;
       },
-      getIconString() {
-        const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            let iconString = xhr.responseText.replace(/@font-face {[^}]+}/, '');
-            this.iconList=iconString.match(/icon-[^:]+/ig);
-          }
-        };
-        xhr.open('GET', '//at.alicdn.com/t/font_904872_39lanr15pjp.css');
-        xhr.send();
+      getIconList() {
+        getIconList().then(data=>{
+          this.iconList=data;
+        })
+          .catch(err=>err)
       },
       handleChangeType(row){
         if(row.type===0){
@@ -329,7 +324,7 @@
     computed: {},
     mounted() {
       this.listPermission();
-      this.getIconString();
+      this.getIconList();
     }
   }
 </script>
