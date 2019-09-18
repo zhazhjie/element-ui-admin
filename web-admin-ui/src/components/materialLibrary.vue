@@ -23,7 +23,7 @@
     <div class="main">
       <div class="opt-area">
         <div class="upload-box">
-          <div class="font16">{{type[params.resType]}}（共{{params.totalCount}}{{unit}}）</div>
+          <div class="font16">{{type[params.resType]}}（共{{params.total}}{{unit}}）</div>
           <div>
             <span class="gray font12">大小不超过5M</span>
             <el-button type='primary' @click='emitSelectFile'>上传素材</el-button>
@@ -40,7 +40,10 @@
         </div>
         <div class="group-box">
           <ul class="group-list">
-            <li :class='curGroup.id==item.id?"select":""' v-for='(item,index) in groupList' @click='changeGroup(item,index)'>{{item.groupName}}</li>
+            <li :class='curGroup.id===item.id?"select":""' v-for='(item,index) in groupList' @click='changeGroup(item,index)'>
+              <span>{{item.groupName}}</span>
+              <i v-if="item.id" class="btn" @click='handleDelete(item)'>×</i>
+            </li>
           </ul>
           <div class="group-opt">
             <el-button type='danger' @click='handleUpdateGroup'>编辑分组</el-button>
@@ -54,7 +57,7 @@
           </div>
           <div>
             <el-button type='danger' @click='handleDeleteMaterial'>删除</el-button>
-            <el-button @click='handleMoveGroup'>移动分组</el-button>
+            <el-button @click='handleMoveGroup'>移动到分组</el-button>
           </div>
         </div>
       </div> 
@@ -73,7 +76,7 @@
               </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item @click.native='handleRename(item)'>重命名</el-dropdown-item>
-                <!-- <el-dropdown-item @click.native='handleMoveGroup(item)'>移动分组</el-dropdown-item> -->
+                <!-- <el-dropdown-item @click.native='handleMoveGroup(item)'>移动到分组</el-dropdown-item> -->
                 <el-dropdown-item @click.native='handleDeleteItem(item)'>删除</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -90,7 +93,7 @@
         </div>
         <div class="not-data gray" v-if='!materialList.length'>-暂无数据-</div>
       </div>
-      <el-pagination style='margin-top: 20px' @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+params.curPage" :page-sizes="[12, 20, 40, 100]" :page-size="+params.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="+params.totalCount">
+      <el-pagination style='margin-top: 20px' @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="+params.current" :page-sizes="[12, 20, 40, 100]" :page-size="+params.size" layout="total, sizes, prev, pager, next, jumper" :total="+params.total">
     </el-pagination>
     </div>
   </el-dialog>
@@ -108,7 +111,7 @@
       </el-form>
       <span slot="footer">
         <el-button @click="handleClose('')">取 消</el-button>
-        <el-button v-if='handleType' type="danger" @click="handleDelete()" :loading='handleLoading'>删除</el-button>
+        <!--<el-button v-if='handleType' type="danger" @click="handleDelete()" :loading='handleLoading'>删除</el-button>-->
         <el-button type="primary" @click="handleSubmit()" :loading='handleLoading'>确认</el-button>
       </span>
     </el-dialog>
@@ -130,9 +133,9 @@
 </template>
 
 <script>
-import {compressImg} from '@/js/util'
-import {upload,listPage,updateById,deleteById,moveGroup} from '@/api/res/resOss'
-import {listGroup,saveGroup,updGroup,delGroup} from '@/api/res/resGroup'
+import {compressImg} from '../js/util'
+import {upload,listPage,updateById,deleteById,moveGroup} from '../api/res/resOss'
+import {listGroup,saveGroup,updGroup,delGroup} from '../api/res/resGroup'
 export default {
   props:{
     visible:{
@@ -141,9 +144,11 @@ export default {
     },
     maxWidth:{
       type:Number,
+      default: 750
     },
     maxHeight:{
-      type:Number
+      type:Number,
+      default: 750
     }
   },
   data() {
@@ -183,9 +188,9 @@ export default {
         keywords:"",
         resType:"image",
         groupId:0,
-        curPage:1,
-        pageSize:12,
-        totalCount:12
+        current:1,
+        size:12,
+        total:12
       }
     }
   },
@@ -231,13 +236,13 @@ export default {
     },
     selectAll(){
       let keys=Object.keys(this.selectedMap);
-      if(keys.length==this.materialList.length){
+      if(keys.length===this.materialList.length){
         this.selectedMap={};
       }else{
         let selectedMap={};
         this.materialList.forEach((el,i)=>{
           selectedMap[el.id]=el;
-        })
+        });
         this.selectedMap=selectedMap;
       }
     },
@@ -261,13 +266,18 @@ export default {
               message: '请选择jpg或png格式!'
             });
           default:
-            compressImg(file,'',this.maxWidth,this.maxHeight,(data,name)=>{
+            let data={
+              file,
+              maxWidth: this.maxWidth,
+              maxHeight: this.maxHeight
+            };
+            compressImg(data).then((data,name)=>{
               this.imgUrlDataList.push({
                 urlData:data,
                 name:file.name,
                 groupId:this.curGroup.id
               })
-            })
+            });
             break;
         }
       }
@@ -300,7 +310,7 @@ export default {
     emitRename(item){
       let curMaterial={...this.curMaterial};
       this.curMaterial={};
-      if(curMaterial.aliasName==item.aliasName) return;
+      if(curMaterial.aliasName===item.aliasName||!curMaterial.aliasName) return;
       updateById(curMaterial).then((res) => {
         item.aliasName=curMaterial.aliasName;
         this.$message({
@@ -310,12 +320,12 @@ export default {
       })
       .catch(err=>err)
     },
-    handleSizeChange(pageSize) {
-      this.params.pageSize = pageSize;
+    handleSizeChange(size) {
+      this.params.size = size;
       this.listPage();
     },
-    handleCurrentChange(curPage) {
-      this.params.curPage = curPage;
+    handleCurrentChange(current) {
+      this.params.current = current;
       this.listPage();
     },
     handleSelect(item){
@@ -331,15 +341,15 @@ export default {
       this.tableLoading=true;
       listPage(this.params).then((res) => {
         this.tableLoading=false;
-        this.materialList=res.data.list;
-        this.params.totalCount=res.data.totalCount;
+        this.materialList=res.data.records;
+        this.params.total=res.data.total;
         if(uploadFiles){
           let selectedMap={};
           this.materialList.forEach(el=>{
             if(uploadFiles.indexOf(el.objUrl)>-1){
               selectedMap[el.id]=el;
             }
-          })
+          });
           this.selectedMap=selectedMap;
         }
       })
@@ -387,11 +397,11 @@ export default {
       this.dialogVisible = true;
       this.curGroup={...this.groupList[this.curGroupIndex]};
     },
-    handleDelete() {
+    handleDelete(item) {
       this.handleLoading = true;
-      this.confirm('确定要删除分组[' + this.curGroup.groupName + ']吗?')
+      this.confirm('确定要删除分组[' + item.groupName + ']吗?')
       .then(() => {
-        delGroup(this.curGroup.id).then(() => {
+        delGroup(item.id).then(() => {
           this.$message({
             type: 'success',
             message: '删除成功!'
@@ -407,7 +417,7 @@ export default {
       });
     },
     handleSearch() {
-      this.params.curPage = 1;
+      this.params.current = 1;
       this.listPage();
     },
     handleSubmit() {
@@ -524,7 +534,7 @@ export default {
     },
     isSelectAll(){
       let len=Object.keys(this.selectedMap).length;
-      return len&&len==this.materialList.length;
+      return len&&len===this.materialList.length;
     }
   },
   mounted(){
@@ -687,6 +697,16 @@ export default {
   text-align: center;
   margin-bottom: 0.15rem;
 }
+.group-list li .btn{
+  display: none;
+  transition: all 0.1s;
+}
+.group-list li .btn:hover{
+  transform: scale(1.2);
+}
+  .group-list li:hover .btn{
+    display: inline-block;
+  }
 </style>
 <style>
 .material-item .el-checkbox__inner{

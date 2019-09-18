@@ -5,17 +5,11 @@
 * @version: 1.0 
 */	
 import Vue from 'vue'
+import store from '../store'
+import {formatAmount} from "./util";
 const OSS_URL = process.env.OSS_URL;
 const defaultImg = require('@/img/defaultImg.png');
-function formatAmount(value) {
-  if (!value) return '0.00';
-  value = value * 1;
-  if (value > 1000000) {
-    return (value / 10000).toFixed(2) + '万'
-  } else {
-    return value.toFixed(2)
-  }
-}
+
 Vue.prototype.confirm = function(msg){
 	return new Promise((resolve,reject)=>{
     this.$confirm(msg, '提示', {
@@ -44,7 +38,10 @@ Vue.prototype.routeBack = function(){
     ? this.$router.go(-1)
     : this.$router.replace('/')
 };
-
+Vue.prototype.routeAndCache = function (route, replace) {
+  this.routeTo(route.path,replace);
+  store.commit("pushCacheMenu",route);
+};
 Vue.prototype.formatAmount=formatAmount;
 Vue.filter('formatAmount',formatAmount);
 
@@ -62,4 +59,4 @@ Vue.directive('src', function (el, binding, vnode) {
     el.src = this.src;
   }
   newImg.src = imgUrl;
-})
+});

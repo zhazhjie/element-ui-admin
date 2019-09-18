@@ -8,7 +8,7 @@
 <template>
   <section>
     <tinymce v-model='content' />
-    <el-button type='success' @click='submit'>提交</el-button>
+    <el-button style="margin-top: 0.2rem" type='primary' @click='submit'>提交</el-button>
   </section>
 </template>
 

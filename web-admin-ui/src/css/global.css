@@ -77,13 +77,13 @@ textarea{
   resize: none;
 }
 :-moz-placeholder {
-    color: #aaa !important;
+    color: #aaa;
 }
 :-moz-placeholder {
-  color: #aaa !important;
+  color: #aaa;
 }
 ::-webkit-input-placeholder{
-  color: #aaa !important;
+  color: #aaa;
 }
 input:disabled,
 textarea:disabled,
@@ -235,22 +235,12 @@ select:disabled{
   position: absolute;
 } */
 .router-view{
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   min-height: 100%;
-  background: var(--bg);
+  /*background: var(--bg);*/
   /* overflow: auto; */
 }
-.child-router{
-  padding: 0.2rem;
-  background: #fff;
-  /* @apply --box; */
-  /* box-shadow: 0 0 0; */
-  /* margin: 0.15rem; */
-  /* width: calc(100% - 0.3rem); */
-}
+
 .active-btn:active{
   background: var(--active) !important;
 }

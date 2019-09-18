@@ -50,6 +50,9 @@ export default {
 
 <style scoped>
 @import url('../../../css/var.css');
+.el-menu-vertical{
+  flex-shrink: 0;
+}
 .logo{
   text-align: center;
   height: 50px;

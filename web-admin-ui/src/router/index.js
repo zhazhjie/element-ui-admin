@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import staticRouter from './staticRouter'
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   //mode:'history',
@@ -28,6 +29,12 @@ export default new Router({
           },
           component: (resolve)=>require(['@/views/sys/info'],resolve),
         },
+        {
+          path: '/redirect/:path*',
+          component: (resolve)=>require(['@/views/redirect'],resolve),
+          hidden: true,
+        },
+        ...staticRouter
       ],
     },
     {
@@ -39,7 +46,6 @@ export default new Router({
     },
     {
       path: '/redirect/:path*',
-      name:'redirect',
       component: (resolve)=>require(['@/views/redirect'],resolve),
       hidden: true,
     },

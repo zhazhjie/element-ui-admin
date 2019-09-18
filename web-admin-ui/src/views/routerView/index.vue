@@ -1,40 +1,47 @@
-/** 
- * @author: zhazhjie 
- * @email: zhazhjie@vip.qq.com
- * @date: 2018-11-06 14:29:32 
- * @version: 1.0 
- */
+/**
+* @author: zhazhjie
+* @email: zhazhjie@vip.qq.com
+* @date: 2018-11-06 14:29:32
+* @version: 1.0
+*/
 
 <template>
-  <div class="router">
-    <transition name='fade-right' mode='out-in'>
-      <router-view class='router-view child-router'/>
+  <section class="router">
+    <transition name='fade' mode='out-in'>
+      <keep-alive :include="menuList">
+        <router-view class='router-view'/>
+      </keep-alive>
     </transition>
-  </div>
+  </section>
 </template>
 
 <script>
-export default {
-  data() {
-    return {
+  export default {
+    name: 'elRouterView',
+    data() {
+      return {
+
+      }
+    },
+    components: {
+
+    },
+    methods: {
+
+    },
+    computed: {
+      menuList(){
+        return this.$store.state.cacheMenuList.map(v=>v.meta.name);
+      }
+    },
+    mounted(){
 
     }
-  },
-  components: {
-
-  },
-  methods: {
-
-  },
-  computed: {
-
-  },
-  mounted(){
-    
   }
-}
 </script>
 
 <style scoped>
-
+  .router{
+    height: 100%;
+  }
 </style>

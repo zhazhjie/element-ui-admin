@@ -1,7 +1,7 @@
 package com.web.admin.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.web.admin.modules.sys.entity.BaseModel;
+import com.web.admin.common.BaseModel;
 import lombok.Data;
 
 /**

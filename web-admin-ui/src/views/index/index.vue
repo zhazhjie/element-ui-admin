@@ -11,6 +11,7 @@
       <nav-bar/>
       <el-container class='right-container'>
         <head-bar />
+        <cache-menu-bar></cache-menu-bar>
         <el-main class='el-main'>
           <el-router-view/>
         </el-main>
@@ -24,6 +25,7 @@
 import headBar from './headBar'
 import navBar from './navBar'
 import elRouterView from '../routerView'
+import CacheMenuBar from "./cacheMenuBar/index";
 export default {
   data() {
     return {
@@ -31,6 +33,7 @@ export default {
     }
   },
   components: {
+    CacheMenuBar,
     headBar,
     navBar,
     elRouterView
@@ -50,6 +53,7 @@ export default {
 <style scoped>
 .container{
 	height: 100vh;
+  background: #fff;
 }
 .el-main{
   position: relative;

@@ -1,7 +1,7 @@
 <template>
   <div class="menu-wrapper">
     <template v-for="(item,index) in menu">
-      <el-menu-item v-if="!item.children.length" v-show='!item.meta.hidden' :index="item.path" @click="open(item)" :key="item.path">
+      <el-menu-item v-if="!item.children||!item.children.length" v-show='!item.meta.hidden' :index="item.path" @click="open(item)" :key="item.path">
         <i :class="item.meta.icon"></i>
         <span slot="title">{{item.meta.name}}</span>
       </el-menu-item>
@@ -11,7 +11,7 @@
           <span slot="title">{{item.meta.name}}</span>
         </template>
         <template v-for="(child,i) in item.children">
-          <el-menu-item :index="child.path" @click="open(child)" v-if="!child.children.length" v-show='!child.meta.hidden' :key="i">
+          <el-menu-item :index="child.path" @click="open(child)" v-if="!child.children||!child.children.length" v-show='!child.meta.hidden' :key="i">
             <i :class="child.meta.icon"></i>
             <span slot="title">{{child.meta.name}}</span>
           </el-menu-item>
@@ -41,11 +41,8 @@ export default {
   mounted() {},
   computed: {},
   methods: {
-    filterPath(path, index) {
-      return path == null ? index + "" : path;
-    },
     open(item) {
-      this.routeTo(item.path);
+      this.routeAndCache(item);
     }
   }
 };

@@ -85,15 +85,16 @@ export default {
 </script>
 
 <style scoped>
+  @import "../../../css/var.css";
 .el-header {
   background-color: #fff;
   color: #000;
   width: 100%;
-  height: 0.5rem;
+  height: 0.4rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--border);
 }
 .right-menu{
   display: flex;
@@ -107,7 +108,7 @@ export default {
   cursor: pointer;
 }
 .menu-icon{
-  font-size: 25px;
+  font-size: 0.2rem;
   color: #48576a;
   cursor: pointer;
   transition: all 0.2s;
