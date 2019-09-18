@@ -1,6 +1,6 @@
 <template>
   <div class="cache-menu-bar" v-if="cacheMenuList.length">
-    <el-tabs v-model="curPath" closable @tab-remove="removeMenu">
+    <el-tabs v-model="curPath" closable @tab-remove="removeMenu" @tab-click="changeMenu">
       <el-tab-pane
         v-for="item in cacheMenuList"
         :key="item.path"
@@ -36,6 +36,9 @@
       }
     },
     methods: {
+      changeMenu(tab){
+        this.routeTo(tab.name);
+      },
       removeMenu(path) {
         let menu=this.cacheMenuList.find(v=>v.path===path);
         this.$store.commit("removeCacheMenu", menu);
