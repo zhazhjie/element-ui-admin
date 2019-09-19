@@ -1,0 +1,42 @@
+{
+  "name": "fly-ui",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "test": "vue-cli-service build --mode test",
+    "build-ui": "vue-cli-service build --target lib --name fly ./src/components/common/build.js --dest dist-ui"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "core-js": "^2.6.5",
+    "element-ui": "^2.12.0",
+    "nprogress": "^0.2.0",
+    "screenfull": "^5.0.0",
+    "vue": "^2.6.10",
+    "vue-router": "^3.0.3",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.11.0",
+    "@vue/cli-service": "^3.11.0",
+    "mockjs": "^1.0.1-beta3",
+    "postcss-cssnext": "^3.1.0",
+    "postcss-import": "^12.0.1",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "postcss": {
+    "plugins": {
+      "postcss-import": {},
+      "postcss-cssnext": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "Android >= 4.0",
+    "IOS >= 6.0",
+    "not ie <= 10"
+  ]
+}
