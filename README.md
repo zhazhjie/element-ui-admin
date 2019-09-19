@@ -1,6 +1,6 @@
-# stock
+# 基本spring boot + element-ui的后台管理系统：前端篇
 
-> stock
+> 技术栈：vue+element-ui
 
 ## Build Setup
 
