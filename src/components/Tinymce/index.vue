@@ -41,7 +41,7 @@
     },
     data() {
       return {
-        OSS_URL: process.env.OSS_URL,
+        OSS_URL: process.env.VUE_APP_REMOTE_URL,
         visible: false,
         hasChange: false,
         hasInit: false,

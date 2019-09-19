@@ -13,7 +13,7 @@ import errorCode from './errorCode'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css'// progress bar style
 
-const API_ROOT = process.env.API_ROOT;
+const API_ROOT = process.env.VUE_APP_API_ROOT;
 axios.defaults.timeout = 20000;
 axios.defaults.baseURL = API_ROOT;
 // 跨域请求，允许保存cookie
