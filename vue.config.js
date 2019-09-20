@@ -7,6 +7,12 @@ module.exports = {
       chunks: ['chunk-vendors', 'chunk-common', 'index']
     },
   },
+  configureWebpack: {
+    externals: {
+      'vue': 'Vue',
+      'element-ui': 'ELEMENT'
+    },
+  },
   productionSourceMap: false,
   publicPath: "./",
   devServer: {
