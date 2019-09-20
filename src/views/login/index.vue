@@ -8,7 +8,7 @@
 <template>
   <section id="login">
     <!--<vue-particles color="#fdf6ec" class='vue-particles'></vue-particles>-->
-    <transition name='fade-left'>
+    <transition name='fade-down'>
       <div class="login-box" v-show='showLoginBox'>
         <div class="login-tit font20">登录</div>
         <div class="login-info">
@@ -118,8 +118,8 @@
   .login-box {
     position: absolute;
     top: 50%;
-    right: 0;
-    transform: translate(-20%, -50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
     border-radius: 0.1rem;
     width: 4rem;
     /*height: 3.5rem;*/
@@ -156,14 +156,14 @@
     margin-left: 0.05rem;
   }
 
-  .fade-left-leave-active,
-  .fade-left-enter-active {
-    transition: all 0.7s;
+  .fade-down-leave-active,
+  .fade-down-enter-active {
+    transition: all 0.5s;
   }
 
-  .fade-left-enter,
-  .fade-left-leave-to {
+  .fade-down-enter,
+  .fade-down-leave-to {
     opacity: 0;
-    transform: translate(50%, -50%);
+    transform: translate(-70%, -50%);
   }
 </style>
