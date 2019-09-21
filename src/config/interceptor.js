@@ -34,8 +34,8 @@ router.beforeEach((to, from, next) => {
   }else{
       next({path:'/login?redirectUrl='+to.fullPath,replace:true});
   }
-})
+});
 
 router.afterEach(() => {
-  NProgress.done() // finish progress bar
+  NProgress.done();
 });

@@ -33,21 +33,23 @@ axios.interceptors.response.use(res => {
   NProgress.done();
   let code = res.data.code;
   //console.log(code)
-  if (code === 200) {
-    return res.data;
-  } else if (code === 401) {
-    Message({
-      message: res.data.message,
-      type: 'warning'
-    });
-    store.commit('logout');
-    return Promise.reject(res.data);
-  } else {
-    Message({
-      message: res.data.message,
-      type: 'error'
-    });
-    return Promise.reject(res.data);
+  switch (code) {
+    case 200:
+      return res.data;
+    case 401:
+    case 403:
+      Message({
+        message: res.data.message,
+        type: 'warning'
+      });
+      store.commit('logout');
+      return Promise.reject(res.data);
+    default:
+      Message({
+        message: res.data.message,
+        type: 'error'
+      });
+      return Promise.reject(res.data);
   }
 }, error => {
   NProgress.done();
@@ -57,7 +59,7 @@ axios.interceptors.response.use(res => {
     message: errorCode[code] || errorCode['default'],
     type: 'error'
   });
-  return Promise.reject(error)
+  return Promise.reject(error);
 });
 
 export default axios

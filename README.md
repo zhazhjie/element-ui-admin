@@ -1,16 +1,18 @@
 # 基本spring boot + element-ui的后台管理系统：前端篇
 
-> 技术栈：vue + element-ui
+> 技术栈：vue全家桶 + element-ui + axios
 
-* 动态路由
+* 动态加载路由
 
-* 权限控制
+* 路由拦截
 
-* 用户管理、角色管理、权限管理
+* 基于axios的前置请求拦截、统一异常处理
 
-* 封装了表单模版，支持表格+分页+弹出层
+* 预设模块：用户管理、角色管理、权限管理
 
-* 集成了富文本、excel导入导出、axios...
+* 基于jsx封装表单模版，支持表格+分页+弹出层
+
+* 集成了富文本、excel导入导出等...
 
 > 后端篇 [戳这里](https://github.com/zhazhjie/springboot-web-admin.git)
 
@@ -29,5 +31,4 @@ npm run serve
 
 # build for production with minification
 npm run build
-
 ```
