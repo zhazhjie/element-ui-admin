@@ -13,8 +13,8 @@
       background-color="#545c64"
       text-color="#fff">
       <div class="logo">
-        <!-- <img src="@/img/google.svg"> -->
-        <span class="tit">spring-admin</span>
+        <span class="tit" v-if="!isCollapse">spring-admin</span>
+        <img v-else src="../../../img/logo.png">
       </div>
       <el-menu-item index='/homePage' @click='routeTo("/homePage")'>
         <i class="icon-home"></i>
@@ -64,7 +64,6 @@ export default {
 .logo img{
   width: 30px;
   height: 30px;
-  border-radius: 50%;
   vertical-align: middle;
 }
 .el-menu--collapse .logo .tit{

@@ -1,12 +1,11 @@
 {
-  "name": "fly-ui",
-  "version": "0.1.0",
+  "name": "element-ui-admin",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "test": "vue-cli-service build --mode test",
-    "build-ui": "vue-cli-service build --target lib --name fly ./src/components/common/build.js --dest dist-ui"
+    "test": "vue-cli-service build --mode test"
   },
   "dependencies": {
     "axios": "^0.19.0",
