@@ -20,14 +20,16 @@
     </div>
     <table-template
       ref="table"
-      @showDialog="findParentId"
+      @submitAdd="submitAdd"
+      @submitEdit="submitUpdate"
+      @showEdit="findParentId"
       :dialogProps="{width:'500px'}"
       :loading='tableLoading'
+      :handleLoading="handleLoading"
       :tableData='roleList'
       :columns='columns'
       :handleList='handleList'
       :handlePageChange='getRoleList'
-      @submit="handleSubmit"
       :page='params'/>
   </section>
 </template>
@@ -81,14 +83,13 @@
                     ref="perms"
                     style="width:100%"
                     placeholder="请选择权限"
-                    value={this.selectedPerms}
-                    on-input={e =>{console.log(e);this.selectedPerms=e}}
-                    props={{
+                    vModel={this.selectedPerms}
+                    props={{props:{
                       label: "name",
                       value: "id",
                       multiple: true,
                       expandTrigger: "hover"
-                    }}
+                    }}}
                     options={this.permissionTree}
                     collapse-tags/>
                 )
@@ -98,13 +99,12 @@
         ],
         handleList: [
           {
-            label: '编辑'
+            label: '编辑',
+            icon:'el-icon-edit'
           },
           {
             label: '删除',
-            props: {
-              type: 'danger'
-            },
+            icon:'el-icon-delete',
             click: row => {
               this.handleDelete(row);
             }
@@ -142,10 +142,9 @@
         })
       },
       handleAdd() {
-        this.handleType = 0;
-        this.dialogVisible = true;
+        this.$refs.table.showAdd(this.curRole);
       },
-      handleDelete(row, index) {
+      handleDelete(row) {
         this.confirm('确定要删除[' + row.roleName + ']吗?').then(() => {
           delObj([row.id]).then(() => {
             this.$message({
@@ -160,40 +159,38 @@
         this.params.current = 1;
         this.getRoleList();
       },
-      handleSubmit(row) {
+      setPerms(row) {
         let permissionIdList=[];
         this.selectedPerms.forEach(item=>{
           permissionIdList.push(...item);
         });
         row.permissionIdList=[...new Set(permissionIdList)];
-        let table = this.$refs.table;
-        if (table.handleType) {
-          this.submitUpdate(row);
-        } else {
-          this.submitAdd(row);
-        }
       },
       submitAdd(row) {
+        this.handleLoading=true;
+        this.setPerms(row);
         addObj(row).then(() => {
           this.$message({
             type: 'success',
             message: '新增成功!'
           });
           this.getRoleList();
-          this.$refs.table.handleCloseDialog();
+          this.$refs.table.closeDialog();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;
         });
       },
       submitUpdate(row) {
+        this.handleLoading=true;
+        this.setPerms(row);
         updObj(row).then(() => {
           this.$message({
             type: 'success',
             message: '更新成功!'
           });
           this.getRoleList();
-          this.$refs.table.handleCloseDialog();
+          this.$refs.table.closeDialog();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;

@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-    <transition name='fade-right'>
+    <transition name='fade' mode='out-in'>
       <router-view class='router-view'/>
     </transition>
   </div>
 </template>
 
 <script>
-import {mapState} from 'vuex'  
+import {mapState} from 'vuex'
 export default {
   name: 'App',
   computed:{
-    
+
   },
   components:{
 

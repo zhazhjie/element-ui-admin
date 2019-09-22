@@ -20,11 +20,13 @@
     </div>
     <table-template
       ref="table"
-      @submit="handleSubmit"
+      @submitAdd="submitAdd"
+      @submitEdit="submitUpdate"
       :dialogProps="{width:'500px'}"
-      :handleProps="{width:'235px'}"
+      :handleProps="{width:'200px'}"
       :rules="rules"
       :loading='tableLoading'
+      :handleLoading="handleLoading"
       :tableData='userList'
       :columns='columns'
       :handleList='handleList'
@@ -39,18 +41,7 @@
   import {roleList} from '@/api/sys/role'
 
   export default {
-    components: {},
     data() {
-      let validateStringIsIncludeBlank = function (rule, value, callback) {
-        if (value === "") {
-          return false;
-        }
-        if (value.indexOf(" ") > -1) {
-          callback(new Error('密码不能包含空格!'));
-        } else {
-          callback();
-        }
-      };
       return {
         dialogVisible: false,
         tableLoading: false,
@@ -80,11 +71,6 @@
             label: '登录账号',
             field: 'username',
           },
-          // {
-          //   label: '密码',
-          //   field: 'password',
-          //   hiddenInTable: true,
-          // },
           {
             label: '手机',
             field: 'phone',
@@ -99,25 +85,18 @@
             field: 'roleIdList',
             hiddenInTable: true,
             formEl: {
-              render: (row) => {
-                return (<el-select
-                  value={row.roleIdList}
-                  on-input={e=>row.roleIdList=e}
-                  multiple
-                  default-first-option
-                  placeholder="请选择角色"
-                  style='width:100%'>
-                  {this.roleList.map(role => {
-                    return (
-                      <el-option
-                        key={role.id}
-                        label={role.roleName}
-                        value={role.id}>
-                      </el-option>
-                    )
-                  })}
-                </el-select>)
-              }
+              type:"select",
+              defaultProp:{
+                value:"id",
+                label:"roleName"
+              },
+              props:{
+                multiple:true,
+              },
+              attrs:{
+                style :"width:100%"
+              },
+              options:()=>this.roleList,
             },
           },
           {
@@ -127,12 +106,8 @@
               return row.state ? <el-tag type="success">正常</el-tag> : <el-tag type="danger">禁用</el-tag>
             },
             formEl: {
-              render: (row) => {
-                return (<div>
-                  <el-radio label={1} value={row.state} on-input={e => row.state = e}>正常</el-radio>
-                  <el-radio label={0} value={row.state} on-input={e => row.state = e}>禁用</el-radio>
-                </div>)
-              }
+              type:"radio",
+              options:[{label:1,text:"正常"},{label:0,text:"禁用"}],
             },
           },
           {
@@ -144,21 +119,18 @@
         handleList: [
           {
             label: '重置密码',
-            props: {
-              type: 'success'
-            },
+            icon:'el-icon-unlock',
             click: row => {
               this.handleResetPwd(row);
             }
           },
           {
             label: '编辑',
+            icon:'el-icon-edit'
           },
           {
             label: '删除',
-            props: {
-              type: 'danger'
-            },
+            icon:'el-icon-delete',
             click: row => {
               this.handleDelete(row);
             }
@@ -166,13 +138,7 @@
         ],
         rules: {
           username: [
-            {required: true, message: '请输入登录账号', trigger: 'blur'},
-            {validator: validateStringIsIncludeBlank, trigger: 'blur', message: "登录账号不能包含空格"}
-          ],
-          password: [
-            {required: true, message: '请输入密码', trigger: 'blur'},
-            {min: 6, message: '密码长度必须6位或者6位以上', trigger: 'blur'},
-            {validator: validateStringIsIncludeBlank, trigger: 'blur'}
+            {required: true, message: '请输入登录账号', trigger: 'blur'}
           ],
         },
         params: {
@@ -199,22 +165,20 @@
         });
       },
       handleAdd() {
-        let table = this.$refs.table;
-        table.curRow = this.curUser;
-        table.handleShowDialog();
+        this.$refs.table.showAdd(this.curUser);
       },
       handleResetPwd(row) {
-        this.confirm('确定要重置[' + row.username + ']的密码吗?').then(() => {
+        this.confirm(`确定要重置[${row.username}]的密码吗?`).then(() => {
           resetPwd(row.id).then((res) => {
             this.$message({
               type: 'success',
-              message: `重置成功，默认密码：${res.data}!`
+              message: `重置成功，默认密码：${res.data}`
             });
           });
         });
       },
       handleDelete(row) {
-        this.confirm('确定要删除[' + row.username + ']吗?').then(() => {
+        this.confirm(`确定删除[${row.username}]吗?`).then(() => {
           delObj([row.id]).then(() => {
             this.$message({
               type: 'success',
@@ -228,22 +192,14 @@
         this.params.current = 1;
         this.fetchList();
       },
-      handleSubmit(row) {
-        let table = this.$refs.table;
-        if (table.handleType) {
-          this.submitUpdate(row);
-        } else {
-          this.submitAdd(row);
-        }
-      },
       submitAdd(row) {
         addObj(row).then((res) => {
           this.$message({
             type: 'success',
-            message: `新增成功，默认密码：${res.data}!'`
+            message: `新增成功，默认密码：${res.data}`
           });
           this.fetchList();
-          this.$refs.table.handleCloseDialog();
+          this.$refs.table.closeDialog();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;
@@ -257,7 +213,7 @@
             message: '更新成功!'
           });
           this.fetchList();
-          this.$refs.table.handleCloseDialog();
+          this.$refs.table.closeDialog();
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;

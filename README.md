@@ -1,6 +1,6 @@
 # 基本spring boot + element-ui的后台管理系统：前端篇
 
-> 技术栈：vue全家桶 + element-ui + axios
+> 技术栈：vue全家桶 + element-ui + jsx
 
 * 动态加载路由
 
@@ -15,8 +15,6 @@
 * 集成了富文本、excel导入导出等...
 
 > 后端篇 [戳这里](https://github.com/zhazhjie/springboot-web-admin.git)
-
-> 预览 [戳这里](https://flyss.top)
 
 > 部署 jenkins
 

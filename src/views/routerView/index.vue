@@ -7,7 +7,7 @@
 
 <template>
   <section class="router">
-    <transition name='fade' mode='out-in'>
+    <transition name='fade-right' mode='out-in'>
       <keep-alive :include="menuList">
         <router-view class='router-view'/>
       </keep-alive>

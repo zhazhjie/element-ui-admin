@@ -1,4 +1,4 @@
-let promise=null;
+let promise = null;
 export default {
   name: "table-template",
   props: {
@@ -64,24 +64,31 @@ export default {
       type: Function,
       default: () => {
       }
-    }
+    },
+    sortable: {
+      type: Boolean,
+      default: false
+    },
+    groupable: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return {
+      dialogTitle: "",
       dialogVisible: false,
       handleType: 0,  //0新增，1编辑
       curRow: {}
     }
   },
   methods: {
+    toString(value) {
+      let result = Object.prototype.toString.call(value);
+      return result.replace(/\[object ([a-z]+)]/ig, "$1");
+    },
     copy(obj) {
       return JSON.parse(JSON.stringify(obj));
-    },
-    vModel(column) {
-      return {
-        props: {value: this.curRow[column.field]},
-        on: {input: e => this.curRow[column.field] = e}
-      }
     },
     handleSizeChange(pageSize) {
       this.page.size = pageSize;
@@ -96,46 +103,117 @@ export default {
         if (valid) {
           // this.dialogVisible = false;
           console.log(this.curRow);
-          this.$emit("submit", this.curRow);
+          this.$emit(this.handleType ? "submitEdit" : "submitAdd", this.curRow);
         } else {
           console.log('error submit!!');
           return false;
         }
       });
     },
-    handleCloseDialog() {
+    closeDialog() {
       this.dialogVisible = false;
       this.resetForm();
     },
-    handleShowDialog() {
+    showAdd(defaultRow, dialogTitle = "新增") {
       this.handleType = 0;
+      this.dialogTitle = dialogTitle;
       this.dialogVisible = true;
+      if (defaultRow) {
+        this.curRow = defaultRow;
+      } else {
+        for (let key in this.curRow) {
+          this.curRow[key] = "";
+        }
+      }
+      this.$emit("showAdd");
+    },
+    showEdit(row, dialogTitle = "编辑") {
+      this.handleType = 1;
+      this.dialogTitle = dialogTitle;
+      this.curRow = this.copy(row);
+      this.dialogVisible = true;
+      this.$emit("showEdit", row);
     },
     resetForm() {
       this.$refs.form.resetFields();
     },
     handleClick(row) {
-      this.curRow = this.copy(row);
-      this.handleType = 1;
-      this.dialogVisible = true;
-      this.$emit("showDialog", row);
+      this.showEdit(row);
     },
     buildFormEl(column = {}) {
-      let {formItem = {}} = column;
-      let {name} = formEl;
-      switch (name) {
+      let {formEl = {}} = column;
+      let {
+        type, props = {}, attrs = {}, options = [], defaultProp = {
+          value: 'value',
+          label: 'label',
+          text: 'text'
+        }
+      } = formEl;
+      let placeholder = "请输入" + column.label;
+      let data = {props, attrs};
+      if (this.toString(options) === "Function") options = options();
+      let getItemVal = (item, key) => {
+        if (this.toString(item) === "Object") {
+          return item[key];
+        } else {
+          return item;
+        }
+      };
+      switch (type) {
         case "checkbox":
-          return <el-checkbox {...this.vModel(column)}/>;
+          return (
+            <el-checkbox-group
+              {...data}
+              vModel={this.curRow[column.field]}>
+              {options.map(item => {
+                return (
+                  <el-checkbox
+                    label={getItemVal(item, defaultProp.label)}>
+                    {getItemVal(item, defaultProp.text)}
+                  </el-checkbox>
+                )
+              })}
+            </el-checkbox-group>
+          );
         case "radio":
-          return <el-radio {...this.vModel(column)}/>;
+          return (
+            <el-radio-group
+              {...data}
+              vModel={this.curRow[column.field]}>
+              {options.map(item => {
+                return (
+                  <el-radio
+                    label={getItemVal(item, defaultProp.label)}>
+                    {getItemVal(item, defaultProp.text)}
+                  </el-radio>
+                )
+              })}
+            </el-radio-group>
+          );
         case "select":
-          return <el-select {...this.vModel(column)}/>;
+          return (
+            <el-select
+              {...data}
+              vModel={this.curRow[column.field]}>
+              {options.map(item => {
+                return (
+                  <el-option
+                    key={getItemVal(item, defaultProp.value)}
+                    label={getItemVal(item, defaultProp.label)}
+                    value={getItemVal(item, defaultProp.value)}>
+                  </el-option>
+                )
+              })}
+            </el-select>
+          );
         default:
-          return <el-input {...this.vModel(column)}/>
+          return <el-input placeholder={placeholder} {...data} vModel={this.curRow[column.field]}/>
       }
     }
   },
   render() {
+    if (this.sortable) {
+    }
     return (
       <div>
         <el-table
@@ -161,7 +239,11 @@ export default {
                         if (column.render) {
                           return column.render(scope.row);
                         } else {
-                          return scope.row[column.field]
+                          return (
+                            <span attrs={column.attrs}>
+                              {column.format ? column.format(scope.row[column.field]) : scope.row[column.field]}
+                            </span>
+                          )
                         }
                       }
                     }}/>
@@ -170,23 +252,26 @@ export default {
             })
           }
           {
-            this.handleList.length && <el-table-column
+            this.handleList.length &&
+            <el-table-column
               label="操作"
               fixed="right"
               header-align="center"
               {...{props: this.handleProps}}
-              width="145"
+              width={this.handleList.length * 60}
               scopedSlots={{
                 default: scope => {
-                  return this.handleList.map(el => {
-                    if (el.render) {
-                      return el.render(scope.row);
+                  return this.handleList.map(item => {
+                    if (item.render) {
+                      return item.render(scope.row);
                     } else {
                       return (
                         <el-button
-                          {...{props: el.props}}
-                          on-click={el.click ? el.click.bind(this, scope.row) : this.handleClick.bind(this, scope.row)}>
-                          {el.label}
+                          type="text"
+                          icon={item.icon}
+                          {...{props: item.props}}
+                          on-click={item.click ? item.click.bind(this, scope.row) : this.handleClick.bind(this, scope.row)}>
+                          {item.label}
                         </el-button>
                       )
                     }
@@ -206,44 +291,49 @@ export default {
           total={+this.page.total}
           layout="total, sizes, prev, pager, next, jumper"/>
         }
-        {!this.withoutDialog && <el-dialog
-          title={this.handleType ? '编辑' : '新增'}
+        {!this.withoutDialog &&
+        <el-dialog
+          title={this.dialogTitle}
           visible={this.dialogVisible}
-          before-close={this.handleCloseDialog.bind(this)}
+          before-close={this.closeDialog.bind(this)}
           close-on-click-modal={false}
           {...{props: this.dialogProps}}
           width="800px">
-          <el-form model={this.curRow} label-width="80px" {...{props: this.formProps}} rules={this.rules} ref="form">
+          <el-form
+            label-width="80px"
+            props={{
+              model: this.curRow,
+              ...this.formProps
+            }}
+            rules={this.rules}
+            ref="form">
             {
               this.columns.map(column => {
                 if (column.hiddenInDialog) {
                   return null;
                 } else {
+                  let {props} = column.formItem || {};
+                  let {render: renderEl} = column.formEl || {};
+                  let {rowNum = 1} = this.formProps || {};
                   return (
-                    <el-form-item
-                      label={column.label}
-                      {...{props: column.formItem ? column.formItem.props : null}}
-                      prop={column.field}>
-                      {
-                        column.formEl && column.formEl.render
-                          ?
-                          column.formEl.render(this.curRow)
-                          :
-                          <el-input
-                            placeholder={column.formEl&&column.formEl.placeholder?column.formEl.placeholder:"请输入" + column.label}
-                            {...{props: column.formEl ? column.formEl.props : null}}
-                            value={this.curRow[column.field]}
-                            on-input={e => this.curRow[column.field] = e}/>
-                      }
-                      {/*{this.buildFormEl(column)}*/}
-                    </el-form-item>
+                    <el-col span={24 / rowNum}>
+                      {/*<div class="item-title">666</div>*/}
+                      <el-form-item
+                        label={column.label}
+                        {...{props}}
+                        prop={column.field}>
+                        {
+                          renderEl ? renderEl(this.curRow) : this.buildFormEl(column)
+                        }
+                      </el-form-item>
+                    </el-col>
                   )
                 }
-              })
+            })
             }
           </el-form>
           <div slot="footer">
-            <el-button on-click={this.handleCloseDialog.bind(this)}>取 消</el-button>
+            <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
             <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
             </el-button>
           </div>

@@ -26,7 +26,7 @@ export default new Vuex.Store({
           resolve(res.data);
         })
           .catch(err => reject(err))
-      }).catch(err => reject(err))
+      })
     },
     listUserPermission: function ({commit, state, dispatch}) {
       return new Promise((resolve, reject) => {
@@ -37,7 +37,7 @@ export default new Vuex.Store({
           resolve();
         })
           .catch(err => reject(err))
-      }).catch(err => reject(err))
+      })
     },
   },
   getters: {},

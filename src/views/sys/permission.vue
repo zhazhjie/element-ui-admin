@@ -20,17 +20,20 @@
     </div>
     <table-template
       ref="table"
-      @submit="handleSubmit"
-      @showDialog="findParentId"
-      :need-page="false"
+      @submitAdd="submitAdd"
+      @submitEdit="submitUpdate"
+      @showEdit="findParentId"
+      :needPage="false"
       :tableProps="{rowKey:'id'}"
-      :dialogProps="{width:'500px'}"
-      :handleProps="{width:'150px'}"
+      :dialogProps="{width:'800px'}"
+      :formProps="{inline:true,rowNum:2}"
       :rules="rules"
       :loading='tableLoading'
+      :handleLoading="handleLoading"
       :tableData='permissionTree'
       :columns='columns'
       :handleList='handleList'
+      :sortable="true"
       :handlePageChange='listPermission'
       :page='params'/>
   </section>
@@ -85,16 +88,17 @@
                     ref="perms"
                     style="width:100%"
                     placeholder="请选择父节点"
-                    value={this.selectedPerms}
+                    vModel={this.selectedPerms}
                     on-input={e=>this.handleSelectNode(e,row)}
-                    props={{
+                    props={{ props:{
                       label: "name",
                       value: "id",
                       checkStrictly: true,
                       expandTrigger: "hover"
-                    }}
+                    }}}
                     options={this.permissionTree}
-                    collapse-tags/>
+                    collapse-tags={true}
+                  />
                 )
               }
             }
@@ -107,16 +111,14 @@
             formEl: {
               render: (row) => {
                 return (<el-select
-                  value={row.icon}
-                  on-input={e=>row.icon=e}
-                  filterable
+                  vModel={row.icon}
+                  filterable={true}
                   placeholder="请选择图标"
                   style='width:100%'>
                   {this.iconList.map(icon => {
                     return (
                       <el-option
                         key={icon}
-                        label={icon}
                         value={icon}>
                         <i class={icon}></i>
                         <span>{icon}</span>
@@ -138,14 +140,8 @@
               }
             },
             formEl: {
-              render: row => {
-                return (
-                  <div>
-                    <el-radio label={0} {...this.vModel(row,'type')} on-change={this.handleChangeType.bind(this,row)}>菜单</el-radio>
-                    <el-radio label={1} {...this.vModel(row,'type')} on-change={this.handleChangeType.bind(this,row)}>接口</el-radio>
-                  </div>
-                )
-              }
+              type:"radio",
+              options:[{label:0,text:"菜单"},{label:1,text:"接口"}],
             }
           },
           {
@@ -166,7 +162,9 @@
               showOverflowTooltip: true
             },
             formEl:{
-              placeholder:'授权标识（如：sys:user:add）',
+              attrs:{
+                placeholder:'授权标识（如：sys:user:add）',
+              }
             }
           },
           {
@@ -174,27 +172,19 @@
             field: 'hidden',
             hiddenInTable:true,
             formEl: {
-              render: row => {
-                return (
-                  <div>
-                    <el-radio label={1} {...this.vModel(row,'hidden')}>是</el-radio>
-                    <el-radio label={0} {...this.vModel(row,'hidden')}>否</el-radio>
-                  </div>
-                )
-              }
+              type:"radio",
+              options:[{label:1,text:"是"},{label:0,text:"否"}],
             },
-            hiddenInDialog: false,
           },
         ],
         handleList: [
           {
             label: '编辑',
+            icon:'el-icon-edit'
           },
           {
             label: '删除',
-            props: {
-              type: 'danger'
-            },
+            icon:'el-icon-delete',
             click: row => {
               this.handleDelete(row);
             }
@@ -204,11 +194,9 @@
           name: [
             {required: true, message: '请输入权限名称', trigger: 'blur'},
           ],
-          parentName: [
-            {message: '请选择上级目录', trigger: 'change'},
-          ],
-          url: [],
-          perms: [],
+          permissionFlag:[
+            {required: true, message: '请输入授权标识', trigger: 'blur'},
+          ]
         },
         params: {
           keyword: '',
@@ -220,12 +208,6 @@
     },
     components: {},
     methods: {
-      vModel(row,key) {
-        return {
-          props: {value: row[key]},
-          on: {input: e => row[key] = e}
-        }
-      },
       listPermission: function () {
         this.tableLoading = true;
         listPermission(this.params).then((res) => {
@@ -245,12 +227,10 @@
         this.selectedPerms=e;
       },
       handleAdd() {
-        let table = this.$refs.table;
-        table.curRow = this.curMenu;
-        table.handleShowDialog();
+        this.$refs.table.showAdd(this.curMenu);
       },
-      handleDelete(id, name) {
-        this.confirm('确定要删除[' + name + ']吗?', '提示').then(() => {
+      handleDelete(row) {
+        this.confirm(`确定删除[${row.name}]吗?`).then(() => {
           delObj(id).then(() => {
             this.$message({
               type: 'success',
@@ -264,15 +244,9 @@
         this.params.current = 1;
         this.listPermission();
       },
-      handleSubmit(row) {
-        row.parentId=this.selectedPerms[this.selectedPerms.length-1];
-        if (this.$refs.table.handleType) {
-          this.submitUpdate(row);
-        } else {
-          this.submitAdd(row);
-        }
-      },
       submitAdd(row) {
+        this.handleLoading = true;
+        row.parentId=this.selectedPerms[this.selectedPerms.length-1];
         addObj(row).then(() => {
           this.$message({
             type: 'success',
@@ -280,12 +254,14 @@
           });
           this.listPermission();
           this.handleLoading = false;
-          this.$refs.table.handleCloseDialog();
+          this.$refs.table.closeDialog();
         }).catch(() => {
           this.handleLoading = false;
         });
       },
       submitUpdate(row) {
+        this.handleLoading = true;
+        row.parentId=this.selectedPerms[this.selectedPerms.length-1];
         udpObj(row).then(() => {
           this.$message({
             type: 'success',
@@ -293,7 +269,7 @@
           });
           this.listPermission();
           this.handleLoading = false;
-          this.$refs.table.handleCloseDialog();
+          this.$refs.table.closeDialog();
         }).catch(() => {
           this.handleLoading = false;
         });
