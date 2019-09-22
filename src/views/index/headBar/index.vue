@@ -1,8 +1,8 @@
-/** 
- * @author: zhazhjie 
+/**
+ * @author: zhazhjie
  * @email: zhazhjie@vip.qq.com
- * @date: 2018-11-05 20:48:31 
- * @version: 1.0 
+ * @date: 2018-11-05 20:48:31
+ * @version: 1.0
  */
 
 <template>
@@ -24,7 +24,7 @@
         <theme-picker class="right-menu-item" />
       </el-tooltip>
       <el-tooltip class="item" effect="dark" content="用户头像" placement="bottom">
-        <img class="avatar" src="@/img/avatar.jpg">
+        <img class="avatar" v-src:avatar="userInfo.avatar">
       </el-tooltip>
       <el-dropdown>
         <span class="el-dropdown-link">

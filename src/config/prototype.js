@@ -9,7 +9,8 @@ import store from '../store'
 import {formatAmount} from "../utils/util";
 
 const REMOTE_URL = process.env.VUE_APP_REMOTE_URL;
-const defaultImg = require('@/img/defaultImg.png');
+const defaultImg = require('../img/defaultImg.png');
+const avatarImg = require('../img/avatar.jpg');
 
 Vue.prototype.confirm = function (msg) {
   return new Promise((resolve, reject) => {
@@ -50,10 +51,11 @@ Vue.filter('formatAmount', formatAmount);
 Vue.directive('src', function (el, binding, vnode) {
   let isHttp = /^http/ig.test(binding.value);
   let imgUrl = isHttp ? binding.value : REMOTE_URL + binding.value;
+  let isAvatar = binding.arg === "avatar";
   if (imgUrl === el.src) {
     return;
   }
-  el.src = defaultImg;
+  el.src = isAvatar ? avatarImg : defaultImg;
   let newImg = new Image();
   newImg.onload = function () {
     el.src = this.src;
