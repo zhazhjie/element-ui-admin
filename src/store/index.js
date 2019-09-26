@@ -5,6 +5,7 @@ import {listUserPermission} from '../api/sys/permission'
 import {setMenu, getStore, setStore} from '../utils/util'
 import {listToMap, toTreeData, treeDataTranslate} from "../utils/util";
 import staticRouter from '../router/staticRouter'
+import router from '../router'
 
 Vue.use(Vuex)
 export default new Vuex.Store({
@@ -14,7 +15,7 @@ export default new Vuex.Store({
     permissions: [],
     size: getStore('size') || 'mini',
     isCollapse: false,
-    menuInitialized: false,
+    initFlag: false,
     cacheMenuList: getStore("cacheMenuList") || []
   },
   actions: {
@@ -33,7 +34,7 @@ export default new Vuex.Store({
         listUserPermission().then(res => {
           state.menuList = setMenu(treeDataTranslate(res.data.menuList)).concat(staticRouter);
           state.permissions = res.data.permissions || [];
-          resolve();
+          resolve(res.data);
         })
           .catch(err => reject(err))
       })
@@ -55,6 +56,7 @@ export default new Vuex.Store({
       state.permissions = [];
       state.userInfo = {};
       state.cacheMenuList = [];
+      router.replace("/login");
       location.reload();
     },
     pushCacheMenu(state, data) {
