@@ -13,10 +13,6 @@ export default new Router({
       children:[
         {
           path: '',
-          redirect:'/homePage'
-        },
-        {
-          path: 'homePage',
           meta:{
             name:'首页'
           },
