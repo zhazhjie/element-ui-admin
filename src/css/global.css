@@ -193,12 +193,14 @@ i {
 }
 
 .item-title {
+  width: 100%;
   height: 0.4rem;
   line-height: 0.4rem;
   display: flex;
   align-items: center;
   margin-top: .1rem;
   color: rgb(191, 203, 217);
+  background: #fff;
 }
 
 .item-title::before {

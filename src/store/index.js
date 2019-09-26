@@ -33,7 +33,6 @@ export default new Vuex.Store({
         listUserPermission().then(res => {
           state.menuList = setMenu(treeDataTranslate(res.data.menuList)).concat(staticRouter);
           state.permissions = res.data.permissions || [];
-          state.menuInitialized = true;
           resolve();
         })
           .catch(err => reject(err))

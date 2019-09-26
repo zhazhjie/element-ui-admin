@@ -24,6 +24,7 @@ router.beforeEach((to, from, next) => {
   	    store.dispatch('getUserInfo'),
         store.dispatch('listUserPermission')
       ]).then(()=>{
+        state.menuInitialized = true;
         router.addRoutes(store.state.menuList);
         next({ ...to, replace: true })
       })

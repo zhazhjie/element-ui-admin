@@ -212,17 +212,30 @@ export default {
     }
   },
   render() {
-    if (this.sortable) {
+    let dialogColumns = this.columns.filter(v => !v.hiddenInDialog);
+    if (this.sortable || this.groupable) {
+      dialogColumns.sort((a, b) => {
+        let defaultSort = 1 << 16;
+        let {sort: aSort = defaultSort, groupSort: aGSort = defaultSort, groupName: aGroup} = a;
+        let {sort: bSort = defaultSort, groupSort: bGSort = defaultSort, groupName: bGroup} = b;
+        if (aGroup === bGroup) {
+          return aSort - bSort;
+        } else {
+          return aGSort - bGSort;
+        }
+      });
     }
+    console.log(dialogColumns);
     return (
       <div>
         <el-table
+          style="width: 100%"
           v-loading={this.tableLoading}
           data={this.tableData}
           {...{props: this.tableProps}}
           border
           on-selection-change={this.handleSelectionChange}
-          style="width: 100%">
+        >
           {this.selectable && <el-table-column type="selection" align="center" width="50"/>}
           {
             this.columns.map(column => {
@@ -308,16 +321,17 @@ export default {
             rules={this.rules}
             ref="form">
             {
-              this.columns.map(column => {
+              dialogColumns.map((column, i) => {
                 if (column.hiddenInDialog) {
                   return null;
                 } else {
                   let {props} = column.formItem || {};
                   let {render: renderEl} = column.formEl || {};
                   let {rowNum = 1} = this.formProps || {};
+                  let prev = dialogColumns[i - 1];
                   return (
                     <el-col span={24 / rowNum}>
-                      {/*<div class="item-title">666</div>*/}
+                      {(!prev || prev.groupName !== column.groupName) && <div class="item-title" style={{width: rowNum + "00%"}}>{column.groupName || "默认"}</div>}
                       <el-form-item
                         label={column.label}
                         {...{props}}
@@ -329,7 +343,7 @@ export default {
                     </el-col>
                   )
                 }
-            })
+              })
             }
           </el-form>
           <div slot="footer">

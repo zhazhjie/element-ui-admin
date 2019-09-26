@@ -26,7 +26,6 @@
       :needPage="false"
       :tableProps="{rowKey:'id'}"
       :dialogProps="{width:'800px'}"
-      :formProps="{inline:true,rowNum:2}"
       :rules="rules"
       :loading='tableLoading'
       :handleLoading="handleLoading"
@@ -128,6 +127,7 @@
                 </el-select>)
               }
             },
+            groupName:"菜单属性"
           },
           {
             label: '类型',
@@ -175,6 +175,7 @@
               type:"radio",
               options:[{label:1,text:"是"},{label:0,text:"否"}],
             },
+            groupName:"菜单属性"
           },
         ],
         handleList: [
