@@ -225,7 +225,6 @@ export default {
         }
       });
     }
-    console.log(dialogColumns);
     return (
       <div>
         <el-table
