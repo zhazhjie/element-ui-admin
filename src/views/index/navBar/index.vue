@@ -55,15 +55,15 @@ export default {
 }
 .logo{
   text-align: center;
-  height: 50px;
-  line-height: 50px;
+  height: 40px;
+  line-height: 40px;
   font-size: 20px;
   color: #fff;
   font-weight: bold;
 }
 .logo img{
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   vertical-align: middle;
 }
 .el-menu--collapse .logo .tit{
