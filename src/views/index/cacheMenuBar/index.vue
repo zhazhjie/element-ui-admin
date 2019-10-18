@@ -68,14 +68,14 @@
   @import "../../../css/var.css";
   .cache-menu-bar {
     background: #fff;
-    padding: 0 1rem 0 0.2rem;
+    padding: 0 100px 0 20px;
     position: relative;
-    border-bottom: 2px solid #E4E7ED;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.1);
   }
   .opt-box{
     position: absolute;
     @apply --middle;
-    right: 0.2rem;
+    right: 20px;
   }
 </style>
 <style>
@@ -83,11 +83,14 @@
     margin: 0;
   }
   .cache-menu-bar .el-tabs__item {
-    height: 0.35rem;
-    line-height: 0.35rem;
+    height: 35px;
+    line-height: 35px;
   }
   .cache-menu-bar .el-tabs {
     position: relative;
-    bottom: -1px;
+    /*bottom: -1px;*/
+  }
+  .cache-menu-bar .el-tabs__nav-wrap::after {
+    height: 0;
   }
 </style>

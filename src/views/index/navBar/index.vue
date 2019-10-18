@@ -16,16 +16,16 @@
         <span class="tit" v-if="!isCollapse">spring-admin</span>
         <img v-else src="../../../img/logo.png">
       </div>
-      <el-menu-item index='/homePage' @click='routeTo("/homePage")'>
+      <el-menu-item index='/homePage' @click='routeTo("/")'>
         <i class="icon-home"></i>
         <span slot="title">首页</span>
       </el-menu-item>
-      <sidebar-item :menu="menuList" :isCollapse="isCollapse"></sidebar-item>
+      <nav-item :menu="menuList" :isCollapse="isCollapse"></nav-item>
     </el-menu>
 </template>
 
 <script>
-import SidebarItem from "./sidebarItem";
+import navItem from "./navItem";
 import { mapState } from "vuex";
 export default {
   data() {
@@ -34,7 +34,7 @@ export default {
     }
   },
   components: {
-    SidebarItem
+    navItem
   },
   methods: {
 
@@ -55,8 +55,8 @@ export default {
 }
 .logo{
   text-align: center;
-  height: 40px;
-  line-height: 40px;
+  height: 50px;
+  line-height: 50px;
   font-size: 20px;
   color: #fff;
   font-weight: bold;

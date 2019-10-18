@@ -15,7 +15,7 @@
             <i :class="child.meta.icon"></i>
             <span slot="title">{{child.meta.name}}</span>
           </el-menu-item>
-          <sidebar-item v-else :menu="[child]" :key="i"></sidebar-item>
+          <nav-item v-else :menu="[child]" :key="i"></nav-item>
         </template>
       </el-submenu>
     </template>
@@ -23,7 +23,7 @@
 </template>
 <script>
 export default {
-  name: "SidebarItem",
+  name: "navItem",
   data() {
     return {};
   },

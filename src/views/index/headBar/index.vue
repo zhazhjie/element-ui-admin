@@ -32,7 +32,7 @@
           <i class="el-icon-arrow-down"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item @click.native='routeTo("/homePage")'>首页</el-dropdown-item>
+          <el-dropdown-item @click.native='routeTo("/")'>首页</el-dropdown-item>
           <el-dropdown-item @click.native='routeTo("/resetPassword")'>修改密码</el-dropdown-item>
           <el-dropdown-item @click.native="logout" divided>退出系统</el-dropdown-item>
         </el-dropdown-menu>
@@ -90,7 +90,7 @@ export default {
   background-color: #fff;
   color: #000;
   width: 100%;
-  height: 0.4rem;
+  height: 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -102,13 +102,13 @@ export default {
   align-items: center;
 }
 .right-menu-item{
-  margin-right: 0.2rem;
+  margin-right: 20px;
 }
 .el-dropdown-link{
   cursor: pointer;
 }
 .menu-icon{
-  font-size: 0.2rem;
+  font-size: 20px;
   color: #48576a;
   cursor: pointer;
   transition: all 0.2s;
@@ -118,13 +118,13 @@ export default {
   transition: all 0.2s
 }
 .el-breadcrumb{
-  margin-left: 0.2rem;
+  margin-left: 20px;
 }
 .avatar{
   padding: 2px;
-  margin-right: 0.05rem;
-  width: 0.3rem;
-  height: 0.3rem;
+  margin-right: 5px;
+  width: 30px;
+  height: 30px;
   border-radius: 100%;
   box-sizing: border-box;
   border: 1px solid #eee;
