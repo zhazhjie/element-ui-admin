@@ -117,7 +117,6 @@
 
   #login {
     width: 100vw;
-    min-width: 1200px;
     height: 100vh;
     background-color: var(--bg);
   }
