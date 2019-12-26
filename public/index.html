@@ -7,16 +7,70 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <title>element-admin</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      #prev-loading {
+        width: 100vw;
+        height: 100vh;
+        text-align: center;
+        color: #999;
+        display: table-cell;
+        vertical-align: middle;
+      }
+      #prev-loading .spin {
+        height: 30px;
+        width: 30px;
+        margin: 5px;
+        animation: prev-loading-rotate 2s linear infinite;
+      }
+      @keyframes prev-loading-rotate {
+        100% {
+          transform: rotate(1turn);
+        }
+      }
+      #prev-loading .path {
+        animation: prev-loading-dash 1.5s ease-in-out infinite;
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: 0;
+        stroke-width: 3;
+        stroke: #4888ff;
+        stroke-linecap: round;
+      }
+      @keyframes prev-loading-dash {
+        0% {
+          stroke-dasharray: 1, 200;
+          stroke-dashoffset: 0;
+        }
+        50% {
+          stroke-dasharray: 90, 150;
+          stroke-dashoffset: -40px;
+        }
+        100% {
+          stroke-dasharray: 90, 150;
+          stroke-dashoffset: -120px;
+        }
+      }
+    </style>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but fly-ui doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app"></div>
+    <div id="app">
+      <div id="prev-loading">
+        <svg viewBox="25 25 50 50" class="spin">
+          <circle cx="50" cy="50" r="20" fill="none" class="path"></circle>
+        </svg>
+        <p>加载中...</p>
+      </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-    <script src="<%= BASE_URL %>js/tinymce4.7.5/tinymce.min.js"></script>
-    <script src="<%= BASE_URL %>js/xlsx.full.min.js"></script>
+    <script src="<%= BASE_URL %>cache/static/js/tinymce4.7.5/tinymce.min.js"></script>
+    <script src="<%= BASE_URL %>cache/static/js/xlsx.full.min.js"></script>
     <!-- built files will be auto injected -->
   </body>
 </html>
