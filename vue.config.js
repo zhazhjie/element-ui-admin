@@ -18,4 +18,7 @@ module.exports = {
   devServer: {
     proxy: process.env.VUE_APP_REMOTE_URL
   },
+  chainWebpack: config => {
+    config.plugins.delete('prefetch-index');
+  }
 };
