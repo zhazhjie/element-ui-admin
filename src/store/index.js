@@ -20,14 +20,11 @@ export default new Vuex.Store({
   },
   actions: {
     getUserInfo({commit, state, dispatch}) {
-      return new Promise((resolve, reject) => {
-        getUserInfo().then(res => {
-          setStore('userInfo', res.data || null);
-          state.userInfo = res.data || {};
-          resolve(res.data);
-        })
-          .catch(err => reject(err))
+      getUserInfo().then(res => {
+        setStore('userInfo', res.data || null);
+        state.userInfo = res.data || {};
       })
+        .catch(err => reject(err))
     },
     listUserPermission: function ({commit, state, dispatch}) {
       return new Promise((resolve, reject) => {

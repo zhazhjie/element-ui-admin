@@ -20,13 +20,6 @@ export function orgRoleList(orgId) {
   })
 }
 
-export function getObj(id) {
-  return request({
-    url: '/sys/role/info/' + id,
-    method: 'get'
-  })
-}
-
 export function addObj(obj) {
   return request({
     url: '/sys/role/add',
@@ -46,33 +39,7 @@ export function updObj(obj) {
 export function delObj(id) {
   return request({
     url: '/sys/role/delete',
-    method: 'post',
+    method: 'delete',
     data: id
-  })
-}
-
-export function permissionUpd(roleId, menuIds) {
-  return request({
-    url: '/sysRole/roleMenuUpd',
-    method: 'put',
-    params: {
-      roleId: roleId,
-      menuIds: menuIds
-    }
-  })
-}
-
-export function fetchRoleTree(roleId) {
-  return request({
-    url: '/sysMenu/roleTree/' + roleId,
-    method: 'get'
-  })
-}
-
-export function fetchOrgTree(query) {
-  return request({
-    url: '/sysOrg/tree',
-    method: 'get',
-    params: query
   })
 }

@@ -47,6 +47,14 @@ export function resetPwd(id) {
   })
 }
 
+export function updatePassword(data) {
+  return request({
+    url: '/sys/user/updatePassword',
+    method: 'post',
+    data: data
+  })
+}
+
 export function getUserInfo() {
   return request({
     url: '/sys/user/info',

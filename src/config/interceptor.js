@@ -20,15 +20,12 @@ router.beforeEach((to, from, next) => {
     next();
   } else if (getStore('token', 'local')) {
     if (!store.state.initFlag) {
-      Promise.all([
-        store.dispatch('getUserInfo'),
-        store.dispatch('listUserPermission')
-      ]).then(() => {
-        store.state.initFlag = true;
-        router.addRoutes(store.state.menuList);
-        next({...to, replace: true})
-      })
-        .catch(err => {})
+        store.dispatch('getUserInfo');
+        store.dispatch('listUserPermission').then(()=>{
+          store.state.initFlag = true;
+          router.addRoutes(store.state.menuList);
+          next({...to, replace: true})
+        }).catch(()=>{});
     } else {
       next();
     }

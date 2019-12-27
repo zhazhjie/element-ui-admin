@@ -26,10 +26,8 @@
         </el-form-item>
 
         <el-form-item>
-
-          <el-button @click="handleClose('')">重置</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
           <el-button type="primary" @click="handleSubmit('ruleForm')" :loading='handleLoading'>确 定</el-button>
-
         </el-form-item>
       </el-form>
     </div>
@@ -37,29 +35,12 @@
 </template>
 
 <script>
-  import {fetchList, getObj, updObj, addObj, resetPwd, delObj} from '@/api/sys/info'
-  import {roleList} from '@/api/sys/role'
+  import {updatePassword} from '../../api/sys/user'
   import {mapState} from 'vuex'
 
   export default {
     data() {
-      var validatePass = (rule, value, callback) => {
-        if (this.curUser.password !== '') {
-          if (value === '') {
-            callback(new Error('请输入新密码'))
-          }
-          /*else if (value.length < 6) {
-            callback(new Error('密码不能小于6位'))
-          } */
-          else {
-            callback()
-          }
-        } else {
-          callback()
-        }
-      }
-
-      var validatePass2 = (rule, value, callback) => {
+      let validatePass = (rule, value, callback) => {
         if (this.curUser.password !== '') {
           if (value === '') {
             callback(new Error('请再次输入密码'))
@@ -71,9 +52,9 @@
         } else {
           callback()
         }
-      }
+      };
       let validateStringIsIncludeBlank = function (rule, value, callback) {
-        if (value == "") {
+        if (value === "") {
           return false;
         }
         if (value.indexOf(" ") > -1) {
@@ -82,19 +63,8 @@
           callback();
         }
       };
-
-
       return {
-        dialogVisible: false,
-        tableLoading: false,
         handleLoading: false,
-        handleType: 0,
-        defaultProps: {
-          children: 'children',
-          label: 'name'
-        },
-        roleList: [],
-        userList: [],
         curUser: {
           username: '',
           password: '',
@@ -106,17 +76,16 @@
             /* {required: true, message: '请输入用户名', trigger: 'blur'},*/
           ],
           password: [
-            /*{required: true, message: '请输入密码', trigger: 'blur'},*/
+            {required: true, message: '请输入密码', trigger: 'blur'},
           ],
-
           newPassword: [
-            {validator: validatePass, trigger: 'blur'},
-            {min: 6, message: '密码长度必须6位或者6位以上', trigger: 'blur'},
+            {required: true, trigger: 'blur'},
+            {min: 6, message: '密码长度必须6位及以上', trigger: 'blur'},
             {validator: validateStringIsIncludeBlank, trigger: 'blur'}
           ],
-
           confirmPassword: [
-            {validator: validatePass2, trigger: 'blur'}
+            {required: true, message: '请再次输入密码', trigger: 'blur'},
+            {validator: validatePass, trigger: 'blur'}
           ],
         },
       }
@@ -126,28 +95,6 @@
       this.curUser.username = this.userInfo.username
     },
     methods: {
-      fetchList() {
-        this.tableLoading = true;
-        fetchList(this.params).then(res => {
-          this.tableLoading = false;
-          this.userList = res.data.list;
-          this.params.totalCount = res.data.totalCount;
-        })
-      },
-      handleResetPwd(row, index) {
-        this.confirm('确定要重置[' + row.username + ']的密码吗?', '提示').then(() => {
-          resetPwd(row.id).then(() => {
-            this.$message({
-              type: 'success',
-              message: '密码重置成功!'
-            });
-          });
-        });
-      },
-      handleSearch(curPage) {
-        this.params.curPage = curPage;
-        this.fetchList();
-      },
       handleSubmit(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -159,17 +106,11 @@
         });
       },
       submitUpdate() {
-        updObj(this.curUser).then(() => {
+        updatePassword(this.curUser).then(() => {
           this.$message({
             type: 'success',
             message: '更新成功!'
           });
-
-          this.$store.dispatch('logout').then(() => {
-            location.reload() // 为了重新实例化vue-router对象 避免bug
-          });
-          //this.fetchList();
-          //this.dialogVisible = false;
           this.handleLoading = false;
         }).catch(() => {
           this.handleLoading = false;

@@ -20,20 +20,6 @@ export function listUserPermission() {
     method: 'get'
   })
 }
-export function findNavTree(query) {
-  return request({
-    url: '/sys/permission/nav',
-    method: 'get',
-    params: query
-  })
-}
-export function getSimpleTree(query) {
-  return request({
-    url: '/sys/permission/tree',
-    method: 'get',
-    params: query
-  })
-}
 
 export function addObj(obj) {
   return request({

@@ -16,7 +16,7 @@
         <span class="tit" v-if="!isCollapse">spring-admin</span>
         <img v-else src="../../../img/logo.png">
       </div>
-      <el-menu-item index='/homePage' @click='routeTo("/")'>
+      <el-menu-item index='/' @click='routeTo("/")'>
         <i class="icon-home"></i>
         <span slot="title">首页</span>
       </el-menu-item>
