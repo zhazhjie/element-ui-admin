@@ -1,4 +1,4 @@
-# 基本spring boot + element-ui的后台管理系统：前端篇
+# 基于spring boot + element-ui的后台管理系统：前端篇
 
 > 技术栈：vue全家桶 + element-ui + jsx
 
