@@ -13,13 +13,6 @@ export function roleList() {
   })
 }
 
-export function orgRoleList(orgId) {
-  return request({
-    url: '/sysRole/list/' + orgId,
-    method: 'get'
-  })
-}
-
 export function addObj(obj) {
   return request({
     url: '/sys/role/add',
