@@ -43,8 +43,8 @@
         showLoginBox: false,
         keepPassword: !!info.username,
         info: {
-          username: info.username || '',
-          password: info.password || '',
+          username: info.username || 'guest',
+          password: info.password || '123456',
         },
         rules: {
           username: [
