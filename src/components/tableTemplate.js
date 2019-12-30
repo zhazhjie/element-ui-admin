@@ -69,17 +69,22 @@ export default {
       type: Boolean,
       default: false
     },
-    groupable: {
-      type: Boolean,
-      default: false
+    group: {
+      type: Array,
+      default: () => ([])
     },
+    searchable: {
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     return {
       dialogTitle: "",
       dialogVisible: false,
       handleType: 0,  //0新增，1编辑
-      curRow: {}
+      curRow: {},
+      searchForm: {}
     }
   },
   methods: {
@@ -102,7 +107,7 @@ export default {
       this.$refs.form.validate((valid) => {
         if (valid) {
           // this.dialogVisible = false;
-          console.log(this.curRow);
+          // console.log(this.curRow);
           this.$emit(this.handleType ? "submitEdit" : "submitAdd", this.curRow);
         } else {
           console.log('error submit!!');
@@ -118,12 +123,9 @@ export default {
       this.handleType = 0;
       this.dialogTitle = dialogTitle;
       this.dialogVisible = true;
-      if (defaultRow) {
-        this.curRow = defaultRow;
-      } else {
-        for (let key in this.curRow) {
-          this.curRow[key] = "";
-        }
+      this.curRow = defaultRow;
+      for (let key in this.curRow) {
+        this.curRow[key] = "";
       }
       this.$emit("showAdd");
     },
@@ -140,15 +142,15 @@ export default {
     handleClick(row) {
       this.showEdit(row);
     },
-    buildFormEl(column = {}) {
-      let {formEl = {}} = column;
-      let {
-        type, props = {}, attrs = {}, options = [], defaultProp = {
-          value: 'value',
-          label: 'label',
-          text: 'text'
-        }
-      } = formEl;
+    handleSearch() {
+      this.$emit("submitSearch", this.searchForm);
+    },
+    handleAdd() {
+      this.showAdd(this.tableData[0] || {});
+    },
+    buildFormEl(column = {}, item = {}, row = {}) {
+      let {options = [], defaultProp = {value: "value", text: "text"}} = column;
+      let {type, props = {}, attrs = {}} = item;
       let placeholder = "请输入" + column.label;
       let data = {props, attrs};
       if (this.toString(options) === "Function") options = options();
@@ -164,11 +166,11 @@ export default {
           return (
             <el-checkbox-group
               {...data}
-              vModel={this.curRow[column.field]}>
+              vModel={row[column.field]}>
               {options.map(item => {
                 return (
                   <el-checkbox
-                    label={getItemVal(item, defaultProp.label)}>
+                    label={getItemVal(item, defaultProp.value)}>
                     {getItemVal(item, defaultProp.text)}
                   </el-checkbox>
                 )
@@ -179,11 +181,11 @@ export default {
           return (
             <el-radio-group
               {...data}
-              vModel={this.curRow[column.field]}>
+              vModel={row[column.field]}>
               {options.map(item => {
                 return (
                   <el-radio
-                    label={getItemVal(item, defaultProp.label)}>
+                    label={getItemVal(item, defaultProp.value)}>
                     {getItemVal(item, defaultProp.text)}
                   </el-radio>
                 )
@@ -194,12 +196,12 @@ export default {
           return (
             <el-select
               {...data}
-              vModel={this.curRow[column.field]}>
+              vModel={row[column.field]}>
               {options.map(item => {
                 return (
                   <el-option
                     key={getItemVal(item, defaultProp.value)}
-                    label={getItemVal(item, defaultProp.label)}
+                    label={getItemVal(item, defaultProp.text)}
                     value={getItemVal(item, defaultProp.value)}>
                   </el-option>
                 )
@@ -207,26 +209,47 @@ export default {
             </el-select>
           );
         default:
-          return <el-input placeholder={placeholder} {...data} vModel={this.curRow[column.field]}/>
+          return <el-input placeholder={placeholder} {...data} vModel={row[column.field]}/>
       }
     }
   },
   render() {
-    let dialogColumns = this.columns.filter(v => !v.hiddenInDialog);
-    if (this.sortable || this.groupable) {
-      dialogColumns.sort((a, b) => {
-        let defaultSort = 1 << 16;
-        let {sort: aSort = defaultSort, groupSort: aGSort = defaultSort, groupName: aGroup} = a;
-        let {sort: bSort = defaultSort, groupSort: bGSort = defaultSort, groupName: bGroup} = b;
-        if (aGroup === bGroup) {
-          return aSort - bSort;
-        } else {
-          return aGSort - bGSort;
-        }
+    let dialogColumns = [];
+    if (this.group.length) {
+      this.group.forEach((item, i) => {
+        dialogColumns.push({
+          title: item.title,
+          columnIndex: item.columnIndex.map(v => this.columns[v])
+        })
       });
+    } else {
+      dialogColumns = this.columns;
     }
     return (
       <div>
+        {this.searchable &&
+        <el-form inline="true">
+          {
+            this.columns.map(column => {
+              if (column.hideInSearch) {
+                return null;
+              } else {
+                return (
+                  <el-form-item label={column.label}>
+                    {this.buildFormEl(column, column.searchEl || column.formEl, this.searchForm)}
+                  </el-form-item>
+                )
+              }
+            })
+          }
+          <el-form-item>
+            <permission-btn type='primary' plain on-click={this.handleSearch.bind(this)}>查询</permission-btn>
+          </el-form-item>
+        </el-form>
+        }
+        <div style="margin-bottom: 15px;">
+          <permission-btn permission='' type='primary' on-click={this.handleAdd.bind(this)}>新增</permission-btn>
+        </div>
         <el-table
           style="width: 100%"
           v-loading={this.tableLoading}
@@ -238,7 +261,7 @@ export default {
           {this.selectable && <el-table-column type="selection" align="center" width="50"/>}
           {
             this.columns.map(column => {
-              if (column.hiddenInTable) {
+              if (column.hideInTable) {
                 return null;
               } else {
                 return (
@@ -321,26 +344,38 @@ export default {
             ref="form">
             {
               dialogColumns.map((column, i) => {
-                if (column.hiddenInDialog) {
-                  return null;
-                } else {
-                  let {props} = column.formItem || {};
-                  let {render: renderEl} = column.formEl || {};
-                  let {rowNum = 1} = this.formProps || {};
-                  let prev = dialogColumns[i - 1];
+                let formItem = (item) => {
+                  let {props = {}} = item.formItem || {};
+                  let {render: renderEl} = item.formEl || {};
+                  let {rowNum = 1} = props;
+                  if (!item || item.hideInDialog) {
+                    return null;
+                  } else {
+                    return (
+                      <el-col span={24 / rowNum}>
+                        <el-form-item
+                          label={item.label}
+                          {...{props}}
+                          prop={item.field}>
+                          {
+                            renderEl ? renderEl(this.curRow) : this.buildFormEl(item, item.formEl || {}, this.curRow)
+                          }
+                        </el-form-item>
+                      </el-col>
+                    )
+                  }
+                };
+                if (column.columnIndex) {
                   return (
-                    <el-col span={24 / rowNum}>
-                      {(!prev || prev.groupName !== column.groupName) && <div class="item-title" style={{width: rowNum + "00%"}}>{column.groupName || "默认"}</div>}
-                      <el-form-item
-                        label={column.label}
-                        {...{props}}
-                        prop={column.field}>
-                        {
-                          renderEl ? renderEl(this.curRow) : this.buildFormEl(column)
-                        }
-                      </el-form-item>
-                    </el-col>
+                    <div>
+                      <div class="item-title">{column.title || "默认"}</div>
+                      {column.columnIndex.map(c => {
+                        return formItem(c);
+                      })}
+                    </div>
                   )
+                } else {
+                  return formItem(column);
                 }
               })
             }

@@ -7,21 +7,11 @@
 
 <template>
   <section>
-    <el-form :inline="true">
-      <el-form-item>
-        <el-input placeholder="用户名" v-model='params.keyword'></el-input>
-      </el-form-item>
-      <el-form-item>
-        <permission-btn type='primary' plain @click='handleSearch'>查询</permission-btn>
-      </el-form-item>
-    </el-form>
-    <div style="margin-bottom: 15px;">
-      <permission-btn permission='' type='primary' @click='handleAdd'>新增</permission-btn>
-    </div>
     <table-template
       ref="table"
       @submitAdd="submitAdd"
       @submitEdit="submitUpdate"
+      @submitSearch="handleSearch"
       :dialogProps="{width:'500px'}"
       :handleProps="{width:'200px'}"
       :rules="rules"
@@ -65,7 +55,8 @@
           {
             label: 'ID',
             field: 'id',
-            hiddenInDialog: true,
+            hideInDialog: true,
+            hideInSearch: true,
           },
           {
             label: '登录账号',
@@ -74,63 +65,74 @@
           {
             label: '手机',
             field: 'phone',
+            hideInSearch: true,
           },
           {
             label: '邮箱',
             field: 'email',
-            hiddenInTable: true
+            hideInTable: true,
+            hideInSearch: true,
           },
           {
             label: '角色',
             field: 'roleIdList',
-            hiddenInTable: true,
+            hideInTable: true,
+            hideInSearch: true,
             formEl: {
-              type:"select",
-              defaultProp:{
-                value:"id",
-                label:"roleName"
+              type: "select",
+              defaultProp: {
+                value: "id",
+                text: "roleName"
               },
-              props:{
-                multiple:true,
+              props: {
+                multiple: true,
               },
-              attrs:{
-                style :"width:100%"
+              attrs: {
+                style: "width:100%"
               },
-              options:()=>this.roleList,
+              options: () => this.roleList,
             },
           },
           {
             label: '状态',
             field: 'state',
+            type: 'tag',
+            options: [{value: 1, text: "正常"}, {value: 0, text: "禁用"}],
             render: (row) => {
               return row.state ? <el-tag type="success">正常</el-tag> : <el-tag type="danger">禁用</el-tag>
             },
             formEl: {
-              type:"radio",
-              options:[{label:1,text:"正常"},{label:0,text:"禁用"}],
+              type: "radio",
             },
+            searchEl: {
+              type: "select",
+              props: {
+                clearable: true
+              }
+            }
           },
           {
             label: '创建时间',
             field: 'createTime',
-            hiddenInDialog: true
+            hideInDialog: true,
+            hideInSearch: true,
           }
         ],
         handleList: [
           {
             label: '重置密码',
-            icon:'el-icon-unlock',
+            icon: 'el-icon-unlock',
             click: row => {
               this.handleResetPwd(row);
             }
           },
           {
             label: '编辑',
-            icon:'el-icon-edit'
+            icon: 'el-icon-edit'
           },
           {
             label: '删除',
-            icon:'el-icon-delete',
+            icon: 'el-icon-delete',
             click: row => {
               this.handleDelete(row);
             }
@@ -145,7 +147,7 @@
           keyword: '',
           current: 1,
           size: 10,
-          total:10
+          total: 10
         }
       }
     },
@@ -163,9 +165,6 @@
         roleList().then(res => {
           this.roleList = res.data;
         });
-      },
-      handleAdd() {
-        this.$refs.table.showAdd(this.curUser);
       },
       handleResetPwd(row) {
         this.confirm(`确定要重置[${row.username}]的密码吗?`).then(() => {
@@ -188,11 +187,13 @@
           });
         });
       },
-      handleSearch() {
+      handleSearch(params) {
         this.params.current = 1;
+        this.params = {...this.params, ...params};
         this.fetchList();
       },
       submitAdd(row) {
+        this.handleLoading = true;
         addObj(row).then((res) => {
           this.$message({
             type: 'success',
