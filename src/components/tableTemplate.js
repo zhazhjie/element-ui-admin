@@ -1,4 +1,3 @@
-let promise = null;
 export default {
   name: "table-template",
   props: {

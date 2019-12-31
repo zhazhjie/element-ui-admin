@@ -199,7 +199,7 @@
             result[index] = [];
           }
           let permission = this.permissionMap[permissionId];
-          result[index].push(permission.id);
+          if (permission) result[index].push(permission.id);
           let parent = this.permissionMap[permission.parentId];
           while (parent) {
             result[index].unshift(parent.id);

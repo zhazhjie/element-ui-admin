@@ -78,19 +78,19 @@
             field: 'roleIdList',
             hideInTable: true,
             hideInSearch: true,
+            options: () => this.roleList,
+            defaultProp: {
+              value: "id",
+              text: "roleName"
+            },
             formEl: {
               type: "select",
-              defaultProp: {
-                value: "id",
-                text: "roleName"
-              },
               props: {
                 multiple: true,
               },
               attrs: {
                 style: "width:100%"
               },
-              options: () => this.roleList,
             },
           },
           {
