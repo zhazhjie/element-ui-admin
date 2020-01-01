@@ -192,33 +192,6 @@ i {
   background: var(--active) !important;
 }
 
-.item-title {
-  width: 100%;
-  height: 0.4rem;
-  line-height: 0.4rem;
-  display: flex;
-  align-items: center;
-  margin-top: .1rem;
-  color: rgb(191, 203, 217);
-  background: #fff;
-}
-
-.item-title::before {
-  width: 0.2rem;
-  content: '';
-  height: 0.01rem;
-  border-bottom: 1px dashed var(--border);
-  margin-right: 0.1rem;
-}
-
-.item-title::after {
-  flex: 1;
-  content: '';
-  height: 0.01rem;
-  border-bottom: 1px dashed var(--border);
-  margin-left: 0.1rem;
-}
-
 @media screen and (max-width: 600px) {
   body,
   input,

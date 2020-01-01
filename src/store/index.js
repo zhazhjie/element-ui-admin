@@ -24,7 +24,7 @@ export default new Vuex.Store({
         setStore('userInfo', res.data || null);
         state.userInfo = res.data || {};
       })
-        .catch(err => reject(err))
+        .catch(err => err)
     },
     listUserPermission: function ({commit, state, dispatch}) {
       return new Promise((resolve, reject) => {

@@ -32,6 +32,7 @@
         userList: [],
         roleList: [],
         config: {
+          mode:"drawer",
           dialogProps: {width: '500px'},
           handleProps: {width: '200px'},
           columns: [
@@ -44,6 +45,10 @@
             {
               label: '登录账号',
               field: 'username',
+              formEl:{
+                type: "date-picker",
+              },
+              value:new Date()
             },
             {
               label: '手机',

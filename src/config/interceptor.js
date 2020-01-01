@@ -20,12 +20,13 @@ router.beforeEach((to, from, next) => {
     next();
   } else if (getStore('token', 'local')) {
     if (!store.state.initFlag) {
-        store.dispatch('getUserInfo');
-        store.dispatch('listUserPermission').then(()=>{
-          store.state.initFlag = true;
-          router.addRoutes(store.state.menuList);
-          next({...to, replace: true})
-        }).catch(()=>{});
+      store.dispatch('getUserInfo');
+      store.dispatch('listUserPermission').then(() => {
+        store.state.initFlag = true;
+        router.addRoutes(store.state.menuList);
+        next({...to, replace: true});
+      }).catch(() => {
+      });
     } else {
       next();
     }

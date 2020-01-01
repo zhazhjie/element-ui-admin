@@ -1,3 +1,5 @@
+import "./tableTemplate.css";
+
 export default {
   name: "table-template",
   props: {
@@ -9,6 +11,7 @@ export default {
       type: Object,
       required: true,
       default: () => ({
+        mode: "dialog",
         columns: [],
         handleList: [],
         rules: {},
@@ -21,7 +24,8 @@ export default {
         withoutDialog: false,
         selectable: false,
         searchable: true,
-        showAdd: true,
+        addBtn: true,
+        addPermission: ""
       })
     },
     page: {
@@ -92,16 +96,16 @@ export default {
       this.hideLoading();
       this.closeDialog();
     },
-    showAdd(defaultRow, dialogTitle = "新增") {
+    addBtn(defaultRow, dialogTitle = "新增") {
       this.handleType = 0;
       this.dialogTitle = dialogTitle;
       this.dialogVisible = true;
       let curRow = {};
       this.config.columns.forEach(column => {
-        curRow[column.field] = column.value
+        curRow[column.field] = column.value;
       });
       this.curRow = curRow;
-      this.$emit("showAdd");
+      this.$emit("addBtn");
     },
     showEdit(row, dialogTitle = "编辑") {
       this.handleType = 1;
@@ -120,7 +124,7 @@ export default {
       this.$emit("submitSearch", this.searchForm);
     },
     handleAdd() {
-      this.showAdd(this.data[0] || {});
+      this.addBtn(this.data[0] || {});
     },
     handleSelectionChange(rows) {
       this.$emit("selectionChange", rows);
@@ -171,6 +175,7 @@ export default {
         case "select":
           return (
             <el-select
+              placeholder={"请选择" + column.label}
               {...data}
               vModel={row[column.field]}>
               {options.map(item => {
@@ -184,19 +189,33 @@ export default {
               })}
             </el-select>
           );
+        case "switch":
+          return (
+            <el-switch
+              {...data}
+              vModel={row[column.field]}>
+            </el-switch>
+          );
         case "tag":
           let field = row[column.field];
           let option = column.options ? column.options.find(v => v[defaultProp.value] === field) : {};
           return (
             <el-tag type={column.stateMapping && column.stateMapping[field]}>{option[defaultProp.text]}</el-tag>
           );
+        case "date-picker":
+          return (
+            <el-date-picker
+              placeholder={"请选择" + column.label}
+              {...data}
+              vModel={row[column.field]}>
+            </el-date-picker>
+          );
         default:
-          let placeholder = "请输入" + column.label;
-          return <el-input placeholder={placeholder} {...data} vModel={row[column.field]}/>
+          return <el-input placeholder={"请输入" + column.label} {...data} vModel={row[column.field]}/>
       }
     },
-    getFormItem(column) {
-      let {props = {}} = column.formItem || {};
+    createFormItem(column) {
+      let {props = {}, append} = column.formItem || {};
       let {rowNum = 1} = props;
       if (!column || column.hideInDialog) {
         return null;
@@ -207,10 +226,9 @@ export default {
               label={column.label}
               {...{props}}
               prop={column.field}>
-              {
-                this.getEl(column, column.formEl || {}, this.curRow, "Form")
-              }
+              {this.getEl(column, column.formEl || {}, this.curRow, "Form")}
             </el-form-item>
+            {append && append()}
           </el-col>
         )
       }
@@ -226,11 +244,80 @@ export default {
       } else {
         return this.createEl(column, scope || {}, row);
       }
+    },
+    createDrawer(dialogColumns) {
+      let {dialogProps = {}} = this.config;
+      return (
+        <el-drawer
+          title={this.dialogTitle}
+          visible={this.dialogVisible}
+          before-close={this.closeDialog.bind(this)}
+          close-on-click-modal={false}
+          {...{props: dialogProps}}
+          size="600px">
+          {this.createForm(dialogColumns)}
+          <div class="el-drawer-footer">
+            <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
+            <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
+            </el-button>
+          </div>
+        </el-drawer>
+      )
+    },
+    createDialog(dialogColumns) {
+      let {dialogProps = {}} = this.config;
+      return (
+        <el-dialog
+          title={this.dialogTitle}
+          visible={this.dialogVisible}
+          before-close={this.closeDialog.bind(this)}
+          close-on-click-modal={false}
+          {...{props: dialogProps}}
+          width="800px">
+          {this.createForm(dialogColumns)}
+          <div slot="footer">
+            <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
+            <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
+            </el-button>
+          </div>
+        </el-dialog>
+      )
+    },
+    createForm(dialogColumns) {
+      let {formProps = {}, rules = {}} = this.config;
+      return (
+        <el-form
+          label-width="80px"
+          props={{
+            model: this.curRow,
+            ...formProps
+          }}
+          rules={rules}
+          ref="form">
+          {
+            dialogColumns.map((column, i) => {
+              if (column.columnIndex) {
+                return (
+                  <div>
+                    {column.title && <div class="item-title">{column.title}</div>}
+                    {column.columnIndex.map(c => {
+                      return this.createFormItem(c);
+                    })}
+                  </div>
+                )
+              } else {
+                return this.createFormItem(column);
+              }
+            })
+          }
+        </el-form>
+      )
     }
   },
   render() {
     let dialogColumns = [];
     let {
+      mode = "dialog",
       columns = [],
       handleList = [],
       rules = {},
@@ -243,7 +330,7 @@ export default {
       withoutDialog = false,
       selectable = false,
       searchable = true,
-      showAdd = true,
+      addBtn = true,
       addPermission = ""
     } = this.config;
     if (group.length) {
@@ -259,7 +346,7 @@ export default {
     return (
       <section>
         {searchable &&
-        <el-form inline="true">
+        <el-form inline={true}>
           {
             columns.map(column => {
               if (column.hideInSearch) {
@@ -281,7 +368,7 @@ export default {
         }
         <el-form>
           <el-form-item>
-            {showAdd &&
+            {addBtn &&
             <permission-btn permission={addPermission} type='primary'
                             on-click={this.handleAdd.bind(this)}>新增</permission-btn>}
             {this.$scopedSlots.add && this.$scopedSlots.add()}
@@ -360,7 +447,7 @@ export default {
         </el-table>
         {pageable &&
         <el-pagination
-          style='margin-top: 20px'
+          style='margin-top: 20px;text-align:right'
           on-size-change={this.handleSizeChange}
           on-current-change={this.handleCurrentChange}
           current-page={+this.page.current}
@@ -370,44 +457,8 @@ export default {
           layout="total, sizes, prev, pager, next, jumper"/>
         }
         {!withoutDialog &&
-        <el-dialog
-          title={this.dialogTitle}
-          visible={this.dialogVisible}
-          before-close={this.closeDialog.bind(this)}
-          close-on-click-modal={false}
-          {...{props: dialogProps}}
-          width="800px">
-          <el-form
-            label-width="80px"
-            props={{
-              model: this.curRow,
-              ...formProps
-            }}
-            rules={rules}
-            ref="form">
-            {
-              dialogColumns.map((column, i) => {
-                if (column.columnIndex) {
-                  return (
-                    <div>
-                      {column.title && <div class="item-title">{column.title}</div>}
-                      {column.columnIndex.map(c => {
-                        return this.getFormItem(c);
-                      })}
-                    </div>
-                  )
-                } else {
-                  return this.getFormItem(column);
-                }
-              })
-            }
-          </el-form>
-          <div slot="footer">
-            <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
-            <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
-            </el-button>
-          </div>
-        </el-dialog>}
+        (mode === "dialog" ? this.createDialog(dialogColumns) : this.createDrawer(dialogColumns))
+        }
       </section>
     )
   }
