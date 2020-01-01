@@ -32,7 +32,8 @@ export function setMenu(menu) {
       meta: {
         name: name,
         icon: icon,
-        hidden: hidden
+        hidden: hidden,
+        keepAlive: false
       },
       children: (children && children.length) ? setMenu(children) : []
     }

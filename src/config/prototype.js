@@ -41,6 +41,7 @@ Vue.prototype.routeBack = function () {
     : this.$router.replace('/')
 };
 Vue.prototype.routeAndCache = function (route, replace) {
+  this.$route.meta.keepAlive = true;
   this.routeTo(route.path, replace);
   store.commit("pushCacheMenu", route);
 };

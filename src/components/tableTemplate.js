@@ -1,16 +1,28 @@
 export default {
   name: "table-template",
   props: {
-    columns: {
+    data: {
       type: Array,
       required: true
     },
-    tableData: {
-      type: Array,
-      required: true
-    },
-    handleList: {
-      type: Array
+    config: {
+      type: Object,
+      required: true,
+      default: () => ({
+        columns: [],
+        handleList: [],
+        rules: {},
+        tableProps: {},
+        handleProps: {},
+        dialogProps: {},
+        formProps: {},
+        group: [],
+        pageable: true,
+        withoutDialog: false,
+        selectable: false,
+        searchable: true,
+        showAdd: true,
+      })
     },
     page: {
       type: Object,
@@ -21,66 +33,17 @@ export default {
         sizes: [5, 10, 20, 50, 100]
       })
     },
-    handlePageChange: {
-      type: Function
-    },
-    needPage: {
-      type: Boolean,
-      default: true
-    },
-    withoutDialog: {
-      type: Boolean,
-      default: false
-    },
     tableLoading: {
       type: Boolean,
       default: false
     },
-    handleLoading: {
-      type: Boolean,
-      default: false
-    },
-    selectable: {
-      type: Boolean,
-      default: false
-    },
-    rules: {
-      type: Object
-    },
-    tableProps: {
-      type: Object
-    },
-    handleProps: {
-      type: Object
-    },
-    dialogProps: {
-      type: Object
-    },
-    formProps: {
-      type: Object
-    },
-    handleSelectionChange: {
-      type: Function,
-      default: () => {
-      }
-    },
-    sortable: {
-      type: Boolean,
-      default: false
-    },
-    group: {
-      type: Array,
-      default: () => ([])
-    },
-    searchable: {
-      type: Boolean,
-      default: true
-    }
   },
   data() {
     return {
       dialogTitle: "",
       dialogVisible: false,
+      handleLoading: false,
+      // tableLoading: false,
       handleType: 0,  //0新增，1编辑
       curRow: {},
       searchForm: {}
@@ -95,37 +58,49 @@ export default {
       return JSON.parse(JSON.stringify(obj));
     },
     handleSizeChange(pageSize) {
+      this.tableLoading = true;
       this.page.size = pageSize;
-      this.handlePageChange();
+      // this.handlePageChange();
+      this.$emit("pageChange");
     },
     handleCurrentChange(curPage) {
+      this.tableLoading = true;
       this.page.current = curPage;
-      this.handlePageChange();
+      // this.handlePageChange();
+      this.$emit("pageChange");
     },
     handleSubmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          // this.dialogVisible = false;
           // console.log(this.curRow);
-          this.$emit(this.handleType ? "submitEdit" : "submitAdd", this.curRow);
+          this.handleLoading = true;
+          this.$emit(this.handleType ? "submitEdit" : "submitAdd", this.curRow, this.hideLoading, this.done);
         } else {
           console.log('error submit!!');
           return false;
         }
       });
     },
+    hideLoading() {
+      this.handleLoading = false;
+    },
     closeDialog() {
       this.dialogVisible = false;
       this.resetForm();
+    },
+    done() {
+      this.hideLoading();
+      this.closeDialog();
     },
     showAdd(defaultRow, dialogTitle = "新增") {
       this.handleType = 0;
       this.dialogTitle = dialogTitle;
       this.dialogVisible = true;
-      this.curRow = defaultRow;
-      for (let key in this.curRow) {
-        this.curRow[key] = "";
-      }
+      let curRow = {};
+      this.config.columns.forEach(column => {
+        curRow[column.field] = column.value
+      });
+      this.curRow = curRow;
       this.$emit("showAdd");
     },
     showEdit(row, dialogTitle = "编辑") {
@@ -145,12 +120,14 @@ export default {
       this.$emit("submitSearch", this.searchForm);
     },
     handleAdd() {
-      this.showAdd(this.tableData[0] || {});
+      this.showAdd(this.data[0] || {});
     },
-    buildFormEl(column = {}, item = {}, row = {}) {
+    handleSelectionChange(rows) {
+      this.$emit("selectionChange", rows);
+    },
+    createEl(column = {}, scope = {}, row = {}) {
       let {options = [], defaultProp = {value: "value", text: "text"}} = column;
-      let {type, props = {}, attrs = {}} = item;
-      let placeholder = "请输入" + column.label;
+      let {type, props = {}, attrs = {}} = scope;
       let data = {props, attrs};
       if (this.toString(options) === "Function") options = options();
       let getItemVal = (item, key) => {
@@ -207,35 +184,90 @@ export default {
               })}
             </el-select>
           );
+        case "tag":
+          let field = row[column.field];
+          let option = column.options ? column.options.find(v => v[defaultProp.value] === field) : {};
+          return (
+            <el-tag type={column.stateMapping && column.stateMapping[field]}>{option[defaultProp.text]}</el-tag>
+          );
         default:
+          let placeholder = "请输入" + column.label;
           return <el-input placeholder={placeholder} {...data} vModel={row[column.field]}/>
+      }
+    },
+    getFormItem(column) {
+      let {props = {}} = column.formItem || {};
+      let {rowNum = 1} = props;
+      if (!column || column.hideInDialog) {
+        return null;
+      } else {
+        return (
+          <el-col span={24 / rowNum}>
+            <el-form-item
+              label={column.label}
+              {...{props}}
+              prop={column.field}>
+              {
+                this.getEl(column, column.formEl || {}, this.curRow, "Form")
+              }
+            </el-form-item>
+          </el-col>
+        )
+      }
+    },
+    getEl(column, scope, row, suffix, custom) {
+      let {render} = scope;
+      if (render) {
+        return render(row);
+      } else if (this.$scopedSlots[column.field + suffix]) {
+        return this.$scopedSlots[column.field + suffix](row);
+      } else if (custom) {
+        return custom(row);
+      } else {
+        return this.createEl(column, scope || {}, row);
       }
     }
   },
   render() {
     let dialogColumns = [];
-    if (this.group.length) {
-      this.group.forEach((item, i) => {
+    let {
+      columns = [],
+      handleList = [],
+      rules = {},
+      tableProps = {},
+      handleProps = {},
+      dialogProps = {},
+      formProps = {},
+      group = [],
+      pageable = true,
+      withoutDialog = false,
+      selectable = false,
+      searchable = true,
+      showAdd = true,
+      addPermission = ""
+    } = this.config;
+    if (group.length) {
+      group.forEach((item, i) => {
         dialogColumns.push({
           title: item.title,
-          columnIndex: item.columnIndex.map(v => this.columns[v])
+          columnIndex: item.columnIndex.map(v => columns[v])
         })
       });
     } else {
-      dialogColumns = this.columns;
+      dialogColumns = columns;
     }
     return (
-      <div>
-        {this.searchable &&
+      <section>
+        {searchable &&
         <el-form inline="true">
           {
-            this.columns.map(column => {
+            columns.map(column => {
               if (column.hideInSearch) {
                 return null;
               } else {
                 return (
                   <el-form-item label={column.label}>
-                    {this.buildFormEl(column, column.searchEl || column.formEl, this.searchForm)}
+                    {this.getEl(column, column.searchEl || column.formEl || {}, this.searchForm, "Search")}
                   </el-form-item>
                 )
               }
@@ -243,23 +275,29 @@ export default {
           }
           <el-form-item>
             <permission-btn type='primary' plain on-click={this.handleSearch.bind(this)}>查询</permission-btn>
+            {this.$scopedSlots.search && this.$scopedSlots.search()}
           </el-form-item>
         </el-form>
         }
-        <div style="margin-bottom: 15px;">
-          <permission-btn permission='' type='primary' on-click={this.handleAdd.bind(this)}>新增</permission-btn>
-        </div>
+        <el-form>
+          <el-form-item>
+            {showAdd &&
+            <permission-btn permission={addPermission} type='primary'
+                            on-click={this.handleAdd.bind(this)}>新增</permission-btn>}
+            {this.$scopedSlots.add && this.$scopedSlots.add()}
+          </el-form-item>
+        </el-form>
         <el-table
           style="width: 100%"
           v-loading={this.tableLoading}
-          data={this.tableData}
-          {...{props: this.tableProps}}
+          data={this.data}
+          {...{props: tableProps}}
           border
-          on-selection-change={this.handleSelectionChange}
+          on-selection-change={this.handleSelectionChange.bind(this)}
         >
-          {this.selectable && <el-table-column type="selection" align="center" width="50"/>}
+          {selectable && <el-table-column type="selection" align="center" width="50"/>}
           {
-            this.columns.map(column => {
+            columns.map(column => {
               if (column.hideInTable) {
                 return null;
               } else {
@@ -270,15 +308,15 @@ export default {
                     {...{props: column.props}}
                     scopedSlots={{
                       default: scope => {
-                        if (column.render) {
-                          return column.render(scope.row);
-                        } else {
+                        let {type} = column;
+                        return this.getEl(column, column, scope.row, "", !type ? () => {
+                          let field = scope.row[column.field];
                           return (
                             <span attrs={column.attrs}>
-                              {column.format ? column.format(scope.row[column.field]) : scope.row[column.field]}
+                              {column.format ? column.format(field) : field}
                             </span>
                           )
-                        }
+                        } : null);
                       }
                     }}/>
                 )
@@ -286,35 +324,41 @@ export default {
             })
           }
           {
-            this.handleList.length &&
+            (handleList.length || this.$scopedSlots["handler"]) &&
             <el-table-column
               label="操作"
               fixed="right"
               header-align="center"
-              {...{props: this.handleProps}}
-              width={this.handleList.length * 60}
+              {...{props: handleProps}}
+              width={handleList.length * 60}
               scopedSlots={{
                 default: scope => {
-                  return this.handleList.map(item => {
-                    if (item.render) {
-                      return item.render(scope.row);
-                    } else {
-                      return (
-                        <el-button
-                          type="text"
-                          icon={item.icon}
-                          {...{props: item.props}}
-                          on-click={item.click ? item.click.bind(this, scope.row) : this.handleClick.bind(this, scope.row)}>
-                          {item.label}
-                        </el-button>
-                      )
-                    }
-                  })
+                  if (handleList.length) {
+                    return handleList.map(item => {
+                      if (item.render) {
+                        return item.render(scope.row);
+                      } else {
+                        return (
+                          <permission-btn
+                            permission={item.permission}
+                            type="text"
+                            icon={item.icon}
+                            {...{props: item.props}}
+                            on-click={item.click ? item.click.bind(this, scope.row) : this.handleClick.bind(this, scope.row)}>
+                            {item.label}
+                          </permission-btn>
+                        )
+                      }
+                    });
+                  } else {
+                    let handler = this.$scopedSlots["handler"];
+                    return handler && handler(scope.row);
+                  }
                 }
               }}/>
           }
         </el-table>
-        {this.needPage &&
+        {pageable &&
         <el-pagination
           style='margin-top: 20px'
           on-size-change={this.handleSizeChange}
@@ -325,56 +369,35 @@ export default {
           total={+this.page.total}
           layout="total, sizes, prev, pager, next, jumper"/>
         }
-        {!this.withoutDialog &&
+        {!withoutDialog &&
         <el-dialog
           title={this.dialogTitle}
           visible={this.dialogVisible}
           before-close={this.closeDialog.bind(this)}
           close-on-click-modal={false}
-          {...{props: this.dialogProps}}
+          {...{props: dialogProps}}
           width="800px">
           <el-form
             label-width="80px"
             props={{
               model: this.curRow,
-              ...this.formProps
+              ...formProps
             }}
-            rules={this.rules}
+            rules={rules}
             ref="form">
             {
               dialogColumns.map((column, i) => {
-                let formItem = (item) => {
-                  let {props = {}} = item.formItem || {};
-                  let {render: renderEl} = item.formEl || {};
-                  let {rowNum = 1} = props;
-                  if (!item || item.hideInDialog) {
-                    return null;
-                  } else {
-                    return (
-                      <el-col span={24 / rowNum}>
-                        <el-form-item
-                          label={item.label}
-                          {...{props}}
-                          prop={item.field}>
-                          {
-                            renderEl ? renderEl(this.curRow) : this.buildFormEl(item, item.formEl || {}, this.curRow)
-                          }
-                        </el-form-item>
-                      </el-col>
-                    )
-                  }
-                };
                 if (column.columnIndex) {
                   return (
                     <div>
-                      <div class="item-title">{column.title || "默认"}</div>
+                      {column.title && <div class="item-title">{column.title}</div>}
                       {column.columnIndex.map(c => {
-                        return formItem(c);
+                        return this.getFormItem(c);
                       })}
                     </div>
                   )
                 } else {
-                  return formItem(column);
+                  return this.getFormItem(column);
                 }
               })
             }
@@ -385,7 +408,7 @@ export default {
             </el-button>
           </div>
         </el-dialog>}
-      </div>
+      </section>
     )
   }
 }
