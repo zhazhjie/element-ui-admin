@@ -436,6 +436,13 @@
             defaultValue: "-"
           },
           {
+            param: "format",
+            explain: "格式化表格列，接收当前字段值作为参数",
+            type: "function",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
             param: "value",
             explain: "表单字段的默认值",
             type: "any",
@@ -444,7 +451,7 @@
           },
           {
             param: "options",
-            explain: "选项列表，type为select/checkbox/radio/tag时可用，同步的可以使用array，异步的必须用function返回array",
+            explain: "选项列表，type为select/checkbox/radio/tag时可用，同步代码可以使用array，异步的必须用function返回array",
             type: "array/function",
             optionalValue: "-",
             defaultValue: "-"
@@ -472,7 +479,7 @@
           },
           {
             param: "formEl",
-            explain: "弹出层表单组件属性，详情formEl",
+            explain: "弹出层表单组件属性，详情FormEl Attribute",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
@@ -486,7 +493,7 @@
           },
           {
             param: "formItem",
-            explain: "弹出层表单项属性，props属性支持el-form-item所有属性（特殊属性span，行占比，默认值24占一行）",
+            explain: "弹出层表单项属性，其props(object)属性支持el-form-item所有属性（特殊属性span，行占比，默认值24占一行）",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
