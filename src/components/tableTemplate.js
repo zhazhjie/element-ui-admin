@@ -1,9 +1,11 @@
 /**
+ * @author: zzj
+ * @date: 2019-12-30 16:05:26
+ * @version: 1.0
  * 表格模版
  * 生成表格+分页+弹出层表单+搜索栏
  * 详见文档
  */
-
 import "./tableTemplate.css";
 
 export default {
@@ -56,7 +58,8 @@ export default {
       // tableLoading: false,
       handleType: 0,  //0新增，1编辑，2查看
       curRow: {},
-      searchForm: {}
+      searchForm: {},
+      showAll: false,
     }
   },
   methods: {
@@ -153,6 +156,9 @@ export default {
     },
     formElChange(field, suffix, row) {
       this.$emit(field + "Change" + (suffix ? "In" + suffix : ""), row);
+    },
+    handleSlide() {
+      this.showAll = !this.showAll;
     },
     createEl(column = {}, scope = {}, row = {}, disabled = false, suffix) {
       let {options = [], defaultProp = {value: "value", text: "text"}} = column;
@@ -295,19 +301,19 @@ export default {
               prop={column.field}>
               {this.getEl(column, column.formEl || {}, this.curRow, "Form", null, this.handleType === 2)}
             </el-form-item>
-            {append && append()}
+            {append && append(this.curRow)}
           </el-col>
         )
       }
     },
-    getEl(column, scope, row, suffix, custom, disabled) {
+    getEl(column, scope, row, suffix, customRender, disabled) {
       let {render} = scope;
       if (render) {
         return render(row);
       } else if (this.$scopedSlots[column.field + suffix]) {
         return this.$scopedSlots[column.field + suffix](row);
-      } else if (custom) {
-        return custom(row);
+      } else if (customRender) {
+        return customRender(row);
       } else {
         return this.createEl(column, scope || {}, row, disabled, suffix);
       }
@@ -321,7 +327,7 @@ export default {
           before-close={this.closeDialog.bind(this)}
           close-on-click-modal={false}
           {...{props: dialogProps}}
-          size="600px">
+          size="800px">
           {this.createForm(dialogColumns)}
           <div class="el-drawer-footer">
             <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
@@ -367,7 +373,7 @@ export default {
             dialogColumns.map((column, i) => {
               if (column.columnIndex) {
                 return (
-                  <div>
+                  <div class="group-item">
                     {column.title && <div class="item-title">{column.title}</div>}
                     {column.columnIndex.map(c => {
                       return this.createFormItem(c);
@@ -414,27 +420,32 @@ export default {
       dialogColumns = columns;
     }
     return (
-      <section>
-        {searchable &&
-        <el-form class="search-bar-form" inline={true} label-width="80px" {...{props:searchFormProps}}>
-          {
-            columns.map(column => {
-              if (column.hideInSearch) {
-                return null;
-              } else {
-                return (
-                  <el-form-item label={column.label} style="width:250px">
-                    {this.getEl(column, column.searchEl || column.formEl || {}, this.searchForm, "Search")}
-                  </el-form-item>
-                )
-              }
-            })
-          }
-          <el-form-item>
-            <permission-btn type='primary' plain on-click={this.handleSearch.bind(this)}>查询</permission-btn>
-            {this.$scopedSlots.search && this.$scopedSlots.search()}
-          </el-form-item>
-        </el-form>
+      <section class="table-template">
+        {searchable && <div class="search-bar-wrapper">
+          <el-form class={"search-bar-form " + (this.showAll ? "slide-down" : "")} inline={true}
+                   label-width="80px" {...{props: searchFormProps}}>
+            {
+              columns.map(column => {
+                if (column.hideInSearch) {
+                  return null;
+                } else {
+                  let {props = {}, append} = column.searchFormItem || {};
+                  return (
+                    <el-form-item label={column.label} style="width:250px" {...{props: props}}>
+                      {this.getEl(column, column.searchEl || column.formEl || {}, this.searchForm, "Search")}
+                      {append && append(this.searchForm)}
+                    </el-form-item>
+                  )
+                }
+              })
+            }
+            <el-form-item>
+              <permission-btn type='primary' plain on-click={this.handleSearch.bind(this)}>查询</permission-btn>
+              {this.$scopedSlots.search && this.$scopedSlots.search()}
+            </el-form-item>
+          </el-form>
+          {/*<i class={"el-icon-d-arrow-right slide-btn "+(this.showAll?"down":"")} on-click={this.handleSlide.bind(this)}></i>*/}
+        </div>
         }
         <el-form>
           <el-form-item>
@@ -485,7 +496,7 @@ export default {
               })
             }
             {
-              (handlerList.length || this.$scopedSlots["handler"]) &&
+              (handlerList.length || this.$scopedSlots["handlerList"]) &&
               <el-table-column
                 label="操作"
                 fixed="right"
@@ -512,7 +523,7 @@ export default {
                         }
                       });
                     } else {
-                      let handler = this.$scopedSlots["handler"];
+                      let handler = this.$scopedSlots["handlerList"];
                       return handler && handler(scope.row);
                     }
                   }

@@ -43,6 +43,12 @@
       :data="formElList"
       :config="config">
     </table-template>
+    <h3>FormItem Attribute</h3>
+    <table-template
+      ref="table"
+      :data="formItemList"
+      :config="config">
+    </table-template>
     <h3>HandlerList Item Attribute</h3>
     <table-template
       ref="table"
@@ -85,7 +91,7 @@
       return {
         demoCode: demoCode,
         tableLoading: false,
-        userList: [{id:"1",username:"xxx",phone:"13555555555",state:1}],
+        userList: [{id: "1", username: "xxx", phone: "13555555555", state: 1}],
         userConfig: {
           dialogProps: {width: '500px'},
           handlerProps: {width: '120px'},
@@ -111,9 +117,9 @@
               type: 'tag',
               value: 1,
               options: [{value: 1, text: "正常"}, {value: 0, text: "禁用"}],
-              stateMapping:{
-                0:"danger",
-                1:"success"
+              stateMapping: {
+                0: "danger",
+                1: "success"
               },
               // render: (row) => {
               //   return row.state ? <el-tag type="success">正常</el-tag> : <el-tag type="danger">禁用</el-tag>
@@ -406,7 +412,7 @@
             defaultValue: "-"
           },
         ],
-        columnsItemList:[
+        columnsItemList: [
           {
             param: "label",
             explain: "必选，字段描述，用于表头、表单标签文本",
@@ -478,6 +484,13 @@
             defaultValue: "-"
           },
           {
+            param: "attrs",
+            explain: "表格列原生元素属性，如style",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
             param: "formEl",
             explain: "弹出层表单组件属性，详情FormEl Attribute",
             type: "object",
@@ -493,7 +506,14 @@
           },
           {
             param: "formItem",
-            explain: "弹出层表单项属性，其props(object)属性支持el-form-item所有属性（特殊属性span，行占比，默认值24占一行）",
+            explain: "弹出层表单项属性，详见FormItem Attribute",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
+            param: "searchFormItem",
+            explain: "搜索栏表单项属性，同formItem",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
@@ -520,7 +540,7 @@
             defaultValue: "false"
           },
         ],
-        formElList:[
+        formElList: [
           {
             param: "type",
             explain: "弹出层表单组件类型",
@@ -550,7 +570,30 @@
             defaultValue: "-"
           },
         ],
-        handlerList:[
+        formItemList: [
+          {
+            param: "props",
+            explain: "表单组件属性，支持el-form-item所有属性",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
+            param: "span",
+            explain: "行占比，默认值24占一行",
+            type: "number",
+            optionalValue: "1-24",
+            defaultValue: "24"
+          },
+          {
+            param: "append",
+            explain: "弹出层表单项后置内容，接收row作为参数",
+            type: "function",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+        ],
+        handlerList: [
           {
             param: "label",
             explain: "显示值",
@@ -594,7 +637,7 @@
             defaultValue: "-"
           },
         ],
-        groupList:[
+        groupList: [
           {
             param: "title",
             explain: "分组标题",
@@ -610,7 +653,7 @@
             defaultValue: "-"
           },
         ],
-        pageList:[
+        pageList: [
           {
             param: "current",
             explain: "当前页",
@@ -640,7 +683,7 @@
             defaultValue: "[10,20,50,100]"
           },
         ],
-        eventList:[
+        eventList: [
           {
             event: "submitAdd",
             explain: "新增提交时触发",
@@ -692,7 +735,7 @@
             cb: "Function(row)",
           },
         ],
-        slotList:[
+        slotList: [
           {
             name: "add",
             explain: "插入到新增按钮后面"
@@ -708,6 +751,10 @@
           {
             name: "tableRight",
             explain: "插入到表格右侧"
+          },
+          {
+            name: "handlerList",
+            explain: "自定义操作栏"
           },
           {
             name: "字段名",
@@ -730,16 +777,19 @@
 <style scoped>
   .table-temp-doc {
     /*padding: 20px;*/
+
     & .tips {
       color: #999;
       line-height: 25px;
     }
+
     & h3 {
       font-size: 25px;
       font-weight: 400;
       margin-top: 20px;
     }
-    & .pre{
+
+    & .pre {
       background: #f1f1f1;
     }
   }

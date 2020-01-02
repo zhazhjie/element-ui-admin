@@ -73,6 +73,7 @@
     padding: 0 100px 0 20px;
     position: relative;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1);
+    z-index: 5;
   }
 
   .opt-box {

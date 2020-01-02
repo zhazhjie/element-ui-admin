@@ -2,10 +2,10 @@
  * @author: zzj
  * @date: 2020-01-02 13:29:53
  * @version: 1.0
- */	
+ */
 export let demoCode =
   `
-  <template>
+<template>
   <section>
     <table-template
       ref="table"
