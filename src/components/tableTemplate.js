@@ -1,3 +1,9 @@
+/**
+ * 表格模版
+ * 生成表格+分页+弹出层表单+搜索栏
+ * 详见文档
+ */
+
 import "./tableTemplate.css";
 
 export default {
@@ -13,10 +19,10 @@ export default {
       default: () => ({
         mode: "dialog",
         columns: [],
-        handleList: [],
+        handlerList: [],
         rules: {},
         tableProps: {},
-        handleProps: {},
+        handlerProps: {},
         dialogProps: {},
         formProps: {},
         group: [],
@@ -24,8 +30,8 @@ export default {
         withoutDialog: false,
         selectable: false,
         searchable: true,
-        addBtn: true,
-        addPermission: ""
+        showAddBtn: true,
+        addBtnPermission: ""
       })
     },
     page: {
@@ -91,6 +97,7 @@ export default {
     closeDialog() {
       this.dialogVisible = false;
       this.resetForm();
+      this.$emit("closeDialog");
     },
     done() {
       this.hideLoading();
@@ -105,7 +112,7 @@ export default {
         curRow[column.field] = column.value;
       });
       this.curRow = curRow;
-      this.$emit("addBtn");
+      this.$emit("showAdd");
     },
     showEdit(row, dialogTitle = "编辑") {
       this.handleType = 1;
@@ -117,8 +124,13 @@ export default {
     resetForm() {
       this.$refs.form.resetFields();
     },
-    handleClick(row) {
-      this.showEdit(row);
+    handleClick(event, row) {
+      let events = ["showAdd", "showView", "showEdit"];
+      if (events.indexOf(event) > -1) {
+        this[event](row);
+      } else {
+        this.showEdit(row);
+      }
     },
     handleSearch() {
       this.$emit("submitSearch", this.searchForm);
@@ -128,6 +140,9 @@ export default {
     },
     handleSelectionChange(rows) {
       this.$emit("selectionChange", rows);
+    },
+    handleRowClick(row){
+      this.$emit("rowClick", row);
     },
     createEl(column = {}, scope = {}, row = {}) {
       let {options = [], defaultProp = {value: "value", text: "text"}} = column;
@@ -319,10 +334,10 @@ export default {
     let {
       mode = "dialog",
       columns = [],
-      handleList = [],
+      handlerList = [],
       rules = {},
       tableProps = {},
-      handleProps = {},
+      handlerProps = {},
       dialogProps = {},
       formProps = {},
       group = [],
@@ -374,77 +389,83 @@ export default {
             {this.$scopedSlots.add && this.$scopedSlots.add()}
           </el-form-item>
         </el-form>
-        <el-table
-          style="width: 100%"
-          v-loading={this.tableLoading}
-          data={this.data}
-          {...{props: tableProps}}
-          border
-          on-selection-change={this.handleSelectionChange.bind(this)}
-        >
-          {selectable && <el-table-column type="selection" align="center" width="50"/>}
-          {
-            columns.map(column => {
-              if (column.hideInTable) {
-                return null;
-              } else {
-                return (
-                  <el-table-column
-                    label={column.label}
-                    align="center"
-                    {...{props: column.props}}
-                    scopedSlots={{
-                      default: scope => {
-                        let {type} = column;
-                        return this.getEl(column, column, scope.row, "", !type ? () => {
-                          let field = scope.row[column.field];
-                          return (
-                            <span attrs={column.attrs}>
+        <div class="table-template-content">
+          {this.$scopedSlots.tableLeft && this.$scopedSlots.tableLeft()}
+          <el-table
+            class="table-template-table"
+            highlight-current-row
+            v-loading={this.tableLoading}
+            data={this.data}
+            {...{props: tableProps}}
+            border
+            on-selection-change={this.handleSelectionChange.bind(this)}
+            on-row-click={this.handleRowClick.bind(this)}
+          >
+            {selectable && <el-table-column type="selection" align="center" width="50"/>}
+            {
+              columns.map(column => {
+                if (column.hideInTable) {
+                  return null;
+                } else {
+                  return (
+                    <el-table-column
+                      label={column.label}
+                      align="center"
+                      {...{props: column.props}}
+                      scopedSlots={{
+                        default: scope => {
+                          let {type} = column;
+                          return this.getEl(column, column, scope.row, "", !type ? () => {
+                            let field = scope.row[column.field];
+                            return (
+                              <span attrs={column.attrs}>
                               {column.format ? column.format(field) : field}
                             </span>
-                          )
-                        } : null);
-                      }
-                    }}/>
-                )
-              }
-            })
-          }
-          {
-            (handleList.length || this.$scopedSlots["handler"]) &&
-            <el-table-column
-              label="操作"
-              fixed="right"
-              header-align="center"
-              {...{props: handleProps}}
-              width={handleList.length * 60}
-              scopedSlots={{
-                default: scope => {
-                  if (handleList.length) {
-                    return handleList.map(item => {
-                      if (item.render) {
-                        return item.render(scope.row);
-                      } else {
-                        return (
-                          <permission-btn
-                            permission={item.permission}
-                            type="text"
-                            icon={item.icon}
-                            {...{props: item.props}}
-                            on-click={item.click ? item.click.bind(this, scope.row) : this.handleClick.bind(this, scope.row)}>
-                            {item.label}
-                          </permission-btn>
-                        )
-                      }
-                    });
-                  } else {
-                    let handler = this.$scopedSlots["handler"];
-                    return handler && handler(scope.row);
-                  }
+                            )
+                          } : null);
+                        }
+                      }}/>
+                  )
                 }
-              }}/>
-          }
-        </el-table>
+              })
+            }
+            {
+              (handlerList.length || this.$scopedSlots["handler"]) &&
+              <el-table-column
+                label="操作"
+                fixed="right"
+                header-align="center"
+                {...{props: handlerProps}}
+                width={handlerList.length * 60}
+                scopedSlots={{
+                  default: scope => {
+                    if (handlerList.length) {
+                      return handlerList.map(item => {
+                        if (item.render) {
+                          return item.render(scope.row);
+                        } else {
+                          return (
+                            <permission-btn
+                              permission={item.permission}
+                              type="text"
+                              icon={item.icon}
+                              {...{props: item.props}}
+                              on-click={item.click ? item.click.bind(this, scope.row) : this.handleClick.bind(this, item.event, scope.row)}>
+                              {item.label}
+                            </permission-btn>
+                          )
+                        }
+                      });
+                    } else {
+                      let handler = this.$scopedSlots["handler"];
+                      return handler && handler(scope.row);
+                    }
+                  }
+                }}/>
+            }
+          </el-table>
+          {this.$scopedSlots.tableRight && this.$scopedSlots.tableRight()}
+        </div>
         {pageable &&
         <el-pagination
           style='margin-top: 20px;text-align:right'

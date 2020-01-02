@@ -15,16 +15,6 @@
       @submitAdd="submitAdd"
       @submitEdit="submitUpdate"
       @showEdit="findParentId"
-      :needPage="false"
-      :tableProps="{rowKey:'id'}"
-      :dialogProps="{width:'500px'}"
-      :rules="rules"
-      :loading='tableLoading'
-      :handleLoading="handleLoading"
-      :tableData='permissionTree'
-      :columns='columns'
-      :handleList='handleList'
-      :searchable="false"
       @pageChange='listPermission'
       :page='params'/>
   </section>
@@ -161,7 +151,7 @@
               },
             },
           ],
-          handleList: [
+          handlerList: [
             {
               label: '编辑',
               icon: 'el-icon-edit'

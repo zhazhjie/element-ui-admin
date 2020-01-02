@@ -17,6 +17,7 @@
       @submitSearch="handleSearch"
       @pageChange="fetchList"
       :page='params'>
+      <template slot="tableLeft"><div>123456</div></template>
     </table-template>
   </section>
 </template>
@@ -34,7 +35,7 @@
         config: {
           mode:"drawer",
           dialogProps: {width: '500px'},
-          handleProps: {width: '200px'},
+          handlerProps: {width: '200px'},
           columns: [
             {
               label: 'ID',
@@ -111,7 +112,7 @@
               hideInSearch: true,
             }
           ],
-          handleList: [
+          handlerList: [
             {
               label: '重置密码',
               icon: 'el-icon-unlock',

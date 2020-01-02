@@ -86,7 +86,7 @@
               }
             }
           ],
-          handleList: [
+          handlerList: [
             {
               label: '编辑',
               icon: 'el-icon-edit'

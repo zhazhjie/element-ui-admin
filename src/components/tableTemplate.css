@@ -41,3 +41,9 @@
   height: 50px;
   z-index: 2;
 }
+.table-template-content{
+  display: flex;
+}
+.table-template-table{
+  flex: 1;
+}
