@@ -3,6 +3,22 @@
     <p class="tips">tips:</p>
     <p class="tips">理论上各个props支持对应的element组件的全部属性</p>
     <p class="tips">显示值的优先级：render > slot > default</p>
+    <el-collapse>
+      <el-collapse-item title="示例代码" name="1">
+        <table-template
+          ref="table"
+          :data="userList"
+          :config="userConfig"
+          :tableLoading="tableLoading"
+          :page='params'>
+        </table-template>
+        <pre class="pre">
+          <code>
+            {{demoCode}}
+          </code>
+        </pre>
+      </el-collapse-item>
+    </el-collapse>
     <h3>Attribute</h3>
     <table-template
       ref="table"
@@ -61,15 +77,87 @@
 </template>
 
 <script>
+  import {demoCode} from "./demoCode";
+
   export default {
     name: "tableTempDoc",
     data() {
       return {
+        demoCode: demoCode,
+        tableLoading: false,
+        userList: [{id:"1",username:"xxx",phone:"13555555555",state:1}],
+        userConfig: {
+          dialogProps: {width: '500px'},
+          handlerProps: {width: '120px'},
+          columns: [
+            {
+              label: 'ID',
+              field: 'id',
+              hideInDialog: true,
+              hideInSearch: true,
+            },
+            {
+              label: '登录账号',
+              field: 'username',
+            },
+            {
+              label: '手机',
+              field: 'phone',
+              hideInSearch: true,
+            },
+            {
+              label: '状态',
+              field: 'state',
+              type: 'tag',
+              value: 1,
+              options: [{value: 1, text: "正常"}, {value: 0, text: "禁用"}],
+              stateMapping:{
+                0:"danger",
+                1:"success"
+              },
+              // render: (row) => {
+              //   return row.state ? <el-tag type="success">正常</el-tag> : <el-tag type="danger">禁用</el-tag>
+              // },
+              formEl: {
+                type: "radio",
+              },
+              searchEl: {
+                type: "select",
+                props: {
+                  clearable: true
+                }
+              }
+            },
+          ],
+          handlerList: [
+            {
+              label: '编辑',
+              icon: 'el-icon-edit'
+            },
+            {
+              label: '删除',
+              icon: 'el-icon-delete',
+              click: row => {
+                this.handleDelete(row);
+              }
+            }
+          ],
+          rules: {
+            username: [
+              {required: true, message: '请输入登录账号', trigger: 'blur'}
+            ],
+          },
+        },
+        params: {
+          current: 1,
+          size: 10,
+          total: 10
+        },
         config: {
           withoutDialog: true,
           searchable: false,
           pageable: false,
-          addBtn: false,
+          showAddBtn: false,
           tableProps: {
             border: false,
           },
@@ -119,7 +207,7 @@
           withoutDialog: true,
           searchable: false,
           pageable: false,
-          addBtn: false,
+          showAddBtn: false,
           tableProps: {
             border: false,
           },
@@ -152,7 +240,7 @@
           withoutDialog: true,
           searchable: false,
           pageable: false,
-          addBtn: false,
+          showAddBtn: false,
           tableProps: {
             border: false,
           },
@@ -262,6 +350,13 @@
             defaultValue: "-"
           },
           {
+            param: "searchFormProps",
+            explain: "搜索栏表单属性，支持el-table所有属性",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
             param: "group",
             explain: "表单分组，详情Group Attribute",
             type: "array",
@@ -304,7 +399,7 @@
             defaultValue: "true"
           },
           {
-            param: "addBtnPermission",
+            param: "showAddBtnPermission",
             explain: "新增按钮权限，如sys:user:add",
             type: "string",
             optionalValue: "-",
@@ -349,8 +444,8 @@
           },
           {
             param: "options",
-            explain: "选项列表，type为select/checkbox/radio/tag可用",
-            type: "array",
+            explain: "选项列表，type为select/checkbox/radio/tag时可用，同步的可以使用array，异步的必须用function返回array",
+            type: "array/function",
             optionalValue: "-",
             defaultValue: "-"
           },
@@ -391,7 +486,7 @@
           },
           {
             param: "formItem",
-            explain: "弹出层表单项属性，支持el-form-item所有属性",
+            explain: "弹出层表单项属性，props属性支持el-form-item所有属性（特殊属性span，行占比，默认值24占一行）",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
@@ -584,6 +679,11 @@
             explain: "点击表格某行时触发",
             cb: "Function(row)",
           },
+          {
+            event: "字段名+Change+?InXxx",
+            explain: "表单组件值改变时触发，包括xxxChange(表格)、xxxChangeInForm(弹出层表单)和xxxChangeInSearch(搜索栏)，如state字段在搜索栏改变，触发stateChangeInSearch事件",
+            cb: "Function(row)",
+          },
         ],
         slotList:[
           {
@@ -603,11 +703,15 @@
             explain: "插入到表格右侧"
           },
           {
-            name: "字段名+'Form'",
+            name: "字段名",
+            explain: "自定义表格列"
+          },
+          {
+            name: "字段名+Form",
             explain: "自定义弹出层表单项"
           },
           {
-            name: "字段名+'Search'",
+            name: "字段名+Search",
             explain: "自定义搜索项"
           },
         ]
@@ -618,6 +722,7 @@
 
 <style scoped>
   .table-temp-doc {
+    /*padding: 20px;*/
     & .tips {
       color: #999;
       line-height: 25px;
@@ -626,6 +731,9 @@
       font-size: 25px;
       font-weight: 400;
       margin-top: 20px;
+    }
+    & .pre{
+      background: #f1f1f1;
     }
   }
 </style>

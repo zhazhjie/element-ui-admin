@@ -16,8 +16,8 @@
       @submitEdit="submitUpdate"
       @submitSearch="handleSearch"
       @pageChange="fetchList"
+      @stateChangeInForm="stateChange"
       :page='params'>
-      <template slot="tableLeft"><div>123456</div></template>
     </table-template>
   </section>
 </template>
@@ -33,7 +33,6 @@
         userList: [],
         roleList: [],
         config: {
-          mode:"drawer",
           dialogProps: {width: '500px'},
           handlerProps: {width: '200px'},
           columns: [
@@ -46,10 +45,6 @@
             {
               label: '登录账号',
               field: 'username',
-              formEl:{
-                type: "date-picker",
-              },
-              value:new Date()
             },
             {
               label: '手机',
@@ -147,6 +142,9 @@
       }
     },
     methods: {
+      stateChange(row){
+        console.log(row)
+      },
       fetchList() {
         this.tableLoading = true;
         fetchList(this.params).then(res => {

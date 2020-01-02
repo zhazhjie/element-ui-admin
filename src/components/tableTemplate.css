@@ -24,11 +24,13 @@
   border-bottom: 1px dashed rgb(191, 203, 217);
   margin-left: 0.1rem;
 }
+
 .el-drawer__body {
   overflow: auto;
   padding: 10px 20px 50px;
 }
-.el-drawer-footer{
+
+.el-drawer-footer {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -41,9 +43,26 @@
   height: 50px;
   z-index: 2;
 }
-.table-template-content{
+
+.table-template-content {
   display: flex;
 }
-.table-template-table{
+
+.table-template-table {
   flex: 1;
+}
+
+.search-bar-form.el-form .el-form-item {
+  display: inline-flex;
+}
+
+.search-bar-form .el-form-item__content {
+  flex: 1;
+}
+
+.search-bar-form.el-form {
+  background-color: #fcfcfc;
+  padding: 18px 0 0;
+  border: 1px solid #e9e9e9;
+  margin: 10px auto;
 }

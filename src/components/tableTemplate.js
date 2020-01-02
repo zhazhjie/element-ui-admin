@@ -54,7 +54,7 @@ export default {
       dialogVisible: false,
       handleLoading: false,
       // tableLoading: false,
-      handleType: 0,  //0新增，1编辑
+      handleType: 0,  //0新增，1编辑，2查看
       curRow: {},
       searchForm: {}
     }
@@ -103,7 +103,7 @@ export default {
       this.hideLoading();
       this.closeDialog();
     },
-    addBtn(defaultRow, dialogTitle = "新增") {
+    showAdd(dialogTitle = "新增") {
       this.handleType = 0;
       this.dialogTitle = dialogTitle;
       this.dialogVisible = true;
@@ -121,6 +121,13 @@ export default {
       this.dialogVisible = true;
       this.$emit("showEdit", row);
     },
+    showView(row, dialogTitle = "查看") {
+      this.handleType = 2;
+      this.dialogTitle = dialogTitle;
+      this.curRow = this.copy(row);
+      this.dialogVisible = true;
+      this.$emit("showView", row);
+    },
     resetForm() {
       this.$refs.form.resetFields();
     },
@@ -136,15 +143,18 @@ export default {
       this.$emit("submitSearch", this.searchForm);
     },
     handleAdd() {
-      this.addBtn(this.data[0] || {});
+      this.showAdd();
     },
     handleSelectionChange(rows) {
       this.$emit("selectionChange", rows);
     },
-    handleRowClick(row){
+    handleRowClick(row) {
       this.$emit("rowClick", row);
     },
-    createEl(column = {}, scope = {}, row = {}) {
+    formElChange(field, suffix, row) {
+      this.$emit(field + "Change" + (suffix ? "In" + suffix : ""), row);
+    },
+    createEl(column = {}, scope = {}, row = {}, disabled = false, suffix) {
       let {options = [], defaultProp = {value: "value", text: "text"}} = column;
       let {type, props = {}, attrs = {}} = scope;
       let data = {props, attrs};
@@ -161,6 +171,7 @@ export default {
           return (
             <el-checkbox-group
               {...data}
+              disabled={disabled}
               vModel={row[column.field]}>
               {options.map(item => {
                 return (
@@ -175,7 +186,9 @@ export default {
         case "radio":
           return (
             <el-radio-group
+              on-change={this.formElChange.bind(this, column.field, suffix)}
               {...data}
+              disabled={disabled}
               vModel={row[column.field]}>
               {options.map(item => {
                 return (
@@ -190,8 +203,10 @@ export default {
         case "select":
           return (
             <el-select
+              on-change={this.formElChange.bind(this, column.field, suffix)}
               placeholder={"请选择" + column.label}
               {...data}
+              disabled={disabled}
               vModel={row[column.field]}>
               {options.map(item => {
                 return (
@@ -207,48 +222,85 @@ export default {
         case "switch":
           return (
             <el-switch
+              on-change={this.formElChange.bind(this, column.field, suffix)}
               {...data}
+              disabled={disabled}
               vModel={row[column.field]}>
             </el-switch>
           );
         case "tag":
           let field = row[column.field];
-          let option = column.options ? column.options.find(v => v[defaultProp.value] === field) : {};
+          let option = (column.options || []).find(v => v[defaultProp.value] === field) || {};
           return (
             <el-tag type={column.stateMapping && column.stateMapping[field]}>{option[defaultProp.text]}</el-tag>
           );
         case "date-picker":
           return (
             <el-date-picker
+              on-change={this.formElChange.bind(this, column.field, suffix)}
               placeholder={"请选择" + column.label}
               {...data}
+              disabled={disabled}
               vModel={row[column.field]}>
             </el-date-picker>
           );
+        case "time-picker":
+          return (
+            <el-time-picker
+              on-change={this.formElChange.bind(this, column.field, suffix)}
+              placeholder={"请选择" + column.label}
+              {...data}
+              disabled={disabled}
+              vModel={row[column.field]}>
+            </el-time-picker>
+          );
+        case "time-select":
+          return (
+            <el-time-select
+              on-change={this.formElChange.bind(this, column.field, suffix)}
+              placeholder={"请选择" + column.label}
+              {...data}
+              disabled={disabled}
+              vModel={row[column.field]}>
+            </el-time-select>
+          );
+        case "input-number":
+          return (
+            <el-input-number
+              {...data}
+              disabled={disabled}
+              vModel={row[column.field]}>
+            </el-input-number>
+          );
         default:
-          return <el-input placeholder={"请输入" + column.label} {...data} vModel={row[column.field]}/>
+          return (
+            <el-input
+              placeholder={"请输入" + column.label}
+              {...data}
+              disabled={disabled}
+              vModel={row[column.field]}/>
+          );
       }
     },
     createFormItem(column) {
-      let {props = {}, append} = column.formItem || {};
-      let {rowNum = 1} = props;
+      let {props = {}, append, span} = column.formItem || {};
       if (!column || column.hideInDialog) {
         return null;
       } else {
         return (
-          <el-col span={24 / rowNum}>
+          <el-col span={span}>
             <el-form-item
               label={column.label}
               {...{props}}
               prop={column.field}>
-              {this.getEl(column, column.formEl || {}, this.curRow, "Form")}
+              {this.getEl(column, column.formEl || {}, this.curRow, "Form", null, this.handleType === 2)}
             </el-form-item>
             {append && append()}
           </el-col>
         )
       }
     },
-    getEl(column, scope, row, suffix, custom) {
+    getEl(column, scope, row, suffix, custom, disabled) {
       let {render} = scope;
       if (render) {
         return render(row);
@@ -257,7 +309,7 @@ export default {
       } else if (custom) {
         return custom(row);
       } else {
-        return this.createEl(column, scope || {}, row);
+        return this.createEl(column, scope || {}, row, disabled, suffix);
       }
     },
     createDrawer(dialogColumns) {
@@ -273,8 +325,9 @@ export default {
           {this.createForm(dialogColumns)}
           <div class="el-drawer-footer">
             <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
+            {this.handleType !== 2 &&
             <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
-            </el-button>
+            </el-button>}
           </div>
         </el-drawer>
       )
@@ -292,8 +345,9 @@ export default {
           {this.createForm(dialogColumns)}
           <div slot="footer">
             <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
+            {this.handleType !== 2 &&
             <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
-            </el-button>
+            </el-button>}
           </div>
         </el-dialog>
       )
@@ -340,13 +394,14 @@ export default {
       handlerProps = {},
       dialogProps = {},
       formProps = {},
+      searchFormProps = {},
       group = [],
       pageable = true,
       withoutDialog = false,
       selectable = false,
       searchable = true,
-      addBtn = true,
-      addPermission = ""
+      showAddBtn = true,
+      addBtnPermission = ""
     } = this.config;
     if (group.length) {
       group.forEach((item, i) => {
@@ -361,14 +416,14 @@ export default {
     return (
       <section>
         {searchable &&
-        <el-form inline={true}>
+        <el-form class="search-bar-form" inline={true} label-width="80px" {...{props:searchFormProps}}>
           {
             columns.map(column => {
               if (column.hideInSearch) {
                 return null;
               } else {
                 return (
-                  <el-form-item label={column.label}>
+                  <el-form-item label={column.label} style="width:250px">
                     {this.getEl(column, column.searchEl || column.formEl || {}, this.searchForm, "Search")}
                   </el-form-item>
                 )
@@ -383,8 +438,8 @@ export default {
         }
         <el-form>
           <el-form-item>
-            {addBtn &&
-            <permission-btn permission={addPermission} type='primary'
+            {showAddBtn &&
+            <permission-btn permission={addBtnPermission} type='primary'
                             on-click={this.handleAdd.bind(this)}>新增</permission-btn>}
             {this.$scopedSlots.add && this.$scopedSlots.add()}
           </el-form-item>
