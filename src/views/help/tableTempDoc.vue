@@ -138,7 +138,7 @@
               label: '删除',
               icon: 'el-icon-delete',
               click: row => {
-                this.handleDelete(row);
+
               }
             }
           ],
