@@ -71,15 +71,11 @@ export default {
       return JSON.parse(JSON.stringify(obj));
     },
     handleSizeChange(pageSize) {
-      this.tableLoading = true;
       this.page.size = pageSize;
-      // this.handlePageChange();
       this.$emit("pageChange");
     },
     handleCurrentChange(curPage) {
-      this.tableLoading = true;
       this.page.current = curPage;
-      // this.handlePageChange();
       this.$emit("pageChange");
     },
     handleSubmit() {
@@ -236,9 +232,9 @@ export default {
           );
         case "tag":
           let field = row[column.field];
-          let option = (column.options || []).find(v => v[defaultProp.value] === field) || {};
+          let option = (column.options || []).find(item => getItemVal(item, defaultProp.value) === field) || {};
           return (
-            <el-tag type={column.stateMapping && column.stateMapping[field]}>{option[defaultProp.text]}</el-tag>
+            <el-tag type={column.stateMapping && column.stateMapping[field]}>{getItemVal(option, defaultProp.text)}</el-tag>
           );
         case "date-picker":
           return (
