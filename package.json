@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "test": "vue-cli-service build --mode test"
+    "test": "vue-cli-service build --mode test",
+    "build-tt": "vue-cli-service build --target lib --name tableTemplate ./src/components/index.js --dest dist-tt"
   },
   "dependencies": {
     "axios": "^0.19.0",

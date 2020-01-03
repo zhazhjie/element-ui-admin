@@ -421,9 +421,13 @@ export default {
     }
     return (
       <section class="table-template">
-        {searchable && <div class="search-bar-wrapper">
-          <el-form class={"search-bar-form " + (this.showAll ? "slide-down" : "")} inline={true}
-                   label-width="80px" {...{props: searchFormProps}}>
+        {searchable &&
+        <div class="search-bar-wrapper">
+          <el-form
+            class="search-bar-form"
+            inline={true}
+            label-width="80px"
+            {...{props: searchFormProps}}>
             {
               columns.map(column => {
                 if (column.hideInSearch) {

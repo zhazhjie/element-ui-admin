@@ -12,5 +12,7 @@ index.install = function (Vue) {
   Vue.component(permissionBtn.name, permissionBtn);
   Vue.component(tableTemplate.name, tableTemplate);
 };
-
+if(typeof window !== 'undefined' && window.Vue){
+  Vue.use(index);
+}
 export default index;
