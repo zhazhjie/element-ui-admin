@@ -42,6 +42,7 @@
         loading: false,
         showLoginBox: false,
         keepPassword: !!info.username,
+        redirectUrl: this.$route.query.redirectUrl || '/',
         info: {
           username: info.username || 'guest',
           password: info.password || '123456',
@@ -77,7 +78,7 @@
           } else {
             setStore('info', null, 'local');
           }
-          this.routeTo('/', 1);
+          this.routeTo(this.redirectUrl, 1);
           this.loading = false;
         })
           .catch(err => this.loading = false)
