@@ -7,29 +7,16 @@
 
 <template>
   <section>
-    <el-form :inline="true">
-      <el-form-item>
-        <el-input placeholder="角色名称" v-model='params.keyword' :clearable="true"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <permission-btn type='primary' plain @click='handleSearch'>查询</permission-btn>
-      </el-form-item>
-    </el-form>
-    <div style="margin-bottom: 15px;">
-      <permission-btn type='primary' @click='handleAdd'>新增</permission-btn>
-    </div>
     <table-template
       ref="table"
+      :data="roleList"
+      :config="config"
+      :tableLoading="tableLoading"
       @submitAdd="submitAdd"
       @submitEdit="submitUpdate"
+      @submitSearch="handleSearch"
       @showEdit="findParentId"
-      :dialogProps="{width:'500px'}"
-      :loading='tableLoading'
-      :handleLoading="handleLoading"
-      :tableData='roleList'
-      :columns='columns'
-      :handleList='handleList'
-      :handlePageChange='getRoleList'
+      @pageChange='getRoleList'
       :page='params'/>
   </section>
 </template>
@@ -44,76 +31,79 @@
     data() {
       return {
         tableLoading: false,
-        handleLoading: false,
         roleList: [],
-        curRole: {
-          roleName: '',
-          remark: '',
-          permissionIdList: []
-        },
         permissionTree: [],
-        selectedPerms:[],
-        columns: [
-          {
-            label: 'ID',
-            field: 'id',
-            hiddenInDialog: true
-          },
-          {
-            label: '角色名',
-            field: 'roleName',
-          },
-          {
-            label: '备注',
-            field: 'remark',
-          },
-          {
-            label: '创建时间',
-            field: 'createTime',
-            hiddenInDialog: true
-          },
-          {
-            label: '选择权限',
-            field: 'permissionIdList',
-            hiddenInTable: true,
-            formEl: {
-              render: row => {
-                return (
-                  <el-cascader
-                    ref="perms"
-                    style="width:100%"
-                    placeholder="请选择权限"
-                    vModel={this.selectedPerms}
-                    props={{props:{
-                      label: "name",
-                      value: "id",
-                      multiple: true,
-                      expandTrigger: "hover"
-                    }}}
-                    options={this.permissionTree}
-                    collapse-tags/>
-                )
+        selectedPerms: [],
+        config: {
+          dialogProps: {width: '500px'},
+          columns: [
+            {
+              label: 'ID',
+              field: 'id',
+              hideInDialog: true,
+              hideInSearch: true
+            },
+            {
+              label: '角色名',
+              field: 'roleName',
+            },
+            {
+              label: '备注',
+              field: 'remark',
+              hideInSearch: true
+            },
+            {
+              label: '创建时间',
+              field: 'createTime',
+              hideInDialog: true,
+              hideInSearch: true
+            },
+            {
+              label: '选择权限',
+              field: 'permissionIdList',
+              hideInTable: true,
+              hideInSearch: true,
+              formEl: {
+                render: row => {
+                  return (
+                    <el-cascader
+                      ref="perms"
+                      style="width:100%"
+                      placeholder="请选择权限"
+                      vModel={this.selectedPerms}
+                      props={{
+                        props: {
+                          label: "name",
+                          value: "id",
+                          multiple: true,
+                          expandTrigger: "hover"
+                        }
+                      }}
+                      options={this.permissionTree}
+                      collapse-tags/>
+                  )
+                }
               }
             }
-          }
-        ],
-        handleList: [
-          {
-            label: '编辑',
-            icon:'el-icon-edit'
-          },
-          {
-            label: '删除',
-            icon:'el-icon-delete',
-            click: row => {
-              this.handleDelete(row);
+          ],
+          handlerList: [
+            {
+              label: '编辑',
+              icon: 'el-icon-edit'
+            },
+            {
+              label: '删除',
+              icon: 'el-icon-delete',
+              click: row => {
+                this.handleDelete(row);
+              }
             }
-          }
-        ],
-        rules: {
-          roleName: [
-            {required: true, message: '请输入角色名', trigger: 'blur'},
-          ]
+          ],
+          rules: {
+            roleName: [
+              {required: true, message: '请输入角色名', trigger: 'blur'},
+            ]
+          },
         },
         params: {
           keyword: '',
@@ -131,7 +121,7 @@
           this.tableLoading = false;
           this.permissionTree = treeDataTranslate(res.data);
           this.permissionMap = listToMap(res.data);
-        })
+        }).catch(() => this.tableLoading = false);
       },
       getRoleList() {
         this.tableLoading = true;
@@ -139,10 +129,7 @@
           this.tableLoading = false;
           this.roleList = res.data.records;
           this.params.total = res.data.total;
-        })
-      },
-      handleAdd() {
-        this.$refs.table.showAdd(this.curRole);
+        }).catch(() => this.tableLoading = false);
       },
       handleDelete(row) {
         this.confirm('确定要删除[' + row.roleName + ']吗?').then(() => {
@@ -155,19 +142,19 @@
           });
         });
       },
-      handleSearch() {
+      handleSearch(params) {
         this.params.current = 1;
+        this.params = {...this.params, ...params};
         this.getRoleList();
       },
       setPerms(row) {
-        let permissionIdList=[];
-        this.selectedPerms.forEach(item=>{
+        let permissionIdList = [];
+        this.selectedPerms.forEach(item => {
           permissionIdList.push(...item);
         });
-        row.permissionIdList=[...new Set(permissionIdList)];
+        row.permissionIdList = [...new Set(permissionIdList)];
       },
-      submitAdd(row) {
-        this.handleLoading=true;
+      submitAdd(row, hideLoading, done) {
         this.setPerms(row);
         addObj(row).then(() => {
           this.$message({
@@ -175,14 +162,10 @@
             message: '新增成功!'
           });
           this.getRoleList();
-          this.$refs.table.closeDialog();
-          this.handleLoading = false;
-        }).catch(() => {
-          this.handleLoading = false;
-        });
+          done();
+        }).catch(() => hideLoading());
       },
-      submitUpdate(row) {
-        this.handleLoading=true;
+      submitUpdate(row, hideLoading, done) {
         this.setPerms(row);
         updObj(row).then(() => {
           this.$message({
@@ -190,30 +173,27 @@
             message: '更新成功!'
           });
           this.getRoleList();
-          this.$refs.table.closeDialog();
-          this.handleLoading = false;
-        }).catch(() => {
-          this.handleLoading = false;
-        });
+          done();
+        }).catch(() => hideLoading());
       },
-      findParentId(row){
-        let result=[];
-        let index=0;
-        let permissionIdList=row.permissionIdList||[];
-        permissionIdList.forEach((permissionId,i)=>{
-          if(!result[index]){
-            result[index]=[];
+      findParentId(row) {
+        let result = [];
+        let index = 0;
+        let permissionIdList = row.permissionIdList || [];
+        permissionIdList.forEach((permissionId, i) => {
+          if (!result[index]) {
+            result[index] = [];
           }
-          let permission=this.permissionMap[permissionId];
-          result[index].push(permission.id);
-          let parent=this.permissionMap[permission.parentId];
-          while (parent){
+          let permission = this.permissionMap[permissionId];
+          if (permission) result[index].push(permission.id);
+          let parent = this.permissionMap[permission.parentId];
+          while (parent) {
             result[index].unshift(parent.id);
-            parent=this.permissionMap[parent.parentId];
+            parent = this.permissionMap[parent.parentId];
           }
           index++;
         });
-        this.selectedPerms=result;
+        this.selectedPerms = result;
       },
     },
     computed: {

@@ -7,7 +7,7 @@ import {listToMap, toTreeData, treeDataTranslate} from "../utils/util";
 import staticRouter from '../router/staticRouter'
 import router from '../router'
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     userInfo: {},
@@ -24,7 +24,7 @@ export default new Vuex.Store({
         setStore('userInfo', res.data || null);
         state.userInfo = res.data || {};
       })
-        .catch(err => reject(err))
+        .catch(err => err)
     },
     listUserPermission: function ({commit, state, dispatch}) {
       return new Promise((resolve, reject) => {
@@ -62,8 +62,8 @@ export default new Vuex.Store({
       state.cacheMenuList.push(data);
       setStore('cacheMenuList', state.cacheMenuList);
     },
-    removeCacheMenu(state, data) {
-      let cacheMenuList = state.cacheMenuList.filter(v => v.path !== data.path);
+    removeCacheMenu(state, path) {
+      let cacheMenuList = state.cacheMenuList.filter(v => v.path !== path);
       state.cacheMenuList = cacheMenuList;
       setStore('cacheMenuList', state.cacheMenuList);
     },

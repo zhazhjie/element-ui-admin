@@ -23,7 +23,7 @@
     name: "cache-menu-bar",
     data() {
       return {
-        editableTabsValue:"",
+        editableTabsValue: "",
         curPath: this.$route.path
       }
     },
@@ -36,13 +36,13 @@
       }
     },
     methods: {
-      changeMenu(tab){
+      changeMenu(tab) {
         this.routeTo(tab.name);
       },
       removeMenu(path) {
-        let menu=this.cacheMenuList.find(v=>v.path===path);
-        this.$store.commit("removeCacheMenu", menu);
-        if(this.curPath!==menu.path) return;
+        this.$route.meta.keepAlive = false;
+        this.$store.commit("removeCacheMenu", path);
+        if (this.curPath !== path) return;
         if (!this.cacheMenuList.length) {
           this.routeTo("/");
         } else {
@@ -50,10 +50,11 @@
         }
       },
       refresh() {
+        this.$route.meta.keepAlive = false;
         let fullPath = this.$route.fullPath;
         this.routeTo("/redirect" + fullPath, true);
       },
-      closeAll(){
+      closeAll() {
         this.$store.commit("removeAllCacheMenu");
         this.routeTo("/");
       }
@@ -66,13 +67,16 @@
 
 <style scoped>
   @import "../../../css/var.css";
+
   .cache-menu-bar {
     background: #fff;
     padding: 0 100px 0 20px;
     position: relative;
-    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1);
+    z-index: 5;
   }
-  .opt-box{
+
+  .opt-box {
     position: absolute;
     @apply --middle;
     right: 20px;
@@ -82,14 +86,17 @@
   .cache-menu-bar .el-tabs__header {
     margin: 0;
   }
+
   .cache-menu-bar .el-tabs__item {
     height: 35px;
     line-height: 35px;
   }
+
   .cache-menu-bar .el-tabs {
     position: relative;
     /*bottom: -1px;*/
   }
+
   .cache-menu-bar .el-tabs__nav-wrap::after {
     height: 0;
   }

@@ -79,7 +79,7 @@
             {required: true, message: '请输入密码', trigger: 'blur'},
           ],
           newPassword: [
-            {required: true, trigger: 'blur'},
+            {required: true, message: '请输入新密码', trigger: 'blur'},
             {min: 6, message: '密码长度必须6位及以上', trigger: 'blur'},
             {validator: validateStringIsIncludeBlank, trigger: 'blur'}
           ],

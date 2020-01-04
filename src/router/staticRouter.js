@@ -5,6 +5,14 @@
  */	
 export default [
   {
+    path: '/tableTempDoc',
+    meta:{
+      icon:"icon-save",
+      name:'表格模版文档'
+    },
+    component: (resolve)=>require(['@/views/help/tableTempDoc'],resolve),
+  },
+  {
     path: '/richText',
     meta:{
       icon:"icon-align-left",

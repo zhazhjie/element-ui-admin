@@ -13,7 +13,7 @@
       background-color="#545c64"
       text-color="#fff">
       <div class="logo">
-        <span class="tit" v-if="!isCollapse">spring-admin</span>
+        <span class="tit" v-if="!isCollapse">element-admin</span>
         <img v-else src="../../../img/logo.png">
       </div>
       <el-menu-item index='/' @click='routeTo("/")'>

@@ -7,30 +7,16 @@
 
 <template>
   <section>
-    <el-form :inline="true">
-      <el-form-item>
-        <el-input placeholder="用户名" v-model='params.keyword'></el-input>
-      </el-form-item>
-      <el-form-item>
-        <permission-btn type='primary' plain @click='handleSearch'>查询</permission-btn>
-      </el-form-item>
-    </el-form>
-    <div style="margin-bottom: 15px;">
-      <permission-btn permission='' type='primary' @click='handleAdd'>新增</permission-btn>
-    </div>
     <table-template
       ref="table"
+      :data="userList"
+      :config="config"
+      :tableLoading="tableLoading"
       @submitAdd="submitAdd"
       @submitEdit="submitUpdate"
-      :dialogProps="{width:'500px'}"
-      :handleProps="{width:'200px'}"
-      :rules="rules"
-      :loading='tableLoading'
-      :handleLoading="handleLoading"
-      :tableData='userList'
-      :columns='columns'
-      :handleList='handleList'
-      :handlePageChange='fetchList'
+      @submitSearch="handleSearch"
+      @pageChange="fetchList"
+      @stateChangeInForm="stateChange"
       :page='params'>
     </table-template>
   </section>
@@ -43,129 +29,134 @@
   export default {
     data() {
       return {
-        dialogVisible: false,
         tableLoading: false,
-        handleLoading: false,
-        handleType: 0,
-        defaultProps: {
-          children: 'children',
-          label: 'name'
-        },
         userList: [],
-        curUser: {
-          username: '',
-          password: '',
-          phone: '',
-          email: '',
-          state: 1,
-          roleIdList: [],
-        },
         roleList: [],
-        columns: [
-          {
-            label: 'ID',
-            field: 'id',
-            hiddenInDialog: true,
-          },
-          {
-            label: '登录账号',
-            field: 'username',
-          },
-          {
-            label: '手机',
-            field: 'phone',
-          },
-          {
-            label: '邮箱',
-            field: 'email',
-            hiddenInTable: true
-          },
-          {
-            label: '角色',
-            field: 'roleIdList',
-            hiddenInTable: true,
-            formEl: {
-              type:"select",
-              defaultProp:{
-                value:"id",
-                label:"roleName"
-              },
-              props:{
-                multiple:true,
-              },
-              attrs:{
-                style :"width:100%"
-              },
-              options:()=>this.roleList,
+        config: {
+          dialogProps: {width: '500px'},
+          handlerProps: {width: '200px'},
+          columns: [
+            {
+              label: 'ID',
+              field: 'id',
+              hideInDialog: true,
+              hideInSearch: true,
             },
-          },
-          {
-            label: '状态',
-            field: 'state',
-            render: (row) => {
-              return row.state ? <el-tag type="success">正常</el-tag> : <el-tag type="danger">禁用</el-tag>
+            {
+              label: '登录账号',
+              field: 'username',
             },
-            formEl: {
-              type:"radio",
-              options:[{label:1,text:"正常"},{label:0,text:"禁用"}],
+            {
+              label: '手机',
+              field: 'phone',
+              hideInSearch: true,
             },
-          },
-          {
-            label: '创建时间',
-            field: 'createTime',
-            hiddenInDialog: true
-          }
-        ],
-        handleList: [
-          {
-            label: '重置密码',
-            icon:'el-icon-unlock',
-            click: row => {
-              this.handleResetPwd(row);
+            {
+              label: '邮箱',
+              field: 'email',
+              hideInTable: true,
+              hideInSearch: true,
+            },
+            {
+              label: '角色',
+              field: 'roleIdList',
+              hideInTable: true,
+              hideInSearch: true,
+              options: () => this.roleList,
+              defaultProp: {
+                value: "id",
+                text: "roleName"
+              },
+              formEl: {
+                type: "select",
+                props: {
+                  multiple: true,
+                },
+                attrs: {
+                  style: "width:100%"
+                },
+              },
+            },
+            {
+              label: '状态',
+              field: 'state',
+              type: 'tag',
+              value: 1,
+              options: [{value: 1, text: "正常"}, {value: 0, text: "禁用"}],
+              stateMapping:{
+                0:"danger",
+                1:"success"
+              },
+              // render: (row) => {
+              //   return row.state ? <el-tag type="success">正常</el-tag> : <el-tag type="danger">禁用</el-tag>
+              // },
+              formEl: {
+                type: "radio",
+              },
+              searchEl: {
+                type: "select",
+                props: {
+                  clearable: true
+                }
+              }
+            },
+            {
+              label: '创建时间',
+              field: 'createTime',
+              hideInDialog: true,
+              hideInSearch: true,
             }
-          },
-          {
-            label: '编辑',
-            icon:'el-icon-edit'
-          },
-          {
-            label: '删除',
-            icon:'el-icon-delete',
-            click: row => {
-              this.handleDelete(row);
-            }
-          }
-        ],
-        rules: {
-          username: [
-            {required: true, message: '请输入登录账号', trigger: 'blur'}
           ],
+          handlerList: [
+            {
+              label: '重置密码',
+              icon: 'el-icon-unlock',
+              click: row => {
+                this.handleResetPwd(row);
+              }
+            },
+            {
+              label: '编辑',
+              icon: 'el-icon-edit'
+            },
+            {
+              label: '删除',
+              icon: 'el-icon-delete',
+              click: row => {
+                this.handleDelete(row);
+              }
+            }
+          ],
+          rules: {
+            username: [
+              {required: true, message: '请输入登录账号', trigger: 'blur'}
+            ],
+          },
         },
         params: {
           keyword: '',
           current: 1,
           size: 10,
-          total:10
+          total: 10
         }
       }
     },
-    components: {},
     methods: {
+      stateChange(row){
+        console.log(row)
+      },
       fetchList() {
         this.tableLoading = true;
         fetchList(this.params).then(res => {
-          this.tableLoading = false;
           this.userList = res.data.records;
           this.params.total = res.data.total;
-        })
+          this.tableLoading = false;
+        }).catch(()=>this.tableLoading=false);
       },
       getRoleList() {
         roleList().then(res => {
           this.roleList = res.data;
         });
-      },
-      handleAdd() {
-        this.$refs.table.showAdd(this.curUser);
       },
       handleResetPwd(row) {
         this.confirm(`确定要重置[${row.username}]的密码吗?`).then(() => {
@@ -188,36 +179,30 @@
           });
         });
       },
-      handleSearch() {
+      handleSearch(params) {
         this.params.current = 1;
+        this.params = {...this.params, ...params};
         this.fetchList();
       },
-      submitAdd(row) {
+      submitAdd(row, hideLoading, done) {
         addObj(row).then((res) => {
           this.$message({
             type: 'success',
             message: `新增成功，默认密码：${res.data}`
           });
           this.fetchList();
-          this.$refs.table.closeDialog();
-          this.handleLoading = false;
-        }).catch(() => {
-          this.handleLoading = false;
-        });
+          done();
+        }).catch(() => hideLoading());
       },
-      submitUpdate(row) {
-        this.handleLoading = true;
+      submitUpdate(row, hideLoading, done) {
         updObj(row).then(() => {
           this.$message({
             type: 'success',
             message: '更新成功!'
           });
           this.fetchList();
-          this.$refs.table.closeDialog();
-          this.handleLoading = false;
-        }).catch(() => {
-          this.handleLoading = false;
-        });
+          done();
+        }).catch(() => hideLoading());
       },
     },
     computed: {},

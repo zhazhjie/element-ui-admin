@@ -8,9 +8,10 @@
 <template>
   <section class="router">
     <transition name='fade-right' mode='out-in'>
-      <keep-alive :include="menuList">
+      <keep-alive v-if="$route.meta.keepAlive">
         <router-view class='router-view'/>
       </keep-alive>
+      <router-view v-else class='router-view'/>
     </transition>
   </section>
 </template>
