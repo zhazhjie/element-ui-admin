@@ -162,7 +162,7 @@ export default {
     },
     formElChange(field, suffix, row) {
       this.$emit(field + "Change" + (suffix ? "In" + suffix : ""), row);
-      this.$emit(field + "-change" + (suffix ? "-in-" + suffix : ""), row);
+      this.$emit(field + "-change" + (suffix ? "-in-" + suffix.toLowerCase() : ""), row);
     },
     handleSlide() {
       this.showAll = !this.showAll;
