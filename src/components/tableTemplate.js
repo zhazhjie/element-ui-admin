@@ -73,10 +73,12 @@ export default {
     handleSizeChange(pageSize) {
       this.page.size = pageSize;
       this.$emit("pageChange");
+      this.$emit("page-change");
     },
     handleCurrentChange(curPage) {
       this.page.current = curPage;
       this.$emit("pageChange");
+      this.$emit("page-change");
     },
     handleSubmit() {
       this.$refs.form.validate((valid) => {
@@ -84,6 +86,7 @@ export default {
           // console.log(this.curRow);
           this.handleLoading = true;
           this.$emit(this.handleType ? "submitEdit" : "submitAdd", this.curRow, this.hideLoading, this.done);
+          this.$emit(this.handleType ? "submit-edit" : "submit-add", this.curRow, this.hideLoading, this.done);
         } else {
           console.log('error submit!!');
           return false;
@@ -97,6 +100,7 @@ export default {
       this.dialogVisible = false;
       this.resetForm();
       this.$emit("closeDialog");
+      this.$emit("close-dialog");
     },
     done() {
       this.hideLoading();
@@ -112,6 +116,7 @@ export default {
       });
       this.curRow = curRow;
       this.$emit("showAdd");
+      this.$emit("show-add");
     },
     showEdit(row, dialogTitle = "编辑") {
       this.handleType = 1;
@@ -119,6 +124,7 @@ export default {
       this.curRow = this.copy(row);
       this.dialogVisible = true;
       this.$emit("showEdit", row);
+      this.$emit("show-edit", row);
     },
     showView(row, dialogTitle = "查看") {
       this.handleType = 2;
@@ -126,6 +132,7 @@ export default {
       this.curRow = this.copy(row);
       this.dialogVisible = true;
       this.$emit("showView", row);
+      this.$emit("show-view", row);
     },
     resetForm() {
       this.$refs.form.resetFields();
@@ -140,18 +147,22 @@ export default {
     },
     handleSearch() {
       this.$emit("submitSearch", this.searchForm);
+      this.$emit("submit-search", this.searchForm);
     },
     handleAdd() {
       this.showAdd();
     },
     handleSelectionChange(rows) {
       this.$emit("selectionChange", rows);
+      this.$emit("selection-change", rows);
     },
     handleRowClick(row) {
       this.$emit("rowClick", row);
+      this.$emit("row-click", row);
     },
     formElChange(field, suffix, row) {
       this.$emit(field + "Change" + (suffix ? "In" + suffix : ""), row);
+      this.$emit(field + "-change" + (suffix ? "-in-" + suffix : ""), row);
     },
     handleSlide() {
       this.showAll = !this.showAll;
@@ -234,7 +245,8 @@ export default {
           let field = row[column.field];
           let option = (column.options || []).find(item => getItemVal(item, defaultProp.value) === field) || {};
           return (
-            <el-tag type={column.stateMapping && column.stateMapping[field]}>{getItemVal(option, defaultProp.text)}</el-tag>
+            <el-tag
+              type={column.stateMapping && column.stateMapping[field]}>{getItemVal(option, defaultProp.text)}</el-tag>
           );
         case "date-picker":
           return (
@@ -403,6 +415,7 @@ export default {
       selectable = false,
       searchable = true,
       showAddBtn = true,
+      showIndex = false,
       addBtnPermission = ""
     } = this.config;
     if (group.length) {
@@ -468,6 +481,7 @@ export default {
             on-row-click={this.handleRowClick.bind(this)}
           >
             {selectable && <el-table-column type="selection" align="center" width="50"/>}
+            {showIndex && <el-table-column type="index" align="center" width="50"/>}
             {
               columns.map(column => {
                 if (column.hideInTable) {
@@ -502,7 +516,6 @@ export default {
                 fixed="right"
                 header-align="center"
                 {...{props: handlerProps}}
-                width={handlerList.length * 60}
                 scopedSlots={{
                   default: scope => {
                     if (handlerList.length) {
