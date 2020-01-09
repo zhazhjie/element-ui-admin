@@ -181,21 +181,32 @@ export default {
       };
       switch (type) {
         case "checkbox":
-          return (
-            <el-checkbox-group
-              {...data}
-              disabled={disabled}
-              vModel={row[column.field]}>
-              {options.map(item => {
-                return (
-                  <el-checkbox
-                    label={getItemVal(item, defaultProp.value)}>
-                    {getItemVal(item, defaultProp.text)}
-                  </el-checkbox>
-                )
-              })}
-            </el-checkbox-group>
-          );
+          if (options.length <= 1) {
+            return (
+              <el-checkbox
+                {...data}
+                disabled={disabled}
+                vModel={row[column.field]}>
+                {getItemVal(options[0], defaultProp.text)}
+              </el-checkbox>
+            );
+          } else {
+            return (
+              <el-checkbox-group
+                {...data}
+                disabled={disabled}
+                vModel={row[column.field]}>
+                {options.map(item => {
+                  return (
+                    <el-checkbox
+                      label={getItemVal(item, defaultProp.value)}>
+                      {getItemVal(item, defaultProp.text)}
+                    </el-checkbox>
+                  )
+                })}
+              </el-checkbox-group>
+            );
+          }
         case "radio":
           return (
             <el-radio-group
