@@ -514,6 +514,12 @@ export default {
                             </span>
                             )
                           } : null);
+                        },
+                        header: scope => {
+                          let {header = {}} = column;
+                          return this.getEl(column, header, scope.row, "Header", () => {
+                            return column.label;
+                          });
                         }
                       }}/>
                   )
