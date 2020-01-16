@@ -1,34 +1,27 @@
 <template>
   <section>
-    <div class="tinymce-container editor-container" :class="{fullscreen:fullscreen}">
-      <textarea class="tinymce-textarea" :id="tinymceId"></textarea>
-    </div>
-    <material-library @selectImg='selectImg' :visible.sync='visible'/>
+    <div :id="tinymceId"></div>
+    <upload-img @selectImg='selectImg' :visible.sync='visible'/>
   </section>
 </template>
 
 <script>
   import plugins from './plugins'
   import toolbar from './toolbar'
-  import materialLibrary from '@/components/materialLibrary'
+  import UploadImg from "./uploadImg";
+  import {upload} from "../../api/base";
 
   export default {
     name: 'tinymce',
-    components: {materialLibrary},
+    components: {UploadImg},
     props: {
-      id: {
-        type: String
-      },
       value: {
         type: String,
         default: ''
       },
-      toolbar: {
-        type: Array,
-        required: false,
-        default() {
-          return []
-        }
+      size: {
+        type: Number,
+        default: 5
       },
       menubar: {
         default: 'file edit insert view format table'
@@ -43,17 +36,16 @@
       return {
         OSS_URL: process.env.VUE_APP_REMOTE_URL,
         visible: false,
-        hasChange: false,
-        hasInit: false,
-        tinymceId: this.id || 'vue-tinymce-' + +new Date(),
-        fullscreen: false
+        tinymceId: 'vue-tinymce-' + +new Date(),
+        taskList: []
       }
     },
     watch: {
       value(val) {
-        if (!this.hasChange && this.hasInit) {
+        if (this.taskList.length) {
+          this.taskList.pop();
           this.$nextTick(() =>
-            window.tinymce.get(this.tinymceId).setContent(val || ''))
+            window.tinymce.get(this.tinymceId).setContent(val || ''));
         }
       }
     },
@@ -67,9 +59,33 @@
       this.destroyTinymce()
     },
     methods: {
-      selectImg(objUrl) {
-        objUrl.forEach(v => {
-          window.tinymce.get(this.tinymceId).insertContent(`<img class="wscnph" src="${this.OSS_URL + v}" />`)
+      selectImg(imgList) {
+        imgList.forEach(v => {
+          this.insertContent(this.getImg(v));
+        })
+      },
+      getImg(url) {
+        return `<img class="wscnph" style="max-width: 100%" src="${this.OSS_URL + url}" />`
+      },
+      checkImg(file) {
+        let limitType = /^image\/(jpeg|jpg|png)$/ig.test(file.type);
+        let limitSize = file.size / 1024 / 1024 < this.size;
+        if (!limitType) {
+          this.$message.error('图片只能是 jpg/png 格式!');
+          return false;
+        }
+        if (!limitSize) {
+          this.$message.error('图片大小不能超过 5MB!');
+          return false;
+        }
+        return true;
+      },
+      uploadImg(file) {
+        let fd = new FormData();
+        fd.set("file", file);
+        // compressImg({file,maxWidth:1024});
+        upload(fd).then(res => {
+          this.insertContent(this.getImg(res.data));
         })
       },
       initTinymce() {
@@ -79,7 +95,7 @@
           height: this.height,
           body_class: 'panel-body ',
           object_resizing: false,
-          toolbar: this.toolbar.length > 0 ? this.toolbar : toolbar,
+          toolbar: toolbar,
           menubar: this.menubar,
           plugins: plugins,
           end_container_on_empty_block: true,
@@ -93,23 +109,40 @@
           link_title: false,
           init_instance_callback: editor => {
             if (this.value) {
-              editor.setContent(this.value)
+              editor.setContent(this.value);
+            } else {
+              this.taskList.push(1);
             }
-            this.hasInit = true;
             editor.on('NodeChange Change KeyUp SetContent', () => {
-              this.hasChange = true;
-              this.$emit('input', editor.getContent())
+              this.$emit('input', editor.getContent());
             })
           },
           setup: editor => {
-            editor.on('FullscreenStateChanged', (e) => {
-              this.fullscreen = e.state
+            editor.on('paste', (e) => {
+              let files = e.clipboardData.files;
+              if (files.length) {
+                if (!this.checkImg(files[0])) return;
+                this.uploadImg(files[0]);
+                // editor.insertContent(this.defaultImg(id));
+              }
             });
-            // 定义按钮，
-            editor.addButton('selectimg', {
+            editor.on('drop', (e) => {
+              // console.log(e);
+              let files = e.dataTransfer.files;
+              if (files.length) {
+                if (!this.checkImg(files[0])) return;
+                this.uploadImg(files[0]);
+                // editor.insertContent(this.defaultImg(id));
+              }
+            });
+            editor.on('dragover', (e) => {
+              e.preventDefault();
+            });
+            // 定义按钮
+            editor.addButton('insertimg', {
               // text: 'button',
               icon: 'image',
-              tooltip: "选择图片",
+              tooltip: "插入图片",
               onclick: () => {
                 this.visible = true;
               }
@@ -119,14 +152,17 @@
       },
       destroyTinymce() {
         if (window.tinymce.get(this.tinymceId)) {
-          window.tinymce.get(this.tinymceId).destroy()
+          window.tinymce.get(this.tinymceId).destroy();
         }
       },
+      insertContent(value) {
+        window.tinymce.get(this.tinymceId).insertContent(value);
+      },
       setContent(value) {
-        window.tinymce.get(this.tinymceId).setContent(value)
+        window.tinymce.get(this.tinymceId).setContent(value);
       },
       getContent() {
-        window.tinymce.get(this.tinymceId).getContent()
+        window.tinymce.get(this.tinymceId).getContent();
       },
     },
     destroyed() {
@@ -135,33 +171,8 @@
   }
 </script>
 
-<style scoped>
-  .tinymce-container {
-    position: relative;
-  }
-
-  .tinymce-container >>> .mce-fullscreen {
+<style>
+  .mce-fullscreen {
     z-index: 10000;
-  }
-
-  .tinymce-textarea {
-    visibility: hidden;
-    z-index: -1;
-  }
-
-  .editor-custom-btn-container {
-    position: absolute;
-    right: 4px;
-    top: 4px;
-    /*z-index: 2005;*/
-  }
-
-  .fullscreen .editor-custom-btn-container {
-    z-index: 10000;
-    position: fixed;
-  }
-
-  .editor-upload-btn {
-    display: inline-block;
   }
 </style>
