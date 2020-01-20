@@ -110,10 +110,6 @@
     transition: all 0.3s;
   }
 
-  .feedback-icon >>> i {
-    margin-right: 0;
-  }
-
   .img-box {
     min-height: 200px;
     margin-bottom: 10px;

@@ -78,17 +78,17 @@ export default {
 .el-submenu .el-menu-item {
   min-width: 180px;
 }
-.el-menu{
-  /*border-right: 0;*/
+.el-submenu__title i,
+.el-menu-item i{
+  margin-right: 5px;
 }
 .el-menu--collapse {
   width: 36px;
 }
 .el-menu-vertical i{
-  color: inherit !important;
+  color: inherit;
 }
 .el-menu--collapse i{
   display: inline-block;
-  margin: 0 auto !important;
 }
 </style>
