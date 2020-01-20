@@ -11,7 +11,7 @@
           <el-input placeholder="请输入标题" v-model="params.title" maxlength="100"></el-input>
         </el-form-item>
         <el-form-item label="内容" prop="content">
-          <el-input placeholder="请输入内容" type="textarea" v-model="params.content" maxlength="255"></el-input>
+          <el-input placeholder="请输入内容" type="textarea" v-model="params.content" :rows="3" show-word-limit maxlength="255"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">
