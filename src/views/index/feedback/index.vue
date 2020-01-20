@@ -120,9 +120,8 @@
     border: 1px solid #eee;
   }
 
-  .img-box >>> img {
-    width: 100% !important;
-    height: auto !important;
+  .img-box img {
+    width: 100%;
   }
 </style>
 <style>
