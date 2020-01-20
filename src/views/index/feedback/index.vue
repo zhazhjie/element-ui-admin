@@ -6,7 +6,7 @@
       <div class="img-box" v-loading="loading">
         <img ref="img" :src="imgData" v-img-preview>
       </div>
-      <el-form label-width="80px" :rules="rules" :model="params" ref="form">
+      <el-form label-width="60px" :rules="rules" :model="params" ref="form">
         <el-form-item label="标题" prop="title">
           <el-input placeholder="请输入标题" v-model="params.title" maxlength="100"></el-input>
         </el-form-item>
