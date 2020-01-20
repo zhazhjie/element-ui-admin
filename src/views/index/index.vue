@@ -12,10 +12,11 @@
       <el-container class='right-container'>
         <head-bar />
         <cache-menu-bar></cache-menu-bar>
-        <el-main class='el-main'>
+        <el-main id='el-main'>
           <el-router-view/>
         </el-main>
       </el-container>
+      <feedback></feedback>
     </el-container>
   </section>
 </template>
@@ -26,6 +27,7 @@ import headBar from './headBar'
 import navBar from './navBar'
 import elRouterView from '../routerView'
 import CacheMenuBar from "./cacheMenuBar/index";
+import Feedback from "./feedback/index";
 export default {
   data() {
     return {
@@ -33,6 +35,7 @@ export default {
     }
   },
   components: {
+    Feedback,
     CacheMenuBar,
     headBar,
     navBar,
@@ -55,7 +58,7 @@ export default {
 	height: 100vh;
   background: #fff;
 }
-.el-main{
+#el-main{
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;

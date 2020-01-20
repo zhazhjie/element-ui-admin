@@ -228,10 +228,9 @@ export function setCookie(name, value, exTime, domain) {
  * @param data
  */
 export function compressImg(data) {
-  let {file, exportType, maxWidth, maxHeight} = data;
+  let {file, fileName, exportType, maxWidth, maxHeight} = data;
   return new Promise((resolve, reject) => {
-    let fr = new FileReader();
-    fr.onload = function () {
+    let buildImg = function (dataUrl, fileName) {
       if (maxWidth || maxHeight) {
         let img = new Image();
         img.onload = function () {
@@ -265,21 +264,29 @@ export function compressImg(data) {
           ctx.fill();
           ctx.drawImage(img, 0, 0, realW, realH);
           let imgData = canvas.toDataURL();
-          resolve(exportType === 'file' ? dataURLtoFile(imgData, file.name) : imgData);
+          resolve(exportType === 'file' ? dataURLtoFile(imgData, fileName) : imgData);
         };
         img.onerror = function () {
           reject();
         };
-        img.src = fr.result;
+        img.src = dataUrl;
       } else {
-        let imgData = fr.result;
-        resolve(exportType === 'file' ? dataURLtoFile(imgData, file.name) : imgData);
+        let imgData = dataUrl;
+        resolve(exportType === 'file' ? dataURLtoFile(imgData, fileName) : imgData);
       }
     };
-    fr.onerror = function () {
-      reject();
-    };
-    fr.readAsDataURL(file)
+    if (typeof file === "string") {
+      buildImg(file, fileName);
+    } else {
+      let fr = new FileReader();
+      fr.onload = function () {
+        buildImg(fr.result, file.name);
+      };
+      fr.onerror = function () {
+        reject();
+      };
+      fr.readAsDataURL(file);
+    }
   });
 }
 

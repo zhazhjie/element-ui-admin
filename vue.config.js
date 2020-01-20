@@ -10,7 +10,8 @@ module.exports = {
   configureWebpack: {
     externals: {
       'vue': 'Vue',
-      'element-ui': 'ELEMENT'
+      'element-ui': 'ELEMENT',
+      'html2canvas': 'html2canvas'
     },
   },
   productionSourceMap: false,

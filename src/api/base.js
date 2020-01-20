@@ -12,3 +12,11 @@ export function upload(data) {
     data: data
   })
 }
+
+export function saveFeedback(data) {
+  return request({
+    url: '/feedback/save',
+    method: 'post',
+    data: data
+  })
+}
