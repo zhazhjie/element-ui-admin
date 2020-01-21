@@ -58,10 +58,10 @@
               formEl: {
                 props: {
                   type: 'textarea',
-                  rows: 3,
                   showWordLimit: true,
                 },
                 attrs: {
+                  rows: 3,
                   maxlength: 255
                 }
               }
