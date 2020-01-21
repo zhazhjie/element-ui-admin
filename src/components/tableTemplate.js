@@ -71,23 +71,39 @@ export default {
     copy(obj) {
       return JSON.parse(JSON.stringify(obj));
     },
+    toCamelBak(name, capitalize) {
+      if (!name) return "";
+      let ary = name.split("-");
+      return ary.map((v, i) => {
+        if (i || capitalize) {
+          return v.substring(0, 1).toUpperCase() + v.substring(1);
+        } else {
+          return v;
+        }
+      }).join("");
+    },
+    toCapitalize(name) {
+      if (!name) return "";
+      return name.substring(0, 1).toUpperCase() + name.substring(1);
+    },
+    emitEvent(event, ...args) {
+      this.$emit(event, ...args);
+      this.$emit(this.toCamelBak(event), ...args);
+    },
     handleSizeChange(pageSize) {
       this.page.size = pageSize;
-      this.$emit("pageChange");
-      this.$emit("page-change");
+      this.emitEvent("page-change");
     },
     handleCurrentChange(curPage) {
       this.page.current = curPage;
-      this.$emit("pageChange");
-      this.$emit("page-change");
+      this.emitEvent("page-change");
     },
     handleSubmit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
           // console.log(this.curRow);
           this.handleLoading = true;
-          this.$emit(this.handleType ? "submitEdit" : "submitAdd", this.curRow, this.hideLoading, this.done);
-          this.$emit(this.handleType ? "submit-edit" : "submit-add", this.curRow, this.hideLoading, this.done);
+          this.emitEvent(this.handleType ? "submit-edit" : "submit-add", this.curRow, this.hideLoading, this.done);
         } else {
           console.log('error submit!!');
           return false;
@@ -98,8 +114,7 @@ export default {
       this.handleLoading = false;
     },
     closeDialog() {
-      this.$emit("closeDialog");
-      this.$emit("close-dialog");
+      this.emitEvent("close-dialog");
       this.dialogVisible = false;
       this.resetForm();
     },
@@ -108,8 +123,7 @@ export default {
       this.closeDialog();
     },
     showAdd(dialogTitle = "新增") {
-      this.$emit("showAdd");
-      this.$emit("show-add");
+      this.emitEvent("show-add");
       this.handleType = 0;
       this.dialogTitle = dialogTitle;
       this.dialogVisible = true;
@@ -120,16 +134,14 @@ export default {
       this.curRow = curRow;
     },
     showEdit(row, dialogTitle = "编辑") {
-      this.$emit("showEdit", row);
-      this.$emit("show-edit", row);
+      this.emitEvent("show-edit", row);
       this.handleType = 1;
       this.dialogTitle = dialogTitle;
       this.curRow = this.copy(row);
       this.dialogVisible = true;
     },
     showView(row, dialogTitle = "查看") {
-      this.$emit("showView", row);
-      this.$emit("show-view", row);
+      this.emitEvent("show-view", row);
       this.handleType = 2;
       this.dialogTitle = dialogTitle;
       this.curRow = this.copy(row);
@@ -147,30 +159,22 @@ export default {
       }
     },
     handleSearch() {
-      this.$emit("submitSearch", this.searchForm);
-      this.$emit("submit-search", this.searchForm);
+      this.emitEvent("submit-search", this.searchForm);
     },
     handleAdd() {
       this.showAdd();
     },
     handleSelectionChange(rows) {
-      this.$emit("selectionChange", rows);
-      this.$emit("selection-change", rows);
+      this.emitEvent("selection-change", rows);
     },
     handleRowClick(row) {
-      this.$emit("rowClick", row);
-      this.$emit("row-click", row);
+      this.emitEvent("row-click", row);
     },
     formElChange(field, suffix, row, val) {
-      this.$emit(field + "Change" + (suffix ? "In" + suffix : ""), row, val);
-      this.$emit(field + "-change" + (suffix ? "-in-" + suffix.toLowerCase() : ""), row, val);
+      this.emitEvent(field + "-change" + (suffix ? "-in-" + suffix.toLowerCase() : ""), row, val);
     },
     handleSlide() {
       this.showAll = !this.showAll;
-    },
-    toCapitalize(val) {
-      if (!val) return "";
-      return val.substring(0, 1).toUpperCase() + val.substring(1);
     },
     createEl(column = {}, scope = {}, row = {}, disabled = false, suffix) {
       let {options = [], defaultProp = {value: "value", text: "text"}} = column;
@@ -243,6 +247,7 @@ export default {
                 return (
                   <el-option
                     key={getItemVal(item, defaultProp.value)}
+                    label={getItemVal(item, defaultProp.text)}
                     value={getItemVal(item, defaultProp.value)}>
                     {this.getEl(column, scope[type] || {}, item, suffix + this.toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                   </el-option>
