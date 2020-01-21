@@ -32,8 +32,9 @@
       return {
         tableLoading: false,
         roleList: [],
+        permissionMap: {},
         permissionTree: [],
-        selectedPerms: [],
+        // selectedPerms: [],
         config: {
           dialogProps: {width: '500px'},
           handlerProps: {width: '125px'},
@@ -61,28 +62,23 @@
             },
             {
               label: '选择权限',
-              field: 'permissionIdList',
+              field: 'selectedPerms',
               hideInTable: true,
               hideInSearch: true,
+              options: () => this.permissionTree,
               formEl: {
-                render: row => {
-                  return (
-                    <el-cascader
-                      ref="perms"
-                      style="width:100%"
-                      placeholder="请选择权限"
-                      vModel={this.selectedPerms}
-                      props={{
-                        props: {
-                          label: "name",
-                          value: "id",
-                          multiple: true,
-                          expandTrigger: "hover"
-                        }
-                      }}
-                      options={this.permissionTree}
-                      collapse-tags/>
-                  )
+                type: 'cascader',
+                props: {
+                  collapseTags: true,
+                  props: {
+                    label: "name",
+                    value: "id",
+                    multiple: true,
+                    expandTrigger: "hover"
+                  },
+                },
+                attrs: {
+                  style: "width:100%"
                 }
               }
             }
@@ -128,6 +124,7 @@
         this.tableLoading = true;
         listPage(this.params).then(res => {
           this.tableLoading = false;
+          res.data.records.forEach(v => v.selectedPerms = []);
           this.roleList = res.data.records;
           this.params.total = res.data.total;
         }).catch(() => this.tableLoading = false);
@@ -150,7 +147,7 @@
       },
       setPerms(row) {
         let permissionIdList = [];
-        this.selectedPerms.forEach(item => {
+        row.selectedPerms.forEach(item => {
           permissionIdList.push(...item);
         });
         row.permissionIdList = [...new Set(permissionIdList)];
@@ -186,7 +183,8 @@
             result[index] = [];
           }
           let permission = this.permissionMap[permissionId];
-          if (permission) result[index].push(permission.id);
+          if (!permission) return;
+          result[index].push(permission.id);
           let parent = this.permissionMap[permission.parentId];
           while (parent) {
             result[index].unshift(parent.id);
@@ -194,7 +192,7 @@
           }
           index++;
         });
-        this.selectedPerms = result;
+        row.selectedPerms = result;
       },
     },
     computed: {

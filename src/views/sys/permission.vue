@@ -15,7 +15,7 @@
       @submitAdd="submitAdd"
       @submitEdit="submitUpdate"
       @showEdit="findParentId"
-      @pageChange='listPermission'
+      @selectedPermsChangeInForm='handleSelectNode'
       :page='params'/>
   </section>
 </template>
@@ -29,8 +29,9 @@
       return {
         iconList: [],
         tableLoading: false,
+        permissionMap: {},
         permissionTree: [],
-        selectedPerms: [],
+        // selectedPerms: [],
         config: {
           pageable: false,
           searchable: false,
@@ -55,60 +56,54 @@
             {
               hideInTable: true,
               label: '父节点',
-              field: 'parentName',
+              field: 'selectedPerms',
+              options: () => this.permissionTree,
               formEl: {
-                render: row => {
-                  return (
-                    <el-cascader
-                      ref="perms"
-                      style="width:100%"
-                      placeholder="请选择父节点"
-                      vModel={this.selectedPerms}
-                      on-input={e => this.handleSelectNode(e, row)}
-                      props={{
-                        props: {
-                          label: "name",
-                          value: "id",
-                          checkStrictly: true,
-                          expandTrigger: "hover"
-                        }
-                      }}
-                      options={this.permissionTree}
-                      collapse-tags={true}
-                    />
-                  )
-                }
+                type: 'cascader',
+                props: {
+                  collapseTags: true,
+                  props: {
+                    label: "name",
+                    value: "id",
+                    checkStrictly: true,
+                    expandTrigger: "hover"
+                  },
+                },
+                attrs: {
+                  style: "width:100%"
+                },
               }
             },
             {
               label: '图标',
               field: 'icon',
               render: row => <i class={row.icon}></i>,
+              options: () => this.iconList,
               hideInDialog: false,
               formEl: {
-                render: (row) => {
-                  return (<el-select
-                    vModel={row.icon}
-                    filterable={true}
-                    placeholder="请选择图标"
-                    style='width:100%'>
-                    {this.iconList.map(icon => {
-                      return (
-                        <el-option
-                          key={icon}
-                          value={icon}>
-                          <i class={icon}></i>
-                          <span>{icon}</span>
-                        </el-option>
-                      )
-                    })}
-                  </el-select>)
+                type: 'select',
+                props: {
+                  filterable: true,
+                },
+                attrs: {
+                  style: "width:100%"
+                },
+                select: {
+                  render: (row) => {
+                    return (
+                      <span>
+                        <i style="margin-right: 5px" class={row}></i>
+                        <span>{row}</span>
+                      </span>
+                    )
+                  }
                 }
               },
             },
             {
               label: '类型',
               field: 'type',
+              value: 0,
               options: [{value: 0, text: "菜单"}, {value: 1, text: "接口"}],
               type: 'tag',
               stateMapping: {
@@ -146,6 +141,7 @@
               label: '导航隐藏',
               field: 'hidden',
               hideInTable: true,
+              value: 0,
               options: [{value: 1, text: "是"}, {value: 0, text: "否"}],
               formEl: {
                 type: "radio",
@@ -183,23 +179,24 @@
     },
     components: {},
     methods: {
-      listPermission: function () {
+      listPermission() {
         this.tableLoading = true;
         listPermission(this.params).then((res) => {
+          res.data.forEach(v => v.selectedPerms = []);
           this.tableLoading = false;
           this.permissionTree = treeDataTranslate(res.data);
           this.permissionMap = listToMap(res.data);
         }).catch(() => this.tableLoading = false);
       },
-      handleSelectNode(e, row) {
-        for (let i = 0; i < e.length; i++) {
-          let perms = this.permissionMap[e[i]];
+      handleSelectNode(row, val) {
+        for (let i = 0; i < val.length; i++) {
+          let perms = this.permissionMap[val[i]];
           if (perms && (perms.id === row.id)) {
-            this.selectedPerms = [];
+            row.selectedPerms = [];
             return this.$message.warning("不能选自己及子节点作为父节点");
           }
         }
-        this.selectedPerms = e;
+        row.selectedPerms = val;
       },
       handleDelete(row) {
         this.confirm(`确定删除[${row.name}]吗?`).then(() => {
@@ -213,7 +210,7 @@
         });
       },
       submitAdd(row, hideLoading, done) {
-        row.parentId = this.selectedPerms[this.selectedPerms.length - 1];
+        row.parentId = row.selectedPerms[row.selectedPerms.length - 1];
         addObj(row).then(() => {
           this.$message({
             type: 'success',
@@ -224,8 +221,7 @@
         }).catch(() => hideLoading());
       },
       submitUpdate(row, hideLoading, done) {
-        this.handleLoading = true;
-        row.parentId = this.selectedPerms[this.selectedPerms.length - 1];
+        row.parentId = row.selectedPerms[row.selectedPerms.length - 1];
         udpObj(row).then(() => {
           this.$message({
             type: 'success',
@@ -242,7 +238,7 @@
           result.unshift(parent.id);
           parent = this.permissionMap[parent.parentId];
         }
-        this.selectedPerms = result;
+        row.selectedPerms = result;
       },
       getIconList() {
         getIconList().then(data => {

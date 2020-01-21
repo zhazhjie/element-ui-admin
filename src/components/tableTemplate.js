@@ -30,6 +30,7 @@ export default {
         group: [],
         pageable: true,
         withoutDialog: false,
+        withoutTable: false,
         selectable: false,
         searchable: true,
         showAddBtn: true,
@@ -97,16 +98,18 @@ export default {
       this.handleLoading = false;
     },
     closeDialog() {
-      this.dialogVisible = false;
-      this.resetForm();
       this.$emit("closeDialog");
       this.$emit("close-dialog");
+      this.dialogVisible = false;
+      this.resetForm();
     },
     done() {
       this.hideLoading();
       this.closeDialog();
     },
     showAdd(dialogTitle = "新增") {
+      this.$emit("showAdd");
+      this.$emit("show-add");
       this.handleType = 0;
       this.dialogTitle = dialogTitle;
       this.dialogVisible = true;
@@ -115,24 +118,22 @@ export default {
         curRow[column.field] = column.value;
       });
       this.curRow = curRow;
-      this.$emit("showAdd");
-      this.$emit("show-add");
     },
     showEdit(row, dialogTitle = "编辑") {
+      this.$emit("showEdit", row);
+      this.$emit("show-edit", row);
       this.handleType = 1;
       this.dialogTitle = dialogTitle;
       this.curRow = this.copy(row);
       this.dialogVisible = true;
-      this.$emit("showEdit", row);
-      this.$emit("show-edit", row);
     },
     showView(row, dialogTitle = "查看") {
+      this.$emit("showView", row);
+      this.$emit("show-view", row);
       this.handleType = 2;
       this.dialogTitle = dialogTitle;
       this.curRow = this.copy(row);
       this.dialogVisible = true;
-      this.$emit("showView", row);
-      this.$emit("show-view", row);
     },
     resetForm() {
       this.$refs.form.resetFields();
@@ -160,12 +161,16 @@ export default {
       this.$emit("rowClick", row);
       this.$emit("row-click", row);
     },
-    formElChange(field, suffix, row) {
-      this.$emit(field + "Change" + (suffix ? "In" + suffix : ""), row);
-      this.$emit(field + "-change" + (suffix ? "-in-" + suffix.toLowerCase() : ""), row);
+    formElChange(field, suffix, row, val) {
+      this.$emit(field + "Change" + (suffix ? "In" + suffix : ""), row, val);
+      this.$emit(field + "-change" + (suffix ? "-in-" + suffix.toLowerCase() : ""), row, val);
     },
     handleSlide() {
       this.showAll = !this.showAll;
+    },
+    toCapitalize(val) {
+      if (!val) return "";
+      return val.substring(0, 1).toUpperCase() + val.substring(1);
     },
     createEl(column = {}, scope = {}, row = {}, disabled = false, suffix) {
       let {options = [], defaultProp = {value: "value", text: "text"}} = column;
@@ -184,15 +189,17 @@ export default {
           if (options.length <= 1) {
             return (
               <el-checkbox
+                on-change={this.formElChange.bind(this, column.field, suffix, row)}
                 {...data}
                 disabled={disabled}
                 vModel={row[column.field]}>
-                {getItemVal(options[0], defaultProp.text)}
+                {this.getEl(column, scope[type] || {}, options[0], suffix + this.toCapitalize(type), () => getItemVal(options[0], defaultProp.text))}
               </el-checkbox>
             );
           } else {
             return (
               <el-checkbox-group
+                on-change={this.formElChange.bind(this, column.field, suffix, row)}
                 {...data}
                 disabled={disabled}
                 vModel={row[column.field]}>
@@ -200,7 +207,7 @@ export default {
                   return (
                     <el-checkbox
                       label={getItemVal(item, defaultProp.value)}>
-                      {getItemVal(item, defaultProp.text)}
+                      {this.getEl(column, scope[type] || {}, item, suffix + this.toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                     </el-checkbox>
                   )
                 })}
@@ -210,7 +217,7 @@ export default {
         case "radio":
           return (
             <el-radio-group
-              on-change={this.formElChange.bind(this, column.field, suffix)}
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
               {...data}
               disabled={disabled}
               vModel={row[column.field]}>
@@ -218,7 +225,7 @@ export default {
                 return (
                   <el-radio
                     label={getItemVal(item, defaultProp.value)}>
-                    {getItemVal(item, defaultProp.text)}
+                    {this.getEl(column, scope[type] || {}, item, suffix + this.toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                   </el-radio>
                 )
               })}
@@ -227,7 +234,7 @@ export default {
         case "select":
           return (
             <el-select
-              on-change={this.formElChange.bind(this, column.field, suffix)}
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
               placeholder={"请选择" + column.label}
               {...data}
               disabled={disabled}
@@ -236,8 +243,8 @@ export default {
                 return (
                   <el-option
                     key={getItemVal(item, defaultProp.value)}
-                    label={getItemVal(item, defaultProp.text)}
                     value={getItemVal(item, defaultProp.value)}>
+                    {this.getEl(column, scope[type] || {}, item, suffix + this.toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                   </el-option>
                 )
               })}
@@ -246,7 +253,7 @@ export default {
         case "switch":
           return (
             <el-switch
-              on-change={this.formElChange.bind(this, column.field, suffix)}
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
               {...data}
               disabled={disabled}
               vModel={row[column.field]}>
@@ -262,7 +269,7 @@ export default {
         case "date-picker":
           return (
             <el-date-picker
-              on-change={this.formElChange.bind(this, column.field, suffix)}
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
               placeholder={"请选择" + column.label}
               {...data}
               disabled={disabled}
@@ -272,7 +279,7 @@ export default {
         case "time-picker":
           return (
             <el-time-picker
-              on-change={this.formElChange.bind(this, column.field, suffix)}
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
               placeholder={"请选择" + column.label}
               {...data}
               disabled={disabled}
@@ -282,7 +289,7 @@ export default {
         case "time-select":
           return (
             <el-time-select
-              on-change={this.formElChange.bind(this, column.field, suffix)}
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
               placeholder={"请选择" + column.label}
               {...data}
               disabled={disabled}
@@ -296,6 +303,54 @@ export default {
               disabled={disabled}
               vModel={row[column.field]}>
             </el-input-number>
+          );
+        case "slider":
+          return (
+            <el-slider
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              {...data}
+              disabled={disabled}
+              vModel={row[column.field]}>
+            </el-slider>
+          );
+        case "rate":
+          return (
+            <el-rate
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              {...data}
+              disabled={disabled}
+              vModel={row[column.field]}>
+            </el-rate>
+          );
+        case "color-picker":
+          return (
+            <el-color-picker
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              {...data}
+              disabled={disabled}
+              vModel={row[column.field]}>
+            </el-color-picker>
+          );
+        case "cascader":
+          return (
+            <el-cascader
+              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              placeholder={"请选择" + column.label}
+              {...data}
+              options={options}
+              disabled={disabled}
+              vModel={row[column.field]}>
+            </el-cascader>
+          );
+        case "upload":
+          return (
+            <el-upload
+              {...data}
+              disabled={disabled}>
+              {this.getEl(column, scope.upload || {}, row, suffix + this.toCapitalize(type), () => <el-button
+                type="primary">上传</el-button>)}
+              {this.getEl(column, scope.uploadTip || {}, row, suffix + this.toCapitalize(type) + "Tip", () => null)}
+            </el-upload>
           );
         default:
           return (
@@ -423,6 +478,7 @@ export default {
       group = [],
       pageable = true,
       withoutDialog = false,
+      withoutTable = false,
       selectable = false,
       searchable = true,
       showAddBtn = true,
@@ -481,6 +537,7 @@ export default {
         </el-form>
         <div class="table-template-content">
           {this.$scopedSlots.tableLeft && this.$scopedSlots.tableLeft()}
+          {!withoutTable &&
           <el-table
             class="table-template-table"
             highlight-current-row
@@ -559,7 +616,7 @@ export default {
                   }
                 }}/>
             }
-          </el-table>
+          </el-table>}
           {this.$scopedSlots.tableRight && this.$scopedSlots.tableRight()}
         </div>
         {pageable &&

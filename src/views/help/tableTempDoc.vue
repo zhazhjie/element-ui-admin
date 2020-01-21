@@ -505,6 +505,13 @@
             defaultValue: "-"
           },
           {
+            param: "header",
+            explain: "表头属性，同formEl",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
             param: "formItem",
             explain: "弹出层表单项属性，详见FormItem Attribute",
             type: "object",
@@ -767,6 +774,10 @@
           {
             name: "字段名+Search",
             explain: "自定义搜索项"
+          },
+          {
+            name: "字段名+Header",
+            explain: "自定义表格头部"
           },
         ]
       }

@@ -1,24 +1,24 @@
 <template>
   <div class="feedback">
-    <el-button type="primary" size="medium" class="feedback-icon" circle icon="icon-camera"
-               @click="buildCanvas"></el-button>
-    <el-dialog width="500px" :visible.sync="dialogVisible" :before-close="resetForm" title="反馈">
-      <div class="img-box" v-loading="loading">
-        <img ref="img" :src="imgData" v-img-preview>
-      </div>
-      <el-form label-width="60px" :rules="rules" :model="params" ref="form">
-        <el-form-item label="标题" prop="title">
-          <el-input placeholder="请输入标题" v-model="params.title" maxlength="100"></el-input>
-        </el-form-item>
-        <el-form-item label="内容" prop="content">
-          <el-input placeholder="请输入内容" type="textarea" v-model="params.content" :rows="3" show-word-limit maxlength="255"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button @click="resetForm">取 消</el-button>
-        <el-button type="primary" :loading="handleLoading" @click="handleSubmit">提 交</el-button>
-      </div>
-    </el-dialog>
+    <el-button
+      type="primary"
+      size="medium"
+      class="feedback-icon"
+      circle
+      icon="icon-camera"
+      @click="buildCanvas">
+    </el-button>
+    <table-template
+      ref="table"
+      :data="[]"
+      :config="config"
+      @submitAdd="handleSubmit">
+      <template v-slot:imgDataForm>
+        <div class="img-box" v-loading="loading">
+          <img ref="img" :src="imgData" v-img-preview>
+        </div>
+      </template>
+    </table-template>
   </div>
 </template>
 
@@ -31,30 +31,61 @@
     name: "feedback",
     data() {
       return {
-        dialogVisible: false,
-        handleLoading: false,
+        config: {
+          searchable: false,
+          pageable: false,
+          withoutTable: true,
+          showAddBtn: false,
+          dialogProps: {width: '500px'},
+          formProps: {labelWidth: '60px'},
+          columns: [
+            {
+              label: '',
+              field: 'imgData',
+              formItem: {
+                props: {
+                  labelWidth: '0px'
+                }
+              }
+            },
+            {
+              label: '标题',
+              field: 'title',
+            },
+            {
+              label: '内容',
+              field: 'content',
+              formEl: {
+                props: {
+                  type: 'textarea',
+                  rows: 3,
+                  showWordLimit: true,
+                },
+                attrs: {
+                  maxlength: 255
+                }
+              }
+            },
+          ],
+          rules: {
+            title: [{required: true, message: '请输入标题', trigger: 'blur'}],
+            content: [{required: true, message: '请输入内容', trigger: 'blur'}]
+          },
+        },
         loading: false,
-        rules: {
-          title: [{required: true, message: '请输入标题', trigger: 'blur'}],
-          content: [{required: true, message: '请输入内容', trigger: 'blur'}]
-        },
-        params: {
-          title: "",
-          content: ""
-        },
-        imgData:""
+        imgData: ""
       }
     },
     methods: {
       buildCanvas() {
-        this.dialogVisible = true;
+        this.$refs.table.showAdd("反馈");
         this.loading = true;
         html2canvas(document.getElementById("el-main")).then(canvas => {
-          this.imgData=canvas.toDataURL();
+          this.imgData = canvas.toDataURL();
           this.loading = false;
         }).catch(() => this.loading = false);
       },
-      uploadImg() {
+      handleSubmit(row, hideLoading, done) {
         let params = {
           file: this.$refs.img.src,
           maxWidth: 500,
@@ -65,31 +96,16 @@
           let fr = new FormData();
           fr.set("file", data);
           upload(fr).then(res => {
-            this.params.imgUrl = res.data;
-            this.saveFeedback();
-          }).catch(() => this.handleLoading = false);
-        }).catch(() => this.handleLoading = false);
+            row.imgUrl = res.data;
+            this.saveFeedback(row, hideLoading, done);
+          }).catch(() => hideLoading());
+        }).catch(() => hideLoading());
       },
-      saveFeedback() {
-        saveFeedback(this.params).then(res => {
+      saveFeedback(row, hideLoading, done) {
+        saveFeedback(row).then(res => {
           this.$message.success("提交成功！");
-          this.handleLoading = false;
-          this.dialogVisible = false;
-        }).catch(() => this.handleLoading = false)
-      },
-      handleSubmit() {
-        this.$refs["form"].validate((valid) => {
-          if (valid) {
-            this.handleLoading = true;
-            this.uploadImg();
-          } else {
-            return false;
-          }
-        });
-      },
-      resetForm() {
-        this.dialogVisible = false;
-        this.$refs["form"].resetFields();
+          done();
+        }).catch(() => hideLoading())
       },
     },
     mounted() {
@@ -98,6 +114,8 @@
 </script>
 
 <style scoped>
+  @import "../../../css/var.css";
+
   .feedback-icon {
     position: fixed;
     bottom: 10px;
@@ -113,7 +131,7 @@
   .img-box {
     min-height: 200px;
     margin-bottom: 10px;
-    border: 1px solid #eee;
+    border: 1px solid var(--border);
   }
 
   .img-box img {
