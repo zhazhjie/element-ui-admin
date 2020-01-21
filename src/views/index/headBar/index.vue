@@ -40,7 +40,6 @@
   </section>
 </template>
 
-
 <script>
   import screenfull from './screenfull'
   import sizeSelect from './sizeSelect'

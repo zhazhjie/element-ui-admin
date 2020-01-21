@@ -323,14 +323,10 @@ export function throttle(callback, delay) {
  */
 export function formatAmount(value) {
   if (!value) return '0.00';
-  value += '';
-  let index = value.indexOf('.');
-  value = index > -1 ? value.substring(0, index + 3) : value;
-  // value = Math.floor(value * 100)/100;
-  if (value > 1000000) {
-    return (value / 10000).toFixed(2) + '万'
+  if (value > 100000) {
+    return (value/10000).setScale(2, 2) + '万';
   } else {
-    return (+value).toFixed(2);
+    return (+value).setScale(2, 2);
   }
 }
 
