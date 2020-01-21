@@ -10,7 +10,7 @@ import {formatAmount} from "../utils/util";
 
 const REMOTE_URL = process.env.VUE_APP_REMOTE_URL;
 const defaultImg = require('../img/defaultImg.png');
-const avatarImg = require('../img/avatar.jpg');
+const defaultAvatar = require('../img/avatar.png');
 
 Vue.prototype.confirm = function (msg) {
   return new Promise((resolve, reject) => {
@@ -50,16 +50,24 @@ Vue.filter('formatAmount', formatAmount);
 
 
 Vue.directive('src', function (el, binding, vnode) {
-  let isHttp = /^http/ig.test(binding.value);
-  let imgUrl = isHttp ? binding.value : REMOTE_URL + binding.value;
+  let value = binding.value + "";
+  let split = value.split(".");
+  let suffix = split[split.length - 1];
+  let isImg = /(jpg|png|jpeg)/ig.test(suffix);
+  let isHttp = /^http/ig.test(value);
+  let imgUrl = isHttp ? binding.value : REMOTE_URL + value;
   let isAvatar = binding.arg === "avatar";
   if (imgUrl === el.src) {
     return;
   }
-  el.src = isAvatar ? avatarImg : defaultImg;
-  let newImg = new Image();
-  newImg.onload = function () {
-    el.src = this.src;
-  };
-  newImg.src = imgUrl;
+  if (isImg || !binding.value) {
+    el.src = isAvatar ? defaultAvatar : defaultImg;
+    let newImg = new Image();
+    newImg.onload = function () {
+      el.src = this.src;
+    };
+    newImg.src = imgUrl;
+  } else {
+    el.src = imgUrl;
+  }
 });
