@@ -36,6 +36,7 @@
           searchable: false,
           tableProps: {rowKey: 'id'},
           dialogProps: {width: '500px'},
+          handlerProps: {width: '125px'},
           group: [{title: "默认属性", columnIndex: [4, 1, 2, 7, 6, 5]}, {title: "菜单专用", columnIndex: [3, 8]}],
           columns: [
             {

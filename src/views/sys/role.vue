@@ -36,6 +36,7 @@
         selectedPerms: [],
         config: {
           dialogProps: {width: '500px'},
+          handlerProps: {width: '125px'},
           columns: [
             {
               label: 'ID',
