@@ -130,7 +130,6 @@
 
   .img-box {
     min-height: 200px;
-    margin-bottom: 10px;
     border: 1px solid var(--border);
   }
 
