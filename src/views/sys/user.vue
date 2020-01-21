@@ -16,7 +16,6 @@
       @submitEdit="submitUpdate"
       @submitSearch="handleSearch"
       @pageChange="fetchList"
-      @stateChangeInForm="stateChange"
       :page='params'>
     </table-template>
   </section>
@@ -142,9 +141,6 @@
       }
     },
     methods: {
-      stateChange(row){
-        console.log(row)
-      },
       fetchList() {
         this.tableLoading = true;
         fetchList(this.params).then(res => {
