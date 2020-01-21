@@ -1,3 +1,5 @@
+const ENV = process.env.NODE_ENV;
+const BASE_PATH = process.env.VUE_APP_BASE_PATH;
 module.exports = {
   pages: {
     index: {
@@ -15,7 +17,7 @@ module.exports = {
     },
   },
   productionSourceMap: false,
-  publicPath: "./",
+  publicPath: ENV === 'development' ? './' : BASE_PATH,
   devServer: {
     proxy: process.env.VUE_APP_REMOTE_URL
   },
