@@ -370,25 +370,25 @@
             defaultValue: "-"
           },
           {
+            param: "withoutDialog",
+            explain: "不渲染弹出层",
+            type: "boolean",
+            optionalValue: "true/false",
+            defaultValue: "false"
+          },
+          {
+            param: "withoutTable",
+            explain: "不渲染表格",
+            type: "boolean",
+            optionalValue: "true/false",
+            defaultValue: "false"
+          },
+          {
             param: "pageable",
-            explain: "是否分页",
+            explain: "是否显示分页",
             type: "boolean",
             optionalValue: "true/false",
             defaultValue: "true"
-          },
-          {
-            param: "withoutDialog",
-            explain: "是否渲染弹出层",
-            type: "boolean",
-            optionalValue: "true/false",
-            defaultValue: "false"
-          },
-          {
-            param: "selectable",
-            explain: "表格是否可勾选",
-            type: "boolean",
-            optionalValue: "true/false",
-            defaultValue: "false"
           },
           {
             param: "searchable",
@@ -410,6 +410,20 @@
             type: "string",
             optionalValue: "-",
             defaultValue: "-"
+          },
+          {
+            param: "showIndex",
+            explain: "显示索引",
+            type: "boolean",
+            optionalValue: "true/false",
+            defaultValue: "false"
+          },
+          {
+            param: "selectable",
+            explain: "表格是否可勾选",
+            type: "boolean",
+            optionalValue: "true/false",
+            defaultValue: "false"
           },
         ],
         columnsItemList: [
