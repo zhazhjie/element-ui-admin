@@ -296,10 +296,13 @@ export function compressImg(data) {
  * @param delay
  */
 export function debounce(callback, delay) {
-  clearTimeout(callback.tId);
-  callback.tId = setTimeout(() => {
-    callback();
-  }, delay)
+  let timer = null;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      callback(...args);
+    }, delay)
+  };
 }
 
 /**
@@ -308,12 +311,15 @@ export function debounce(callback, delay) {
  * @param delay
  */
 export function throttle(callback, delay) {
-  if (callback.canDo === false) return;
-  callback.canDo = false;
-  callback();
-  setTimeout(() => {
-    callback.canDo = true;
-  }, delay)
+  let timer = null;
+  return function (...args) {
+    if (!timer) {
+      timer = setTimeout(() => {
+        callback(...args);
+        timer = null;
+      }, delay)
+    }
+  };
 }
 
 /**
