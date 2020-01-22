@@ -7,6 +7,7 @@
 import Vue from 'vue'
 import store from '../store'
 import {formatAmount} from "../utils/util";
+import {intersectionObserver} from "../utils/imgLazyLoad";
 
 const REMOTE_URL = process.env.VUE_APP_REMOTE_URL;
 const defaultImg = require('../img/defaultImg.png');
@@ -48,26 +49,30 @@ Vue.prototype.routeAndCache = function (route, replace) {
 Vue.prototype.formatAmount = formatAmount;
 Vue.filter('formatAmount', formatAmount);
 
-
 Vue.directive('src', function (el, binding, vnode) {
-  let value = binding.value + "";
-  let split = value.split(".");
-  let suffix = split[split.length - 1];
-  let isImg = /(jpg|png|jpeg)/ig.test(suffix);
-  let isHttp = /^http/ig.test(value);
-  let imgUrl = isHttp ? binding.value : REMOTE_URL + value;
+  let value = binding.value;
+  let isImg = el.tagName === "IMG";
+  let isFullPath = /^http/ig.test(value);
+  let objUrl = isFullPath ? value : REMOTE_URL + value;
   let isAvatar = binding.arg === "avatar";
-  if (imgUrl === el.src) {
+  if (objUrl === el.src) {
     return;
   }
-  if (isImg || !binding.value) {
+  if (isImg) {
     el.src = isAvatar ? defaultAvatar : defaultImg;
-    let newImg = new Image();
-    newImg.onload = function () {
-      el.src = this.src;
-    };
-    newImg.src = imgUrl;
+    let lazy = el.getAttribute("lazy");
+    let isLazy = lazy === "" || lazy === "true";
+    if (isLazy) {
+      el.dataset.src = objUrl;
+      intersectionObserver.observe(el);
+    } else {
+      let newImg = new Image();
+      newImg.onload = function () {
+        el.src = this.src;
+      };
+      newImg.src = objUrl;
+    }
   } else {
-    el.src = imgUrl;
+    el.src = objUrl;
   }
 });
