@@ -347,13 +347,14 @@ export default {
             </el-cascader>
           );
         case "upload":
+          let tip = "Tip";
           return (
             <el-upload
               {...data}
               disabled={disabled}>
-              {this.getEl(column, scope.upload || {}, row, suffix + this.toCapitalize(type), () => <el-button
+              {this.getEl(column, scope[type] || {}, row, suffix + this.toCapitalize(type), () => <el-button
                 type="primary">上传</el-button>)}
-              {this.getEl(column, scope.uploadTip || {}, row, suffix + this.toCapitalize(type) + "Tip", () => null)}
+              {this.getEl(column, scope[type + tip] || {}, row, suffix + this.toCapitalize(type) + tip, () => null)}
             </el-upload>
           );
         default:
