@@ -174,6 +174,14 @@ export default {
     // handleSlide() {
     //   this.showAll = !this.showAll;
     // },
+    hasPermission(permission) {
+      if (!permission) {
+        return true;
+      } else {
+        let {permissions = []} = this.config;
+        return permissions.some(perms => perms === permission)
+      }
+    },
     getEl(column, scope, row, suffix, customRender, disabled) {
       let {render} = scope;
       let scopedSlots = this.$scopedSlots[column.field + suffix];
@@ -387,15 +395,9 @@ export default {
           visible={this.dialogVisible}
           before-close={this.closeDialog.bind(this)}
           close-on-click-modal={false}
-          {...{props: dialogProps}}
-          size="800px">
+          {...{props: dialogProps}}>
           {this.createForm()}
-          <div class="el-drawer-footer">
-            <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
-            {this.handleType !== 2 &&
-            <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
-            </el-button>}
-          </div>
+          {this.createOptBtn(null, "el-drawer-footer")}
         </el-drawer>
       )
     },
@@ -407,16 +409,20 @@ export default {
           visible={this.dialogVisible}
           before-close={this.closeDialog.bind(this)}
           close-on-click-modal={false}
-          {...{props: dialogProps}}
-          width="800px">
+          {...{props: dialogProps}}>
           {this.createForm()}
-          <div slot="footer">
-            <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
-            {this.handleType !== 2 &&
-            <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
-            </el-button>}
-          </div>
+          {this.createOptBtn("footer")}
         </el-dialog>
+      )
+    },
+    createOptBtn(slot, className) {
+      return (
+        <div slot={slot} class={className}>
+          <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
+          {this.handleType !== 2 &&
+          <el-button type="primary" loading={this.handleLoading} on-click={this.handleSubmit.bind(this)}>确 定
+          </el-button>}
+        </div>
       )
     },
     createForm() {
@@ -516,7 +522,7 @@ export default {
               })
             }
             <el-form-item>
-              <permission-btn type='primary' plain on-click={this.handleSearch.bind(this)}>查询</permission-btn>
+              <el-button type='primary' plain on-click={this.handleSearch.bind(this)}>查询</el-button>
               {this.$scopedSlots.search && this.$scopedSlots.search()}
             </el-form-item>
           </el-form>
@@ -525,9 +531,9 @@ export default {
         }
         <el-form>
           <el-form-item>
-            {showAddBtn &&
-            <permission-btn permission={addBtnPermission} type='primary'
-                            on-click={this.showAdd.bind(this)}>新增</permission-btn>}
+            {showAddBtn && this.hasPermission(addBtnPermission) &&
+            <el-button type='primary'
+                       on-click={this.showAdd.bind(this)}>新增</el-button>}
             {this.$scopedSlots.add && this.$scopedSlots.add()}
           </el-form-item>
         </el-form>
@@ -593,14 +599,14 @@ export default {
                           return item.render(scope.row);
                         } else {
                           return (
-                            <permission-btn
-                              permission={item.permission}
+                            this.hasPermission(item.permission) &&
+                            <el-button
                               type="text"
                               icon={item.icon}
                               {...{props: item.props}}
                               on-click={item.click ? item.click.bind(this, scope.row) : this.handleClick.bind(this, item.event, scope.row)}>
                               {item.label}
-                            </permission-btn>
+                            </el-button>
                           )
                         }
                       });
