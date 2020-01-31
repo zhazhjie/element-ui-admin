@@ -625,7 +625,7 @@ export default {
         </div>
         {pageable &&
         <el-pagination
-          style='margin-top: 20px;text-align:right'
+          style='margin-top:20px;text-align:right'
           on-size-change={this.handleSizeChange}
           on-current-change={this.handleCurrentChange}
           current-page={+this.page.current}
