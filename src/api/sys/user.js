@@ -1,6 +1,6 @@
 import request from '../../config/request'
 
-export function fetchList(query) {
+export function listPage(query) {
   return request({
     url: '/sys/user/listPage',
     method: 'get',

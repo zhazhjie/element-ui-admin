@@ -42,9 +42,17 @@ export function setMenu(menu) {
 
 export function setStore(name, data, type) {
   if (type) {
-    localStorage.setItem(name, JSON.stringify(data))
+    if (data === null) {
+      localStorage.removeItem(name);
+    } else {
+      localStorage.setItem(name, JSON.stringify(data))
+    }
   } else {
-    sessionStorage.setItem(name, JSON.stringify(data))
+    if (data === null) {
+      sessionStorage.removeItem(name);
+    } else {
+      sessionStorage.setItem(name, JSON.stringify(data))
+    }
   }
 }
 
@@ -87,8 +95,8 @@ function findChildren(parent, list, idKey, parentIdKey, level) {
  * @param {*} pid
  */
 export function treeDataTranslate(data, id = 'id', pid = 'parentId') {
-  let res = []
-  let temp = {}
+  let res = [];
+  let temp = {};
   for (let i = 0; i < data.length; i++) {
     temp[data[i][id]] = data[i]
   }
@@ -100,13 +108,13 @@ export function treeDataTranslate(data, id = 'id', pid = 'parentId') {
       if (!temp[data[k][pid]]['_level']) {
         temp[data[k][pid]]['_level'] = 1
       }
-      data[k]['_level'] = temp[data[k][pid]]._level + 1
+      data[k]['_level'] = temp[data[k][pid]]._level + 1;
       temp[data[k][pid]]['children'].push(data[k])
     } else {
       res.push(data[k])
     }
   }
-  return res
+  return res;
 }
 
 /**
@@ -119,7 +127,7 @@ export function listToMap(list, key = "id") {
   let map = {};
   list.forEach(item => {
     map[item[key]] = item;
-  })
+  });
   return map;
 }
 
@@ -137,9 +145,9 @@ Date.prototype.Format = function (fmt) { //author: meizz
     fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
   for (let k in o)
     if (new RegExp("(" + k + ")").test(fmt))
-      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
   return fmt;
-}
+};
 
 /**
  * 验证手机号
@@ -330,7 +338,7 @@ export function throttle(callback, delay) {
 export function formatAmount(value) {
   if (!value) return '0.00';
   if (value > 100000) {
-    return (value/10000).setScale(2, 2) + '万';
+    return (value / 10000).setScale(2, 2) + '万';
   } else {
     return (+value).setScale(2, 2);
   }

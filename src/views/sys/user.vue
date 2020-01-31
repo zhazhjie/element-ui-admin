@@ -15,15 +15,15 @@
       @submitAdd="submitAdd"
       @submitEdit="submitUpdate"
       @submitSearch="handleSearch"
-      @pageChange="fetchList"
+      @pageChange="listPage"
       :page='params'>
     </table-template>
   </section>
 </template>
 
 <script>
-  import {fetchList, getObj, updObj, addObj, resetPwd, delObj} from '@/api/sys/user'
-  import {roleList} from '@/api/sys/role'
+  import {addObj, delObj, listPage, resetPwd, updObj} from '../../api/sys/user'
+  import {roleList} from '../../api/sys/role'
 
   export default {
     data() {
@@ -141,9 +141,9 @@
       }
     },
     methods: {
-      fetchList() {
+      listPage() {
         this.tableLoading = true;
-        fetchList(this.params).then(res => {
+        listPage(this.params).then(res => {
           this.userList = res.data.records;
           this.params.total = res.data.total;
           this.tableLoading = false;
@@ -171,14 +171,14 @@
               type: 'success',
               message: '删除成功!'
             });
-            this.fetchList();
+            this.listPage();
           });
         });
       },
       handleSearch(params) {
         this.params.current = 1;
         this.params = {...this.params, ...params};
-        this.fetchList();
+        this.listPage();
       },
       submitAdd(row, hideLoading, done) {
         addObj(row).then((res) => {
@@ -186,7 +186,7 @@
             type: 'success',
             message: `新增成功，默认密码：${res.data}`
           });
-          this.fetchList();
+          this.listPage();
           done();
         }).catch(() => hideLoading());
       },
@@ -196,14 +196,14 @@
             type: 'success',
             message: '更新成功!'
           });
-          this.fetchList();
+          this.listPage();
           done();
         }).catch(() => hideLoading());
       },
     },
     computed: {},
     mounted() {
-      this.fetchList();
+      this.listPage();
       this.getRoleList();
     }
   }

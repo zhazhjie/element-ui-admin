@@ -7,7 +7,6 @@
 
 <template>
   <section id="login">
-    <!--<vue-particles color="#fdf6ec" class='vue-particles'></vue-particles>-->
     <transition name='fade-down'>
       <el-form class="login-box" v-show='showLoginBox' :model="info" :rules="rules" ref="form">
         <div class="login-tit font20">后台管理</div>
@@ -23,7 +22,7 @@
           </el-input>
         </el-form-item>
         <el-checkbox v-model="keepPassword">记住密码</el-checkbox>
-        <el-button size='medium' type='primary' @click="handleLogin">登录</el-button>
+        <el-button size='medium' type='primary' :loading="loading" @click="handleLogin">登录</el-button>
       </el-form>
     </transition>
   </section>
@@ -103,7 +102,6 @@
       ...mapState(['paramInfo'])
     },
     mounted() {
-      // this.getBg();
       this.showLoginBox = true;
       addEventListener('keyup', this.enterCallback)
     },
