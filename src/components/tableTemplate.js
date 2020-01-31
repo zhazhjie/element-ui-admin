@@ -65,8 +65,7 @@ export default {
   },
   methods: {
     toString(value) {
-      let result = Object.prototype.toString.call(value);
-      return result.replace(/\[object ([a-z]+)]/ig, "$1");
+      return Object.prototype.toString.call(value);
     },
     copy(obj) {
       return JSON.parse(JSON.stringify(obj));
@@ -180,9 +179,9 @@ export default {
       let {options = [], defaultProp = {value: "value", text: "text"}} = column;
       let {type, props = {}, attrs = {}} = scope;
       let data = {props, attrs};
-      if (this.toString(options) === "Function") options = options();
+      if (this.toString(options) === "[object Function]") options = options();
       let getItemVal = (item, key) => {
-        if (this.toString(item) === "Object") {
+        if (this.toString(item) === "[object Object]") {
           return item[key];
         } else {
           return item;
