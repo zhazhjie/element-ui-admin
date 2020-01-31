@@ -500,6 +500,7 @@ export default {
     } else {
       dialogColumns = columns;
     }
+    let handlerListSlots = this.$scopedSlots.handlerList;
     return (
       <section class="table-template">
         {searchable &&
@@ -545,7 +546,6 @@ export default {
           {!withoutTable &&
           <el-table
             class="table-template-table"
-            highlight-current-row
             v-loading={this.tableLoading}
             data={this.data}
             {...{props: tableProps}}
@@ -589,7 +589,7 @@ export default {
               })
             }
             {
-              (handlerList.length || this.$scopedSlots["handlerList"]) &&
+              (handlerList.length || handlerListSlots) &&
               <el-table-column
                 label="操作"
                 fixed="right"
@@ -615,8 +615,7 @@ export default {
                         }
                       });
                     } else {
-                      let handler = this.$scopedSlots["handlerList"];
-                      return handler && handler(scope.row);
+                      return handlerListSlots && handlerListSlots(scope.row);
                     }
                   }
                 }}/>
