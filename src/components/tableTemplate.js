@@ -8,6 +8,31 @@
  */
 import "./tableTemplate.css";
 
+function toString(value) {
+  return Object.prototype.toString.call(value);
+}
+
+function copy(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function toCamelBak(name, capitalize) {
+  if (!name) return "";
+  let ary = name.split("-");
+  return ary.map((v, i) => {
+    if (i || capitalize) {
+      return v.substring(0, 1).toUpperCase() + v.substring(1);
+    } else {
+      return v;
+    }
+  }).join("");
+}
+
+function toCapitalize(name) {
+  if (!name) return "";
+  return name.substring(0, 1).toUpperCase() + name.substring(1);
+}
+
 export default {
   name: "table-template",
   props: {
@@ -60,34 +85,13 @@ export default {
       handleType: 0,  //0新增，1编辑，2查看
       curRow: {},
       searchForm: {},
-      showAll: false,
+      // showAll: false,
     }
   },
   methods: {
-    toString(value) {
-      return Object.prototype.toString.call(value);
-    },
-    copy(obj) {
-      return JSON.parse(JSON.stringify(obj));
-    },
-    toCamelBak(name, capitalize) {
-      if (!name) return "";
-      let ary = name.split("-");
-      return ary.map((v, i) => {
-        if (i || capitalize) {
-          return v.substring(0, 1).toUpperCase() + v.substring(1);
-        } else {
-          return v;
-        }
-      }).join("");
-    },
-    toCapitalize(name) {
-      if (!name) return "";
-      return name.substring(0, 1).toUpperCase() + name.substring(1);
-    },
     emitEvent(event, ...args) {
       this.$emit(event, ...args);
-      this.$emit(this.toCamelBak(event), ...args);
+      this.$emit(toCamelBak(event), ...args);
     },
     handleSizeChange(pageSize) {
       this.page.size = pageSize;
@@ -104,7 +108,6 @@ export default {
           this.handleLoading = true;
           this.emitEvent(this.handleType ? "submit-edit" : "submit-add", this.curRow, this.hideLoading, this.done);
         } else {
-          console.log('error submit!!');
           return false;
         }
       });
@@ -122,28 +125,27 @@ export default {
       this.closeDialog();
     },
     showAdd(dialogTitle = "新增") {
-      this.emitEvent("show-add");
-      this.handleType = 0;
-      this.dialogTitle = dialogTitle;
-      this.dialogVisible = true;
-      let curRow = {};
-      this.config.columns.forEach(column => {
-        curRow[column.field] = column.value;
-      });
-      this.curRow = curRow;
+      this.handleEvent("show-add", null, dialogTitle, 0);
     },
     showEdit(row, dialogTitle = "编辑") {
-      this.emitEvent("show-edit", row);
-      this.handleType = 1;
-      this.dialogTitle = dialogTitle;
-      this.curRow = this.copy(row);
-      this.dialogVisible = true;
+      this.handleEvent("show-edit", row, dialogTitle, 1);
     },
     showView(row, dialogTitle = "查看") {
-      this.emitEvent("show-view", row);
-      this.handleType = 2;
+      this.handleEvent("show-view", row, dialogTitle, 2);
+    },
+    handleEvent(event, row, dialogTitle, handleType) {
+      this.emitEvent(event, row);
+      this.handleType = handleType;
       this.dialogTitle = dialogTitle;
-      this.curRow = this.copy(row);
+      if (handleType === 0) {
+        let curRow = {};
+        this.config.columns.forEach(column => {
+          curRow[column.field] = column.value;
+        });
+        this.curRow = curRow;
+      } else {
+        this.curRow = copy(row);
+      }
       this.dialogVisible = true;
     },
     resetForm() {
@@ -160,9 +162,6 @@ export default {
     handleSearch() {
       this.emitEvent("submit-search", this.searchForm);
     },
-    handleAdd() {
-      this.showAdd();
-    },
     handleSelectionChange(rows) {
       this.emitEvent("selection-change", rows);
     },
@@ -172,16 +171,29 @@ export default {
     formElChange(field, suffix, row, val) {
       this.emitEvent(field + "-change" + (suffix ? "-in-" + suffix.toLowerCase() : ""), row, val);
     },
-    handleSlide() {
-      this.showAll = !this.showAll;
+    // handleSlide() {
+    //   this.showAll = !this.showAll;
+    // },
+    getEl(column, scope, row, suffix, customRender, disabled) {
+      let {render} = scope;
+      let scopedSlots = this.$scopedSlots[column.field + suffix];
+      if (render) {
+        return render(row);
+      } else if (scopedSlots) {
+        return scopedSlots(row);
+      } else if (customRender) {
+        return customRender(row);
+      } else {
+        return this.createEl(column, scope || {}, row, disabled, suffix);
+      }
     },
     createEl(column = {}, scope = {}, row = {}, disabled = false, suffix) {
       let {options = [], defaultProp = {value: "value", text: "text"}} = column;
       let {type, props = {}, attrs = {}} = scope;
       let data = {props, attrs};
-      if (this.toString(options) === "[object Function]") options = options();
+      if (toString(options) === "[object Function]") options = options();
       let getItemVal = (item, key) => {
-        if (this.toString(item) === "[object Object]") {
+        if (toString(item) === "[object Object]") {
           return item[key];
         } else {
           return item;
@@ -196,7 +208,7 @@ export default {
                 {...data}
                 disabled={disabled}
                 vModel={row[column.field]}>
-                {this.getEl(column, scope[type] || {}, options[0], suffix + this.toCapitalize(type), () => getItemVal(options[0], defaultProp.text))}
+                {this.getEl(column, scope[type] || {}, options[0], suffix + toCapitalize(type), () => getItemVal(options[0], defaultProp.text))}
               </el-checkbox>
             );
           } else {
@@ -210,7 +222,7 @@ export default {
                   return (
                     <el-checkbox
                       label={getItemVal(item, defaultProp.value)}>
-                      {this.getEl(column, scope[type] || {}, item, suffix + this.toCapitalize(type), () => getItemVal(item, defaultProp.text))}
+                      {this.getEl(column, scope[type] || {}, item, suffix + toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                     </el-checkbox>
                   )
                 })}
@@ -228,7 +240,7 @@ export default {
                 return (
                   <el-radio
                     label={getItemVal(item, defaultProp.value)}>
-                    {this.getEl(column, scope[type] || {}, item, suffix + this.toCapitalize(type), () => getItemVal(item, defaultProp.text))}
+                    {this.getEl(column, scope[type] || {}, item, suffix + toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                   </el-radio>
                 )
               })}
@@ -248,7 +260,7 @@ export default {
                     key={getItemVal(item, defaultProp.value)}
                     label={getItemVal(item, defaultProp.text)}
                     value={getItemVal(item, defaultProp.value)}>
-                    {this.getEl(column, scope[type] || {}, item, suffix + this.toCapitalize(type), () => getItemVal(item, defaultProp.text))}
+                    {this.getEl(column, scope[type] || {}, item, suffix + toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                   </el-option>
                 )
               })}
@@ -352,9 +364,9 @@ export default {
             <el-upload
               {...data}
               disabled={disabled}>
-              {this.getEl(column, scope[type] || {}, row, suffix + this.toCapitalize(type), () => <el-button
+              {this.getEl(column, scope[type] || {}, row, suffix + toCapitalize(type), () => <el-button
                 type="primary">上传</el-button>)}
-              {this.getEl(column, scope[type + tip] || {}, row, suffix + this.toCapitalize(type) + tip, () => null)}
+              {this.getEl(column, scope[type + tip] || {}, row, suffix + toCapitalize(type) + tip, () => null)}
             </el-upload>
           );
         default:
@@ -367,37 +379,7 @@ export default {
           );
       }
     },
-    createFormItem(column) {
-      let {props = {}, append, span} = column.formItem || {};
-      if (!column || column.hideInDialog) {
-        return null;
-      } else {
-        return (
-          <el-col span={span}>
-            <el-form-item
-              label={column.label}
-              {...{props}}
-              prop={column.field}>
-              {this.getEl(column, column.formEl || {}, this.curRow, "Form", null, this.handleType === 2)}
-            </el-form-item>
-            {append && append(this.curRow)}
-          </el-col>
-        )
-      }
-    },
-    getEl(column, scope, row, suffix, customRender, disabled) {
-      let {render} = scope;
-      if (render) {
-        return render(row);
-      } else if (this.$scopedSlots[column.field + suffix]) {
-        return this.$scopedSlots[column.field + suffix](row);
-      } else if (customRender) {
-        return customRender(row);
-      } else {
-        return this.createEl(column, scope || {}, row, disabled, suffix);
-      }
-    },
-    createDrawer(dialogColumns) {
+    createDrawer() {
       let {dialogProps = {}} = this.config;
       return (
         <el-drawer
@@ -407,7 +389,7 @@ export default {
           close-on-click-modal={false}
           {...{props: dialogProps}}
           size="800px">
-          {this.createForm(dialogColumns)}
+          {this.createForm()}
           <div class="el-drawer-footer">
             <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
             {this.handleType !== 2 &&
@@ -417,7 +399,7 @@ export default {
         </el-drawer>
       )
     },
-    createDialog(dialogColumns) {
+    createDialog() {
       let {dialogProps = {}} = this.config;
       return (
         <el-dialog
@@ -427,7 +409,7 @@ export default {
           close-on-click-modal={false}
           {...{props: dialogProps}}
           width="800px">
-          {this.createForm(dialogColumns)}
+          {this.createForm()}
           <div slot="footer">
             <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
             {this.handleType !== 2 &&
@@ -437,8 +419,9 @@ export default {
         </el-dialog>
       )
     },
-    createForm(dialogColumns) {
-      let {formProps = {}, rules = {}} = this.config;
+    createForm() {
+      let {columns = [], formProps = {}, rules = {}, group = []} = this.config;
+      let dialogColumns = group.length ? group : columns;
       return (
         <el-form
           label-width="80px"
@@ -454,8 +437,8 @@ export default {
                 return (
                   <div class="group-item">
                     {column.title && <div class="item-title">{column.title}</div>}
-                    {column.columnIndex.map(c => {
-                      return this.createFormItem(c);
+                    {column.columnIndex.map(index => {
+                      return this.createFormItem(columns[index]);
                     })}
                   </div>
                 )
@@ -466,10 +449,27 @@ export default {
           }
         </el-form>
       )
-    }
+    },
+    createFormItem(column) {
+      if (!column || column.hideInDialog) {
+        return null;
+      } else {
+        let {props = {}, append, span} = column.formItem || {};
+        return (
+          <el-col span={span}>
+            <el-form-item
+              label={column.label}
+              {...{props}}
+              prop={column.field}>
+              {this.getEl(column, column.formEl || {}, this.curRow, "Form", null, this.handleType === 2)}
+            </el-form-item>
+            {append && append(this.curRow)}
+          </el-col>
+        )
+      }
+    },
   },
   render() {
-    let dialogColumns = [];
     let {
       mode = "dialog",
       columns = [],
@@ -490,16 +490,6 @@ export default {
       showIndex = false,
       addBtnPermission = ""
     } = this.config;
-    if (group.length) {
-      group.forEach((item, i) => {
-        dialogColumns.push({
-          title: item.title,
-          columnIndex: item.columnIndex.map(v => columns[v])
-        })
-      });
-    } else {
-      dialogColumns = columns;
-    }
     let handlerListSlots = this.$scopedSlots.handlerList;
     return (
       <section class="table-template">
@@ -537,7 +527,7 @@ export default {
           <el-form-item>
             {showAddBtn &&
             <permission-btn permission={addBtnPermission} type='primary'
-                            on-click={this.handleAdd.bind(this)}>新增</permission-btn>}
+                            on-click={this.showAdd.bind(this)}>新增</permission-btn>}
             {this.$scopedSlots.add && this.$scopedSlots.add()}
           </el-form-item>
         </el-form>
@@ -635,7 +625,7 @@ export default {
           layout="total, sizes, prev, pager, next, jumper"/>
         }
         {!withoutDialog &&
-        (mode === "dialog" ? this.createDialog(dialogColumns) : this.createDrawer(dialogColumns))
+        (mode === "dialog" ? this.createDialog() : this.createDrawer())
         }
       </section>
     )
