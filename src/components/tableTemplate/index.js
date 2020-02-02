@@ -6,7 +6,7 @@
  * 生成表格+分页+弹出层表单+搜索栏
  * 详见文档
  */
-import "./tableTemplate.css";
+import "./style.css";
 
 function toString(value) {
   return Object.prototype.toString.call(value);
@@ -442,7 +442,7 @@ export default {
               if (column.columnIndex) {
                 return (
                   <div class="group-item">
-                    {column.title && <div class="item-title">{column.title}</div>}
+                    {column.title && <div class="group-item-title">{column.title}</div>}
                     {column.columnIndex.map(index => {
                       return this.createFormItem(columns[index]);
                     })}
@@ -537,11 +537,11 @@ export default {
             {this.$scopedSlots.add && this.$scopedSlots.add()}
           </el-form-item>
         </el-form>
-        <div class="table-template-content">
+        <div class="content">
           {this.$scopedSlots.tableLeft && this.$scopedSlots.tableLeft()}
           {!withoutTable &&
           <el-table
-            class="table-template-table"
+            class="table"
             v-loading={this.tableLoading}
             data={this.data}
             {...{props: tableProps}}
