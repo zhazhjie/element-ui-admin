@@ -124,6 +124,9 @@ export default {
       this.hideLoading();
       this.closeDialog();
     },
+    handleAdd(){
+      this.showAdd();
+    },
     showAdd(dialogTitle = "新增") {
       this.handleEvent("show-add", null, dialogTitle, 0);
     },
@@ -533,7 +536,7 @@ export default {
           <el-form-item>
             {showAddBtn && this.hasPermission(addBtnPermission) &&
             <el-button type='primary'
-                       on-click={this.showAdd.bind(this)}>新增</el-button>}
+                       on-click={this.handleAdd.bind(this)}>新增</el-button>}
             {this.$scopedSlots.add && this.$scopedSlots.add()}
           </el-form-item>
         </el-form>
