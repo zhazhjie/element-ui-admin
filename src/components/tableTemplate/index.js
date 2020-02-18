@@ -178,7 +178,8 @@ export default {
         let searchBar = this.$refs.searchBar.$el;
         let searchOpt = this.$refs.searchOpt.$el;
         let item = searchBar.querySelector(".el-form-item");
-        this.showNum = (searchBar.offsetWidth - searchOpt.offsetWidth) / item.offsetWidth | 0;
+        let margin = 10;
+        this.showNum = (searchBar.offsetWidth - searchOpt.offsetWidth - margin) / (item.offsetWidth + margin) | 0;
       }
     },
     getEl(column, scope, row, suffix, customRender, disabled) {
