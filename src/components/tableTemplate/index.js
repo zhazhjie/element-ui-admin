@@ -43,33 +43,11 @@ export default {
     config: {
       type: Object,
       required: true,
-      default: () => ({
-        mode: "dialog",
-        columns: [],
-        handlerList: [],
-        rules: {},
-        tableProps: {},
-        handlerProps: {},
-        dialogProps: {},
-        formProps: {},
-        group: [],
-        pageable: true,
-        withoutDialog: false,
-        withoutTable: false,
-        selectable: false,
-        searchable: true,
-        showAddBtn: true,
-        addBtnPermission: ""
-      })
+      default: () => ({})
     },
     page: {
       type: Object,
-      default: () => ({
-        current: 1,
-        size: 10,
-        total: 10,
-        sizes: [5, 10, 20, 50, 100]
-      })
+      default: () => ({})
     },
     tableLoading: {
       type: Boolean,
@@ -85,8 +63,12 @@ export default {
       handleType: 0,  //0新增，1编辑，2查看
       curRow: {},
       searchForm: {},
-      // showAll: false,
+      slideFlag: false,
+      showNum: 1
     }
+  },
+  mounted() {
+    this.getShowNum();
   },
   methods: {
     emitEvent(event, ...args) {
@@ -124,7 +106,7 @@ export default {
       this.hideLoading();
       this.closeDialog();
     },
-    handleAdd(){
+    handleAdd() {
       this.showAdd();
     },
     showAdd(dialogTitle = "新增") {
@@ -154,6 +136,9 @@ export default {
     resetForm() {
       this.$refs.form.resetFields();
     },
+    clearSelection() {
+      this.$refs.table.clearSelection();
+    },
     handleClick(event, row) {
       let events = ["showAdd", "showView", "showEdit"];
       if (events.indexOf(event) > -1) {
@@ -171,18 +156,29 @@ export default {
     handleRowClick(row) {
       this.emitEvent("row-click", row);
     },
-    formElChange(field, suffix, row, val) {
+    handleFormElChange(field, suffix, row, val) {
       this.emitEvent(field + "-change" + (suffix ? "-in-" + suffix.toLowerCase() : ""), row, val);
     },
-    // handleSlide() {
-    //   this.showAll = !this.showAll;
-    // },
+    handleReset() {
+      this.searchForm = {};
+    },
+    handleSlide() {
+      this.slideFlag = !this.slideFlag;
+    },
     hasPermission(permission) {
       if (!permission) {
         return true;
       } else {
         let {permissions = []} = this.config;
         return permissions.some(perms => perms === permission)
+      }
+    },
+    getShowNum() {
+      if (this.config.collapsible) {
+        let searchBar = this.$refs.searchBar.$el;
+        let searchOpt = this.$refs.searchOpt.$el;
+        let item = searchBar.querySelector(".el-form-item");
+        this.showNum = (searchBar.offsetWidth - searchOpt.offsetWidth) / item.offsetWidth | 0;
       }
     },
     getEl(column, scope, row, suffix, customRender, disabled) {
@@ -215,7 +211,7 @@ export default {
           if (options.length <= 1) {
             return (
               <el-checkbox
-                on-change={this.formElChange.bind(this, column.field, suffix, row)}
+                on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
                 {...data}
                 disabled={disabled}
                 vModel={row[column.field]}>
@@ -225,7 +221,7 @@ export default {
           } else {
             return (
               <el-checkbox-group
-                on-change={this.formElChange.bind(this, column.field, suffix, row)}
+                on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
                 {...data}
                 disabled={disabled}
                 vModel={row[column.field]}>
@@ -243,7 +239,7 @@ export default {
         case "radio":
           return (
             <el-radio-group
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               {...data}
               disabled={disabled}
               vModel={row[column.field]}>
@@ -260,7 +256,7 @@ export default {
         case "select":
           return (
             <el-select
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               placeholder={"请选择" + column.label}
               {...data}
               disabled={disabled}
@@ -280,7 +276,7 @@ export default {
         case "switch":
           return (
             <el-switch
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               {...data}
               disabled={disabled}
               vModel={row[column.field]}>
@@ -296,7 +292,7 @@ export default {
         case "date-picker":
           return (
             <el-date-picker
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               placeholder={"请选择" + column.label}
               {...data}
               disabled={disabled}
@@ -306,7 +302,7 @@ export default {
         case "time-picker":
           return (
             <el-time-picker
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               placeholder={"请选择" + column.label}
               {...data}
               disabled={disabled}
@@ -316,7 +312,7 @@ export default {
         case "time-select":
           return (
             <el-time-select
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               placeholder={"请选择" + column.label}
               {...data}
               disabled={disabled}
@@ -334,7 +330,7 @@ export default {
         case "slider":
           return (
             <el-slider
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               {...data}
               disabled={disabled}
               vModel={row[column.field]}>
@@ -343,7 +339,7 @@ export default {
         case "rate":
           return (
             <el-rate
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               {...data}
               disabled={disabled}
               vModel={row[column.field]}>
@@ -352,7 +348,7 @@ export default {
         case "color-picker":
           return (
             <el-color-picker
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               {...data}
               disabled={disabled}
               vModel={row[column.field]}>
@@ -361,7 +357,7 @@ export default {
         case "cascader":
           return (
             <el-cascader
-              on-change={this.formElChange.bind(this, column.field, suffix, row)}
+              on-change={this.handleFormElChange.bind(this, column.field, suffix, row)}
               placeholder={"请选择" + column.label}
               {...data}
               options={options}
@@ -391,28 +387,30 @@ export default {
       }
     },
     createDrawer() {
-      let {dialogProps = {}} = this.config;
+      let {dialogProps = {}, dialogAttrs = {}} = this.config;
       return (
         <el-drawer
           title={this.dialogTitle}
           visible={this.dialogVisible}
           before-close={this.closeDialog.bind(this)}
           close-on-click-modal={false}
-          {...{props: dialogProps}}>
+          props={dialogProps}
+          attrs={dialogAttrs}>
           {this.createForm()}
           {this.createOptBtn(null, "el-drawer-footer")}
         </el-drawer>
       )
     },
     createDialog() {
-      let {dialogProps = {}} = this.config;
+      let {dialogProps = {}, dialogAttrs = {}} = this.config;
       return (
         <el-dialog
           title={this.dialogTitle}
           visible={this.dialogVisible}
           before-close={this.closeDialog.bind(this)}
           close-on-click-modal={false}
-          {...{props: dialogProps}}>
+          props={dialogProps}
+          attrs={dialogAttrs}>
           {this.createForm()}
           {this.createOptBtn("footer")}
         </el-dialog>
@@ -429,7 +427,7 @@ export default {
       )
     },
     createForm() {
-      let {columns = [], formProps = {}, rules = {}, group = []} = this.config;
+      let {columns = [], formProps = {}, formAttrs = {}, rules = {}, group = []} = this.config;
       let dialogColumns = group.length ? group : columns;
       return (
         <el-form
@@ -438,6 +436,7 @@ export default {
             model: this.curRow,
             ...formProps
           }}
+          attrs={formAttrs}
           rules={rules}
           ref="form">
           {
@@ -468,7 +467,7 @@ export default {
           <el-col span={span}>
             <el-form-item
               label={column.label}
-              {...{props}}
+              props={props}
               prop={column.field}>
               {this.getEl(column, column.formEl || {}, this.curRow, "Form", null, this.handleType === 2)}
             </el-form-item>
@@ -485,17 +484,24 @@ export default {
       handlerList = [],
       rules = {},
       tableProps = {},
+      tableAttrs = {},
       handlerProps = {},
+      handlerAttrs = {},
       dialogProps = {},
+      dialogAttrs = {},
       formProps = {},
+      formAttrs = {},
       searchFormProps = {},
+      searchFormAttrs = {},
       group = [],
       pageable = true,
       withoutDialog = false,
       withoutTable = false,
       selectable = false,
       searchable = true,
+      collapsible = false,
       showAddBtn = true,
+      showResetBtn = true,
       showIndex = false,
       addBtnPermission = ""
     } = this.config;
@@ -505,18 +511,21 @@ export default {
         {searchable &&
         <div class="search-bar-wrapper">
           <el-form
+            ref="searchBar"
             class="search-bar-form"
             inline={true}
             label-width="80px"
-            {...{props: searchFormProps}}>
+            attrs={searchFormAttrs}
+            props={searchFormProps}>
             {
-              columns.map(column => {
+              columns.map((column, index) => {
                 if (column.hideInSearch) {
                   return null;
                 } else {
-                  let {props = {}, append} = column.searchFormItem || {};
+                  let {props = {}, attrs = {style: "width:250px"}, append} = column.searchFormItem || {};
                   return (
-                    <el-form-item label={column.label} style="width:250px" {...{props: props}}>
+                    <el-form-item label={column.label} props={props} attrs={attrs}
+                                  style={{display: collapsible && !this.slideFlag && index >= this.showNum ? "none" : "inline-flex"}}>
                       {this.getEl(column, column.searchEl || column.formEl || {}, this.searchForm, "Search")}
                       {append && append(this.searchForm)}
                     </el-form-item>
@@ -524,12 +533,14 @@ export default {
                 }
               })
             }
-            <el-form-item>
-              <el-button type='primary' plain on-click={this.handleSearch.bind(this)}>查询</el-button>
+            <el-form-item ref="searchOpt">
+              <el-button type='primary' on-click={this.handleSearch.bind(this)}>查询</el-button>
+              {showResetBtn && <el-button on-click={this.handleReset.bind(this)}>重置</el-button>}
               {this.$scopedSlots.search && this.$scopedSlots.search()}
             </el-form-item>
           </el-form>
-          {/*<i class={"el-icon-d-arrow-right slide-btn "+(this.showAll?"down":"")} on-click={this.handleSlide.bind(this)}></i>*/}
+          {collapsible && <i class={"el-icon-d-arrow-right slide-btn " + (this.slideFlag ? "down" : "")}
+                             on-click={this.handleSlide.bind(this)}> </i>}
         </div>
         }
         <el-form>
@@ -544,10 +555,12 @@ export default {
           {this.$scopedSlots.tableLeft && this.$scopedSlots.tableLeft()}
           {!withoutTable &&
           <el-table
+            ref="table"
             class="table"
             v-loading={this.tableLoading}
             data={this.data}
-            {...{props: tableProps}}
+            props={tableProps}
+            attrs={tableAttrs}
             border
             on-selection-change={this.handleSelectionChange.bind(this)}
             on-row-click={this.handleRowClick.bind(this)}
@@ -563,7 +576,8 @@ export default {
                     <el-table-column
                       label={column.label}
                       align="center"
-                      {...{props: column.props}}
+                      props={column.props}
+                      attrs={column.attrs}
                       scopedSlots={{
                         default: scope => {
                           let {type} = column;
@@ -593,7 +607,8 @@ export default {
                 label="操作"
                 fixed="right"
                 header-align="center"
-                {...{props: handlerProps}}
+                props={handlerProps}
+                attrs={handlerAttrs}
                 scopedSlots={{
                   default: scope => {
                     if (handlerList.length) {
@@ -606,7 +621,8 @@ export default {
                             <el-button
                               type="text"
                               icon={item.icon}
-                              {...{props: item.props}}
+                              props={item.props}
+                              attrs={item.attrs}
                               on-click={item.click ? item.click.bind(this, scope.row) : this.handleClick.bind(this, item.event, scope.row)}>
                               {item.label}
                             </el-button>

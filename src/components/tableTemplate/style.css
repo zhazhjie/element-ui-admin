@@ -69,36 +69,35 @@
   background-color: #fcfcfc;
   padding: 18px 0 0;
   border: 1px solid #e9e9e9;
-  /*height: 67px;*/
   transition: all 0.3s;
   overflow: hidden;
 }
 
-/*.search-bar-form.slide-down {*/
-/*  height: 300px;*/
-/*  transition: all 0.3s;*/
-/*}*/
+.search-bar-form.slide-down {
+  height: 300px;
+  transition: all 0.2s;
+}
 
-/*.search-bar-wrapper .slide-btn {*/
-/*  position: absolute;*/
-/*  top: 100%;*/
-/*  left: 50%;*/
-/*  transform: translateX(-50%) rotate(90deg);*/
-/*  cursor: pointer;*/
-/*  font-size: 18px;*/
-/*  color: #ccc;*/
-/*  z-index: 5;*/
-/*  transition: all 0.3s;*/
-/*}*/
+.search-bar-wrapper .slide-btn {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) rotate(90deg);
+  cursor: pointer;
+  font-size: 18px;
+  color: #ccc;
+  z-index: 5;
+  transition: all 0.2s;
+}
 
-/*.search-bar-wrapper .slide-btn.down {*/
-/*  transform: translateX(-50%) rotate(-90deg);*/
-/*  transition: all 0.3s;*/
-/*}*/
+.search-bar-wrapper .slide-btn.down {
+  transform: translateX(-50%) rotate(-90deg);
+  transition: all 0.3s;
+}
 
-/*.search-bar-wrapper .slide-btn:hover {*/
-/*  color: #999;*/
-/*}*/
+.search-bar-wrapper .slide-btn:hover {
+  color: #999;
+}
 
 .search-bar-form .el-date-editor.el-input {
   width: 100%;
