@@ -291,6 +291,13 @@
             optionalValue: "true/false",
             defaultValue: "false"
           },
+          {
+            param: "beforeOpen",
+            explain: "打开弹出层前触发，接收两个参数：Function(row,done)",
+            type: "function",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
         ],
         configList: [
           {
@@ -709,16 +716,6 @@
             event: "pageChange",
             explain: "点击分页时触发",
             cb: "Function(page)",
-          },
-          {
-            event: "showAdd",
-            explain: "显示新增时触发",
-            cb: "Function()",
-          },
-          {
-            event: "showEdit",
-            explain: "显示编辑时触发",
-            cb: "Function(row)",
           },
           {
             event: "closeDialog",
