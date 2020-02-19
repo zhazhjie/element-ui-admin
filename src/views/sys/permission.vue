@@ -12,9 +12,9 @@
       :data="permissionTree"
       :config="config"
       :tableLoading="tableLoading"
+      :beforeOpen="findParentId"
       @submitAdd="submitAdd"
       @submitEdit="submitUpdate"
-      @showEdit="findParentId"
       @selectedPermsChangeInForm='handleSelectNode'
       :page='params'/>
   </section>
@@ -231,14 +231,17 @@
           done();
         }).catch(() => hideLoading());
       },
-      findParentId(row) {
-        let result = [];
-        let parent = this.permissionMap[row.parentId];
-        while (parent) {
-          result.unshift(parent.id);
-          parent = this.permissionMap[parent.parentId];
+      findParentId(row, done) {
+        if (row) {
+          let result = [];
+          let parent = this.permissionMap[row.parentId];
+          while (parent) {
+            result.unshift(parent.id);
+            parent = this.permissionMap[parent.parentId];
+          }
+          row.selectedPerms = result;
         }
-        row.selectedPerms = result;
+        done();
       },
       getIconList() {
         getIconList().then(data => {

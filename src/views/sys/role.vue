@@ -12,10 +12,10 @@
       :data="roleList"
       :config="config"
       :tableLoading="tableLoading"
+      :beforeOpen="findParentId"
       @submitAdd="submitAdd"
       @submitEdit="submitUpdate"
       @submitSearch="handleSearch"
-      @showEdit="findParentId"
       @pageChange='getRoleList'
       :page='params'/>
   </section>
@@ -174,25 +174,28 @@
           done();
         }).catch(() => hideLoading());
       },
-      findParentId(row) {
-        let result = [];
-        let index = 0;
-        let permissionIdList = row.permissionIdList || [];
-        permissionIdList.forEach((permissionId, i) => {
-          if (!result[index]) {
-            result[index] = [];
-          }
-          let permission = this.permissionMap[permissionId];
-          if (!permission) return;
-          result[index].push(permission.id);
-          let parent = this.permissionMap[permission.parentId];
-          while (parent) {
-            result[index].unshift(parent.id);
-            parent = this.permissionMap[parent.parentId];
-          }
-          index++;
-        });
-        row.selectedPerms = result;
+      findParentId(row, done) {
+        if (row) {
+          let result = [];
+          let index = 0;
+          let permissionIdList = row.permissionIdList || [];
+          permissionIdList.forEach((permissionId, i) => {
+            if (!result[index]) {
+              result[index] = [];
+            }
+            let permission = this.permissionMap[permissionId];
+            if (!permission) return;
+            result[index].push(permission.id);
+            let parent = this.permissionMap[permission.parentId];
+            while (parent) {
+              result[index].unshift(parent.id);
+              parent = this.permissionMap[parent.parentId];
+            }
+            index++;
+          });
+          row.selectedPerms = result;
+        }
+        done();
       },
     },
     computed: {

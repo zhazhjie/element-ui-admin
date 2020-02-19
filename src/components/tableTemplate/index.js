@@ -74,6 +74,9 @@ export default {
       type: Boolean,
       default: false
     },
+    beforeOpen: {
+      type: Function
+    }
   },
   data() {
     return {
@@ -131,28 +134,35 @@ export default {
       this.showAdd();
     },
     showAdd(dialogTitle = "新增") {
-      this.handleEvent("show-add", null, dialogTitle, 0);
+      this.handleEvent(null, dialogTitle, 0);
     },
     showEdit(row, dialogTitle = "编辑") {
-      this.handleEvent("show-edit", row, dialogTitle, 1);
+      this.handleEvent(row, dialogTitle, 1);
     },
     showView(row, dialogTitle = "查看") {
-      this.handleEvent("show-view", row, dialogTitle, 2);
+      this.handleEvent(row, dialogTitle, 2);
     },
-    handleEvent(event, row, dialogTitle, handleType) {
-      this.emitEvent(event, row);
-      this.handleType = handleType;
-      this.dialogTitle = dialogTitle;
-      if (handleType === 0) {
-        let curRow = {};
-        this.config.columns.forEach(column => {
-          curRow[column.field] = column.value;
-        });
-        this.curRow = curRow;
+    handleEvent(row, dialogTitle, handleType) {
+      // this.emitEvent(event, row);
+      let done = () => {
+        this.handleType = handleType;
+        this.dialogTitle = dialogTitle;
+        if (handleType === 0) {
+          let curRow = {};
+          this.config.columns.forEach(column => {
+            curRow[column.field] = column.value;
+          });
+          this.curRow = curRow;
+        } else {
+          this.curRow = copy(row);
+        }
+        this.dialogVisible = true;
+      };
+      if (this.beforeOpen) {
+        this.beforeOpen(row, done);
       } else {
-        this.curRow = copy(row);
+        done();
       }
-      this.dialogVisible = true;
     },
     resetForm() {
       this.$refs.form.resetFields();
