@@ -3,19 +3,35 @@
  * @date: 2019-12-30 16:05:26
  * @version: 1.0
  * 表格模版
- * 生成表格+分页+弹出层表单+搜索栏
+ * 生成表格 + 分页 + 弹出层表单 + 搜索
  * 详见文档
  */
 import "./style.css";
 
+/**
+ * 获取值类型 [object ?]
+ * @param value
+ * @returns {string}
+ */
 function toString(value) {
   return Object.prototype.toString.call(value);
 }
 
+/**
+ * 简单拷贝
+ * @param obj
+ * @returns {any}
+ */
 function copy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
+/**
+ * 横杠转驼峰
+ * @param name
+ * @param capitalize
+ * @returns {string}
+ */
 function toCamelBak(name, capitalize) {
   if (!name) return "";
   let ary = name.split("-");
@@ -28,6 +44,11 @@ function toCamelBak(name, capitalize) {
   }).join("");
 }
 
+/**
+ * 首字母大写
+ * @param name
+ * @returns {string}
+ */
 function toCapitalize(name) {
   if (!name) return "";
   return name.substring(0, 1).toUpperCase() + name.substring(1);
@@ -64,11 +85,11 @@ export default {
       curRow: {},
       searchForm: {},
       slideFlag: false,
-      showNum: 1
+      visibleNum: 1
     }
   },
   mounted() {
-    this.getShowNum();
+    this.getVisibleNum();
   },
   methods: {
     emitEvent(event, ...args) {
@@ -173,14 +194,14 @@ export default {
         return permissions.some(perms => perms === permission)
       }
     },
-    getShowNum() {
+    getVisibleNum() {
       let {collapsible = false, searchable = true} = this.config;
       if (collapsible && searchable) {
         let searchBar = this.$refs.searchBar.$el;
         let searchOpt = this.$refs.searchOpt.$el;
         let item = searchBar.querySelector(".el-form-item");
         let margin = 10;
-        this.showNum = (searchBar.offsetWidth - searchOpt.offsetWidth - margin) / (item.offsetWidth + margin) | 0;
+        this.visibleNum = (searchBar.offsetWidth - searchOpt.offsetWidth - margin) / (item.offsetWidth + margin) | 0;
       }
     },
     getEl(column, scope, row, suffix, customRender, disabled) {
@@ -464,12 +485,13 @@ export default {
       if (!column || column.hideInDialog) {
         return null;
       } else {
-        let {props = {}, append, span} = column.formItem || {};
+        let {props = {}, attrs = {}, append, span} = column.formItem || {};
         return (
           <el-col span={span}>
             <el-form-item
               label={column.label}
               props={props}
+              attrs={attrs}
               prop={column.field}>
               {this.getEl(column, column.formEl || {}, this.curRow, "Form", null, this.handleType === 2)}
             </el-form-item>
@@ -508,7 +530,7 @@ export default {
       addBtnPermission = ""
     } = this.config;
     let handlerListSlots = this.$scopedSlots.handlerList;
-    let searchColumns = columns.filter(v=>!v.hideInSearch);
+    let searchColumns = columns.filter(v => !v.hideInSearch);
     return (
       <section class="table-template">
         {searchable &&
@@ -525,10 +547,10 @@ export default {
                 if (column.hideInSearch) {
                   return null;
                 } else {
-                  let {props = {}, attrs = {style: "width:250px"}, append} = column.searchFormItem || {};
+                  let {props = {}, attrs = {style: "width:250px"}, append} = column.searchItem || {};
                   return (
                     <el-form-item label={column.label} props={props} attrs={attrs}
-                                  style={{display: collapsible && !this.slideFlag && index >= this.showNum ? "none" : "inline-flex"}}>
+                                  style={{display: collapsible && !this.slideFlag && index >= this.visibleNum ? "none" : "inline-flex"}}>
                       {this.getEl(column, column.searchEl || column.formEl || {}, this.searchForm, "Search")}
                       {append && append(this.searchForm)}
                     </el-form-item>
@@ -542,8 +564,9 @@ export default {
               {this.$scopedSlots.search && this.$scopedSlots.search()}
             </el-form-item>
           </el-form>
-          {collapsible && <i class={"el-icon-d-arrow-right slide-btn " + (this.slideFlag ? "down" : "")}
-                             on-click={this.handleSlide.bind(this)}> </i>}
+          {collapsible && searchColumns.length > this.visibleNum &&
+          <i class={"el-icon-d-arrow-right slide-btn " + (this.slideFlag ? "down" : "")}
+             on-click={this.handleSlide.bind(this)}> </i>}
         </div>
         }
         <el-form>

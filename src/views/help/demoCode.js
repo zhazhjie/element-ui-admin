@@ -5,7 +5,7 @@
  */
 export let demoCode =
   `
-<template>
+  <template>
   <section>
     <table-template
       ref="table"
@@ -17,6 +17,10 @@ export let demoCode =
       @submitSearch="handleSearch"
       @pageChange="fetchList"
       :page='params'>
+<!--        <template v-slot:state="row">-->
+<!--           <el-tag type="success" v-if="row.state">正常</el-tag>-->
+<!--           <el-tag type="danger" v-else>禁用</el-tag>-->
+<!--        </template>-->
     </table-template>
   </section>
 </template>
@@ -25,7 +29,7 @@ export let demoCode =
     data() {
       return {
         tableLoading: false,
-        userList: [{id:"1",username:"xxx",phone:"13555555555",state:1}],
+        userList: [{id: "1",username: "xxx",phone: "13555555555",state: 1}],
         config: {
           dialogProps: {width: '500px'},
           handlerProps: {width: '200px'},

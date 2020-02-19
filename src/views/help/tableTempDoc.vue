@@ -43,12 +43,6 @@
       :data="formElList"
       :config="config">
     </table-template>
-    <h3>FormItem Attribute</h3>
-    <table-template
-      ref="table"
-      :data="formItemList"
-      :config="config">
-    </table-template>
     <h3>HandlerList Item Attribute</h3>
     <table-template
       ref="table"
@@ -335,8 +329,22 @@
             defaultValue: "-"
           },
           {
+            param: "tableAttrs",
+            explain: "表格原生属性，如style",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
             param: "handlerProps",
             explain: "操作列属性，支持el-table-column所有属性",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
+            param: "handlerAttrs",
+            explain: "表格原生属性，如style",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
@@ -349,15 +357,36 @@
             defaultValue: "-"
           },
           {
+            param: "dialogAttrs",
+            explain: "表格原生属性，如style",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
             param: "formProps",
-            explain: "弹出层的表单属性，支持el-table所有属性",
+            explain: "弹出层的表单属性，支持el-form所有属性",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
+            param: "formAttrs",
+            explain: "弹出层表单原生属性，如style",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
           },
           {
             param: "searchFormProps",
-            explain: "搜索栏表单属性，支持el-table所有属性",
+            explain: "搜索栏表单属性，支持el-form所有属性",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
+            param: "searchFormAttrs",
+            explain: "搜索栏表单原生属性，如style",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
@@ -370,25 +399,25 @@
             defaultValue: "-"
           },
           {
-            param: "withoutDialog",
-            explain: "不渲染弹出层",
-            type: "boolean",
-            optionalValue: "true/false",
-            defaultValue: "false"
-          },
-          {
-            param: "withoutTable",
-            explain: "不渲染表格",
-            type: "boolean",
-            optionalValue: "true/false",
-            defaultValue: "false"
-          },
-          {
             param: "pageable",
-            explain: "是否显示分页",
+            explain: "是否分页",
             type: "boolean",
             optionalValue: "true/false",
             defaultValue: "true"
+          },
+          {
+            param: "withoutDialog",
+            explain: "是否渲染弹出层",
+            type: "boolean",
+            optionalValue: "true/false",
+            defaultValue: "false"
+          },
+          {
+            param: "selectable",
+            explain: "表格是否可勾选",
+            type: "boolean",
+            optionalValue: "true/false",
+            defaultValue: "false"
           },
           {
             param: "searchable",
@@ -410,20 +439,6 @@
             type: "string",
             optionalValue: "-",
             defaultValue: "-"
-          },
-          {
-            param: "showIndex",
-            explain: "显示索引",
-            type: "boolean",
-            optionalValue: "true/false",
-            defaultValue: "false"
-          },
-          {
-            param: "selectable",
-            explain: "表格是否可勾选",
-            type: "boolean",
-            optionalValue: "true/false",
-            defaultValue: "false"
           },
         ],
         columnsItemList: [
@@ -471,7 +486,7 @@
           },
           {
             param: "options",
-            explain: "选项列表，type为select/checkbox/radio/tag时可用，同步代码可以使用array，异步的必须用function返回array",
+            explain: "选项列表，type为select/checkbox/radio/cascader/tag时可用，同步代码可以使用array，异步的必须用function返回array",
             type: "array/function",
             optionalValue: "-",
             defaultValue: "-"
@@ -499,7 +514,7 @@
           },
           {
             param: "attrs",
-            explain: "表格列原生元素属性，如style",
+            explain: "表格列原生属性，如style",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
@@ -519,22 +534,8 @@
             defaultValue: "-"
           },
           {
-            param: "header",
-            explain: "表头属性，同formEl",
-            type: "object",
-            optionalValue: "-",
-            defaultValue: "-"
-          },
-          {
             param: "formItem",
-            explain: "弹出层表单项属性，详见FormItem Attribute",
-            type: "object",
-            optionalValue: "-",
-            defaultValue: "-"
-          },
-          {
-            param: "searchFormItem",
-            explain: "搜索栏表单项属性，同formItem",
+            explain: "弹出层表单项属性，其props(object)属性支持el-form-item所有属性（特殊属性span，行占比，默认值24占一行）",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
@@ -591,29 +592,6 @@
             defaultValue: "-"
           },
         ],
-        formItemList: [
-          {
-            param: "props",
-            explain: "表单组件属性，支持el-form-item所有属性",
-            type: "object",
-            optionalValue: "-",
-            defaultValue: "-"
-          },
-          {
-            param: "span",
-            explain: "行占比，默认值24占一行",
-            type: "number",
-            optionalValue: "1-24",
-            defaultValue: "24"
-          },
-          {
-            param: "append",
-            explain: "弹出层表单项后置内容，接收row作为参数",
-            type: "function",
-            optionalValue: "-",
-            defaultValue: "-"
-          },
-        ],
         handlerList: [
           {
             param: "label",
@@ -632,6 +610,13 @@
           {
             param: "props",
             explain: "支持el-button的所有属性",
+            type: "object",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
+            param: "attrs",
+            explain: "原生属性，如style",
             type: "object",
             optionalValue: "-",
             defaultValue: "-"
@@ -774,10 +759,6 @@
             explain: "插入到表格右侧"
           },
           {
-            name: "handlerList",
-            explain: "自定义操作栏"
-          },
-          {
             name: "字段名",
             explain: "自定义表格列"
           },
@@ -788,10 +769,6 @@
           {
             name: "字段名+Search",
             explain: "自定义搜索项"
-          },
-          {
-            name: "字段名+Header",
-            explain: "自定义表格头部"
           },
         ]
       }
