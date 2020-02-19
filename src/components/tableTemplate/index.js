@@ -174,7 +174,8 @@ export default {
       }
     },
     getShowNum() {
-      if (this.config.collapsible) {
+      let {collapsible = false, searchable = true} = this.config;
+      if (collapsible && searchable) {
         let searchBar = this.$refs.searchBar.$el;
         let searchOpt = this.$refs.searchOpt.$el;
         let item = searchBar.querySelector(".el-form-item");
@@ -507,6 +508,7 @@ export default {
       addBtnPermission = ""
     } = this.config;
     let handlerListSlots = this.$scopedSlots.handlerList;
+    let searchColumns = columns.filter(v=>!v.hideInSearch);
     return (
       <section class="table-template">
         {searchable &&
@@ -519,7 +521,7 @@ export default {
             attrs={searchFormAttrs}
             props={searchFormProps}>
             {
-              columns.map((column, index) => {
+              searchColumns.map((column, index) => {
                 if (column.hideInSearch) {
                   return null;
                 } else {
