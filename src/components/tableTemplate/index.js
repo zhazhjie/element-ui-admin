@@ -76,6 +76,9 @@ export default {
     },
     beforeOpen: {
       type: Function
+    },
+    beforeClose: {
+      type: Function
     }
   },
   data() {
@@ -122,9 +125,16 @@ export default {
       this.handleLoading = false;
     },
     closeDialog() {
-      this.emitEvent("close-dialog");
-      this.dialogVisible = false;
-      this.resetForm();
+      // this.emitEvent("before-close");
+      let done = () => {
+        this.dialogVisible = false;
+        this.resetForm();
+      };
+      if (this.beforeClose) {
+        this.beforeClose(this.handleType ? this.curRow : null, done);
+      } else {
+        done();
+      }
     },
     done() {
       this.hideLoading();
@@ -214,7 +224,7 @@ export default {
         this.visibleNum = (searchBar.offsetWidth - searchOpt.offsetWidth - margin) / (item.offsetWidth + margin) | 0;
       }
     },
-    getEl(column, scope, row, suffix, customRender, disabled) {
+    renderEl(column, scope, row, suffix, customRender, disabled) {
       let {render} = scope;
       let scopedSlots = this.$scopedSlots[column.field + suffix];
       if (render) {
@@ -248,7 +258,7 @@ export default {
                 {...data}
                 disabled={disabled}
                 vModel={row[column.field]}>
-                {this.getEl(column, scope[type] || {}, options[0], suffix + toCapitalize(type), () => getItemVal(options[0], defaultProp.text))}
+                {this.renderEl(column, scope[type] || {}, options[0], suffix + toCapitalize(type), () => getItemVal(options[0], defaultProp.text))}
               </el-checkbox>
             );
           } else {
@@ -262,7 +272,7 @@ export default {
                   return (
                     <el-checkbox
                       label={getItemVal(item, defaultProp.value)}>
-                      {this.getEl(column, scope[type] || {}, item, suffix + toCapitalize(type), () => getItemVal(item, defaultProp.text))}
+                      {this.renderEl(column, scope[type] || {}, item, suffix + toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                     </el-checkbox>
                   )
                 })}
@@ -280,7 +290,7 @@ export default {
                 return (
                   <el-radio
                     label={getItemVal(item, defaultProp.value)}>
-                    {this.getEl(column, scope[type] || {}, item, suffix + toCapitalize(type), () => getItemVal(item, defaultProp.text))}
+                    {this.renderEl(column, scope[type] || {}, item, suffix + toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                   </el-radio>
                 )
               })}
@@ -300,7 +310,7 @@ export default {
                     key={getItemVal(item, defaultProp.value)}
                     label={getItemVal(item, defaultProp.text)}
                     value={getItemVal(item, defaultProp.value)}>
-                    {this.getEl(column, scope[type] || {}, item, suffix + toCapitalize(type), () => getItemVal(item, defaultProp.text))}
+                    {this.renderEl(column, scope[type] || {}, item, suffix + toCapitalize(type), () => getItemVal(item, defaultProp.text))}
                   </el-option>
                 )
               })}
@@ -404,9 +414,9 @@ export default {
             <el-upload
               {...data}
               disabled={disabled}>
-              {this.getEl(column, scope[type] || {}, row, suffix + toCapitalize(type), () => <el-button
+              {this.renderEl(column, scope[type] || {}, row, suffix + toCapitalize(type), () => <el-button
                 type="primary">上传</el-button>)}
-              {this.getEl(column, scope[type + tip] || {}, row, suffix + toCapitalize(type) + tip, () => null)}
+              {this.renderEl(column, scope[type + tip] || {}, row, suffix + toCapitalize(type) + tip, () => null)}
             </el-upload>
           );
         default:
@@ -419,37 +429,39 @@ export default {
           );
       }
     },
-    createDrawer() {
-      let {dialogProps = {}, dialogAttrs = {}} = this.config;
-      return (
-        <el-drawer
-          title={this.dialogTitle}
-          visible={this.dialogVisible}
-          before-close={this.closeDialog.bind(this)}
-          close-on-click-modal={false}
-          props={dialogProps}
-          attrs={dialogAttrs}>
-          {this.createForm()}
-          {this.createOptBtn(null, "el-drawer-footer")}
-        </el-drawer>
-      )
-    },
     createDialog() {
-      let {dialogProps = {}, dialogAttrs = {}} = this.config;
-      return (
-        <el-dialog
-          title={this.dialogTitle}
-          visible={this.dialogVisible}
-          before-close={this.closeDialog.bind(this)}
-          close-on-click-modal={false}
-          props={dialogProps}
-          attrs={dialogAttrs}>
-          {this.createForm()}
-          {this.createOptBtn("footer")}
-        </el-dialog>
-      )
+      let {mode = "dialog", dialogProps = {}, dialogAttrs = {}, dialogFormRender, dialogFooterRender} = this.config;
+      let formColumn = {field: "dialogForm", dialogFormRender};
+      let footerColumn = {field: "dialogFooter", dialogFooterRender};
+      if (mode === "dialog") {
+        return (
+          <el-dialog
+            title={this.dialogTitle}
+            visible={this.dialogVisible}
+            before-close={this.closeDialog.bind(this)}
+            close-on-click-modal={false}
+            props={dialogProps}
+            attrs={dialogAttrs}>
+            {this.renderEl(formColumn, formColumn, this.curRow, "", this.createForm)}
+            {this.renderEl(footerColumn, footerColumn, this.curRow, "", () => this.createDialogFooter("footer"))}
+          </el-dialog>
+        )
+      } else {
+        return (
+          <el-drawer
+            title={this.dialogTitle}
+            visible={this.dialogVisible}
+            before-close={this.closeDialog.bind(this)}
+            close-on-click-modal={false}
+            props={dialogProps}
+            attrs={dialogAttrs}>
+            {this.renderEl(formColumn, formColumn, this.curRow, "", this.createForm)}
+            {this.renderEl(footerColumn, footerColumn, this.curRow, "", () => this.createDialogFooter(null, "el-drawer-footer"))}
+          </el-drawer>
+        )
+      }
     },
-    createOptBtn(slot, className) {
+    createDialogFooter(slot, className) {
       return (
         <div slot={slot} class={className}>
           <el-button on-click={this.closeDialog.bind(this)}>取 消</el-button>
@@ -503,7 +515,7 @@ export default {
               props={props}
               attrs={attrs}
               prop={column.field}>
-              {this.getEl(column, column.formEl || {}, this.curRow, "Form", null, this.handleType === 2)}
+              {this.renderEl(column, column.formEl || {}, this.curRow, "Form", null, this.handleType === 2)}
             </el-form-item>
             {append && append(this.curRow)}
           </el-col>
@@ -557,11 +569,11 @@ export default {
                 if (column.hideInSearch) {
                   return null;
                 } else {
-                  let {props = {}, attrs = {style: "width:250px"}, append} = column.searchItem || {};
+                  let {props = {}, attrs = {}, append} = column.searchItem || {};
                   return (
                     <el-form-item label={column.label} props={props} attrs={attrs}
                                   style={{display: collapsible && !this.slideFlag && index >= this.visibleNum ? "none" : "inline-flex"}}>
-                      {this.getEl(column, column.searchEl || column.formEl || {}, this.searchForm, "Search")}
+                      {this.renderEl(column, column.searchEl || column.formEl || {}, this.searchForm, "Search")}
                       {append && append(this.searchForm)}
                     </el-form-item>
                   )
@@ -617,7 +629,7 @@ export default {
                       scopedSlots={{
                         default: scope => {
                           let {type} = column;
-                          return this.getEl(column, column, scope.row, "", !type ? () => {
+                          return this.renderEl(column, column, scope.row, "", !type ? () => {
                             let field = scope.row[column.field];
                             return (
                               <span attrs={column.attrs}>
@@ -628,7 +640,7 @@ export default {
                         },
                         header: scope => {
                           let {header = {}} = column;
-                          return this.getEl(column, header, scope.row, "Header", () => {
+                          return this.renderEl(column, header, scope.row, "Header", () => {
                             return column.label;
                           });
                         }
@@ -685,9 +697,7 @@ export default {
           total={+this.page.total}
           layout="total, sizes, prev, pager, next, jumper"/>
         }
-        {!withoutDialog &&
-        (mode === "dialog" ? this.createDialog() : this.createDrawer())
-        }
+        {!withoutDialog && this.createDialog()}
       </section>
     )
   }

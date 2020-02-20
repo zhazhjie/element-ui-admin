@@ -54,10 +54,18 @@
 
 .search-bar-form.el-form .el-form-item {
   display: inline-flex;
+  width: 250px;
 }
 
 .search-bar-form .el-form-item__content {
   flex: 1;
+}
+
+.search-bar-form .el-form-item .el-input,
+.search-bar-form .el-form-item .el-select,
+.search-bar-form .el-form-item .el-cascader,
+.search-bar-form .el-form-item .el-input__inner {
+  width: 100%;
 }
 
 .search-bar-wrapper {
@@ -98,12 +106,3 @@
 .search-bar-wrapper .slide-btn:hover {
   color: #999;
 }
-
-.search-bar-form .el-date-editor.el-input {
-  width: 100%;
-}
-
-.search-bar-form .el-date-editor--daterange.el-input__inner {
-  width: 100%;
-}
-

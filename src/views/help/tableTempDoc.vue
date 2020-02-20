@@ -293,7 +293,14 @@
           },
           {
             param: "beforeOpen",
-            explain: "打开弹出层前触发，接收两个参数：Function(row,done)",
+            explain: "打开弹出层前触发，接收两个参数：Function(row,done)，操作完成后调用done打开弹出层",
+            type: "function",
+            optionalValue: "-",
+            defaultValue: "-"
+          },
+          {
+            param: "beforeClose",
+            explain: "关闭弹出层前触发，接收两个参数：Function(row,done)，操作完成后调用done关闭弹出层",
             type: "function",
             optionalValue: "-",
             defaultValue: "-"
@@ -660,7 +667,7 @@
           },
           {
             param: "columnIndex",
-            explain: "分组索引数据，对应columns下标",
+            explain: "分组索引列表，对应columns下标",
             type: "array",
             optionalValue: "-",
             defaultValue: "-"
@@ -716,11 +723,6 @@
             event: "pageChange",
             explain: "点击分页时触发",
             cb: "Function(page)",
-          },
-          {
-            event: "closeDialog",
-            explain: "关闭弹出层时触发",
-            cb: "Function()",
           },
           {
             event: "selectionChange",
