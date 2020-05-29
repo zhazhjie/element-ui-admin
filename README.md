@@ -10,7 +10,7 @@
 
 * 预设模块：用户管理、角色管理、权限管理
 
-* 基于jsx封装表格模版，支持表格+分页+弹出层+搜索（详见预览：表格模版文档）[模版预览](https://codepen.io/zhazhjie/pen/zYxPoWP)
+* 基于jsx封装表格模版，支持表格+分页+弹出层+搜索 [项目地址](https://github.com/zhazhjie/element-components) / [模版预览](https://codepen.io/zhazhjie/pen/zYxPoWP)
 
 * 集成了富文本、excel导入导出等...
 
